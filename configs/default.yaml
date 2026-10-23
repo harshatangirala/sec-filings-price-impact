@@ -149,7 +149,9 @@ tuning:
   pruner: median
   heads: [lightgbm, catboost, enet]
   trials: {lightgbm: 15, catboost: 6, enet: 8}
-  tuned_rungs: [L1, L2, L3, L4, L6]    # L4_levels / L4_change / L6_nochange inherit the parent rung's parameters
+  tuned_rungs: [L1, L2, L3, L4, L6]   # L4_levels / L4_change / L6_nochange inherit the parent rung's parameters
+  tune_max_train_rows: 30000  # Optuna screen: time-stratified subsample per fold (final runs use all rows)
+  tune_last_folds: 3          # Optuna screen on the most recent walk-forward folds (final runs use all folds)
   timeout_s_per_study: 5400
   inner_val_frac: 0.15
   min_train_rows: 50          # a fold with fewer training rows is skipped and reported

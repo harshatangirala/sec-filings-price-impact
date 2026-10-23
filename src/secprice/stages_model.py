@@ -279,15 +279,27 @@ def adversarial(lad: Ladder, ids, lab) -> list[dict]:
         Xt, _, _ = lad.matrices("L6", te, [te[:1]])
         Xa = np.vstack([X, Xt])
         ya = np.r_[np.zeros(len(X)), np.ones(len(Xt))]
-        keep = [i for i, n in enumerate(names) if n not in ("meta_year",)]
-        Xa = Xa[:, keep]
-        pr = np.zeros(len(ya))
-        for a, b in StratifiedKFold(3, shuffle=True, random_state=0).split(Xa, ya):
-            m = lgb.LGBMClassifier(n_estimators=150, learning_rate=0.1, num_leaves=31, verbose=-1).fit(Xa[a], ya[a])
-            pr[b] = m.predict_proba(Xa[b])[:, 1]
         from sklearn.metrics import roc_curve
+        aucs = {}
+        for tag, drop in (("all_features", lambda n: n == "meta_year"),
+                          ("firm_level_only", lambda n: n.startswith("mkt_") or n in ("meta_year", "meta_month", "meta_dow"))):
+            keep = [i for i, n in enumerate(names) if not drop(n)]
+            Xk = Xa[:, keep]
+            pr = np.zeros(len(ya))
+            for a, b in StratifiedKFold(3, shuffle=True, random_state=0).split(Xk, ya):
+                m = lgb.LGBMClassifier(n_estimators=150, learning_rate=0.1, num_leaves=31, verbose=-1).fit(Xk[a], ya[a])
+                pr[b] = m.predict_proba(Xk[b])[:, 1]
+            aucs[tag] = (float(roc_auc_score(ya, pr)), pr)
+            if tag == "firm_level_only":
+                # which features separate the periods (gain share of a fit on all rows of this fold)
+                g = lgb.LGBMClassifier(n_estimators=150, learning_rate=0.1, num_leaves=31, verbose=-1).fit(Xk, ya)
+                gain = g.booster_.feature_importance("gain")
+                top = np.argsort(-gain)[:5]
+                drivers = [[names[keep[i]], round(float(gain[i] / max(gain.sum(), 1e-12)), 3)] for i in top]
+        pr = aucs["firm_level_only"][1]
         fpr, tpr, _ = roc_curve(ya, pr)
-        out.append({"fold": f, "auc": float(roc_auc_score(ya, pr)), "n_train": len(X), "n_val": len(Xt),
+        out.append({"fold": f, "auc": aucs["firm_level_only"][0], "auc_all_features": aucs["all_features"][0],
+                    "top_shift_features": json.dumps(drivers), "n_train": len(X), "n_val": len(Xt),
                     "fpr": json.dumps(fpr[:: max(1, len(fpr) // 50)].round(4).tolist()),
                     "tpr": json.dumps(tpr[:: max(1, len(tpr) // 50)].round(4).tolist())})
     return out

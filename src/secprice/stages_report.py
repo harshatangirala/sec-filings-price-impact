@@ -479,7 +479,17 @@ def collect(ctx):
         sanity.append({"check": "random-split demo (pedagogical)", "observed": rd["random_split_macro_f1"], "null_mean": rd["walk_forward_macro_f1"]})
     adv = _opt(ctx, "S11", "adversarial.csv", "csv")
     if adv is not None and len(adv):
-        sanity.append({"check": "adversarial validation AUC (mean over folds)", "observed": adv.auc.mean(), "null_mean": 0.5})
+        note = ("AUC near 1: training and validation periods are separable (covariate shift); this is not by itself evidence "
+                "of leakage, which the audit above tests directly")
+        if "top_shift_features" in adv:
+            top = json.loads(adv.top_shift_features.iloc[-1])
+            note += "; main drivers (last fold): " + ", ".join(n for n, _ in top[:4])
+        sanity.append({"check": "adversarial validation AUC, firm-level features (mean over folds)", "observed": adv.auc.mean(),
+                       "null_mean": 0.5, "note": note if adv.auc.mean() > 0.8 else "AUC near 0.5 does not prove the split is unbiased"})
+        if "auc_all_features" in adv:
+            sanity.append({"check": "adversarial validation AUC, all features incl. market-wide / calendar (mean)",
+                           "observed": adv.auc_all_features.mean(), "null_mean": 0.5,
+                           "note": "date-level features fingerprint each date, so this AUC is ~1 by construction"})
     trig = _opt(ctx, "S18", "review_triggers.json", "json")
     if trig:
         sanity.append({"check": "review triggers", "observed": len(trig["triggers"]), "null_mean": None, "p_value": None,

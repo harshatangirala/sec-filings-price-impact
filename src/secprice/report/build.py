@@ -69,7 +69,7 @@ def build_markdown(f: dict) -> str:
     a(f"\n**Timing policy:** {f.get('timing_policy')}")
     a("\n**Reading rules:** association is not causation; prediction is not profitability. Results are "
       "validation-selected, never a global optimum. Power labels: n<30 warning, 30-99 exploratory, wide CI inconclusive.")
-    a("\n## 10. Executive summary")
+    a("\n## Executive summary")
     for b in f.get("exec_bullets", []):
         a(f"- {b}")
     a(f"\n**Smallest defensible claim.** {smallest_defensible_claim(f)}")

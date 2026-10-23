@@ -13,7 +13,7 @@ and *Run all*. Profiles: `smoke` (default) → `pilot` → `full` (G2: pilot don
 **Local (CPU stages and tests, no credits).**
 ```bash
 uv venv .venv --python 3.12 && uv pip install -e ".[dev,gpu]"
-pytest                                   # 43 unit tests + offline integration smoke (gate G1)
+pytest                                   # 43 unit tests + 1 offline integration smoke (gate G1)
 export SEC_USER_AGENT="Your Name you@example.com" DATA_ROOT=/path/to/sec-price-study
 secprice run --profile smoke --stages S00-S12 S20 S21
 secprice prereg-freeze --profile smoke && secprice run --profile smoke --stages S13-S18 S22 S24
@@ -25,6 +25,42 @@ secprice prereg-freeze --profile smoke && secprice run --profile smoke --stages 
 | smoke | 5 fixed (AAPL, MSFT, JNJ, XOM, JPM) | 2021-2023 | the chain on real data in under an hour on CPU |
 | pilot | ~40 sector-balanced | 2012-2026 | full core pipeline, small samples; required before full (G2) |
 | full | 500 | 2000-01 to 2026-07 | the study |
+
+## Run order on Colab (Pro+)
+Inputs already sit in `MyDrive/sec-price-study/inputs` (979 OHLCV files, frozen yfinance gap-fill, LM dictionary, HF census,
+factor / S&P 500 / SIC caches). Pilot Part 1 has been run and its artifacts are in `MyDrive/sec-price-study/pilot`; stage
+hashes do not depend on the machine, so Colab skips those stages.
+
+| Step | Runtime | Settings in the first code cell | Stages |
+|---|---|---|---|
+| 1. pilot Part 2 | A100 | `RUN_PROFILE="pilot"`, `PART="gpu"` | S13-S17 (embeddings, ChronoBERT vintages, L5/L7, G3, fine-tuning, RAG, distillation) |
+| 2. pilot Part 3 | CPU | `RUN_PROFILE="pilot"`, `PART="cpu2"` | S18 dev holdout + MCS/PBO + G4 freeze, S22 backtest, S24 report (S19 stays sealed) |
+| 3. full Part 1 | CPU High-RAM | `RUN_PROFILE="full"`, `PART="cpu1"`, `OWNER_OVERRIDES["full"]["owner_opt_in_full"]=True` | S00-S12, S20-S21 (~9 h EDGAR at 6 req/s, ~2.5 h S11) |
+| 4. full Part 2 | A100 | `PART="gpu"` | S13-S17 (~3-6 h) |
+| 5. full Part 3 | CPU | `PART="cpu2"` | S18, S22, S24 |
+| 6. lockbox | CPU/GPU | `OWNER_OVERRIDES["lockbox"]["unlock_locked_test"]=True` after reviewing S18 | S19, scored once |
+
+Restart the runtime when switching between CPU and GPU. Fine-tuning runs only if G3 passes unless
+`gates.owner_override_g3_finetune=True` (results then labelled EXPLORATORY). Track C (S23) needs the gold annotations.
+
+## Pilot Part 1 results (local CPU, 23 Oct 2026)
+40 sector-balanced S&P 500 firms, 2012-01 to 2026-07: 11,370 filings parsed (SGML acceptance header for every one), 10,105
+events, all timestamp quality A; release-EPS parser agrees with XBRL on 78.5% of usable-confidence releases; leakage audit
+passes and catches all 4 planted leaks.
+
+| Track B, T_trade h=1, 3-class, walk-forward (2 folds, n = 2,871) | macro-F1 [95% block-bootstrap CI] |
+|---|---|
+| L1 price only (CatBoost, tuned) | 0.362 [0.342, 0.383] |
+| L2 metadata (elastic net) | 0.396 [0.380, 0.412] |
+| L4 text: lexical + change + novelty + TF-IDF (LightGBM, tuned) | 0.391 [0.373, 0.412] |
+| L6 all CPU features (LightGBM, tuned, validation-selected) | 0.396 [0.378, 0.411] |
+| Permutation null (10 within-month label shuffles) | mean 0.328; none reached 0.395 (p ≤ 0.09) |
+
+Validation-selected, not a global optimum (the elastic-net certificate shows only that its convex loss reached the same
+optimum from 3 starts). L6 does not beat L2 metadata alone (0.396 vs 0.396); training F1 0.66 against validation 0.40 flags
+overfitting; adversarial AUC ≈ 1 reflects drift in filing vocabulary (covariate shift), not leakage (D-051). Track A: SUE
+post-earnings drift Q5-Q1 = -3.2% [-5.3%, -1.1%] (weak/mixed; opposite sign to classic PEAD in this small sample); text
+beyond momentum not supported. Association is not causation; prediction is not profitability.
 
 ## Labelling (Track C)
 S12 writes `gold_*_filings_template.csv` and `gold_passages_template.csv` + `ANNOTATION_GUIDE.md` into the S12 folder.

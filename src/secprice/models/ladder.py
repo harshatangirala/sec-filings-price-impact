@@ -189,7 +189,7 @@ class Ladder:
     # ------------------------------------------------------------------ one configuration over folds
     def run(self, rung: str, head: str, params: dict | None, lab: pd.DataFrame, cohort_ids: pd.Index, scheme: str,
             task: str = "cls", enc: str | None = None, keep: bool = True, folds: list[int] | None = None,
-            trial=None, curves: bool = False) -> dict:
+            trial=None, curves: bool = False, max_train: int | None = None) -> dict:
         self.config_counter += 1
         out = {"fold_metrics": [], "preds": [], "fold_scores": [], "train_scores": []}
         ids_all = cohort_ids
@@ -200,6 +200,9 @@ class Ladder:
                 out["fold_metrics"].append({"fold": f, "skipped": f"insufficient rows (train {len(tr)}, test {len(te)})"})
                 continue
             trs = lab.loc[tr].sort_values("date")
+            if max_train and len(trs) > max_train:
+                # tuning screen only: time-stratified subsample (every k-th row in date order keeps all years)
+                trs = trs.iloc[np.linspace(0, len(trs) - 1, int(max_train)).round().astype(int)]
             cut = int(len(trs) * (1 - self.inner_frac))
             itr, iva = trs.index[:cut], trs.index[cut:]
             ytr, yva, yte = lab.loc[itr, "y"].to_numpy(), lab.loc[iva, "y"].to_numpy(), lab.loc[te, "y"].to_numpy()
@@ -281,9 +284,16 @@ class Ladder:
             from .heads import DEFAULTS
             study.enqueue_trial(DEFAULTS[head])
 
+        tc = self.cfg["tuning"]
+        last = int(tc.get("tune_last_folds") or 0)
+        fl = self.folds("walk_forward")
+        tune_folds = fl[-last:] if last else fl
+        cap = int(tc.get("tune_max_train_rows") or 0) or None
+
         def obj(trial):
             params = space(trial, head)
-            r = self.run(rung, head, params, lab, cohort_ids, "walk_forward", task, enc, keep=False, trial=trial)
+            r = self.run(rung, head, params, lab, cohort_ids, "walk_forward", task, enc, keep=False, trial=trial,
+                         folds=tune_folds, max_train=cap)
             return r["mean_score"] if r["mean_score"] is not None else 0.0
 
         remaining = max(0, int(n_trials) - done)
