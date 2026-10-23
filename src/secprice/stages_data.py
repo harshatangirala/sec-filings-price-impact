@@ -467,7 +467,9 @@ def s05(ctx):
     u = C.universe(ctx).set_index("cik")
     fixture = ctx.services.get("fixture_root")
     nproc = int(S.get("parse_workers") or 0) or max(1, (os.cpu_count() or 2) - 1)
-    nproc = 1 if fixture else min(nproc, 8, max(1, tasks.cik.nunique()))
+    # one process per firm, each limited to max_rps / nproc (the total never exceeds sec.max_rps); downloads are
+    # latency-bound, so more processes use more of the fair-access budget (RAM ~100 MB per worker)
+    nproc = 1 if fixture else min(nproc, int(S.get("max_parse_workers") or 8), max(1, tasks.cik.nunique()))
     ua = "fixture" if fixture else resolve_user_agent(S["user_agent_env"])
     jobs = []
     for cik, g in tasks.groupby("cik"):
