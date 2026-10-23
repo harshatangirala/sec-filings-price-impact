@@ -143,12 +143,18 @@ class Ladder:
         return self.cache[ck]
 
     def _cached(self, key, fn):
-        """Transformed blocks are reused across trials/heads; bounded so memory stays flat."""
+        """Transformed blocks are reused across trials/heads; the cache is bounded in bytes (runtime.ladder_cache_max_gb,
+        oldest blocks evicted first) so memory stays flat at full scale (~180k events)."""
         if key not in self.cache:
-            if len([k for k in self.cache if k[0] in ("tfidf_x", "pca_x")]) > 400:
-                for k in [k for k in self.cache if k[0] in ("tfidf_x", "pca_x")][:200]:
-                    del self.cache[k]
-            self.cache[key] = fn()
+            x = fn()
+            budget = float((self.cfg.get("runtime") or {}).get("ladder_cache_max_gb", 2.0)) * 1e9
+            blocks = [k for k in self.cache if k[0] in ("tfidf_x", "pca_x")]
+            used = sum(getattr(self.cache[k], "nbytes", 0) for k in blocks)
+            while blocks and used + getattr(x, "nbytes", 0) > budget:
+                k = blocks.pop(0)
+                used -= getattr(self.cache[k], "nbytes", 0)
+                del self.cache[k]
+            self.cache[key] = x
         return self.cache[key]
 
     def matrices(self, rung: str, tr_ids, eval_ids: list, enc: str | None = None):

@@ -75,7 +75,9 @@ def _leaderboard(rung: str, enc: str | None, prov: pd.DataFrame, block: str) -> 
 def build_ladder(ctx, with_emb: bool = False, with_ext: bool = False) -> Ladder:
     ev = C.events(ctx)
     F = C.read(ctx, "S09", "features.parquet")
-    tg = C.read(ctx, "S08", "targets.parquet")
+    # only the columns the ladder reads: the full targets table is ~7M rows at full scale (memory)
+    tg = C.read(ctx, "S08", "targets.parquet", columns=["event_id", "target_def", "horizon", "label3", "weight_uniq",
+                                                         "ar_mm", "vol_ratio", "abs_std"])
     sp = C.read(ctx, "S10", "splits.parquet")
     tx = C.read(ctx, "S09", "event_text.parquet").set_index("event_id")["text"]
     prov = pd.read_csv(ctx.dep("S10") / "fold_provenance.csv")

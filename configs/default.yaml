@@ -234,3 +234,6 @@ extensions:
   ext_generation_metrics: false
   ext_data_modules: false
   ext_app: false
+
+runtime:                      # resource settings that never change results (no stage hash reads them)
+  ladder_cache_max_gb: 2.0    # transformed TF-IDF / PCA blocks kept in memory (bytes-bounded, oldest evicted first)
