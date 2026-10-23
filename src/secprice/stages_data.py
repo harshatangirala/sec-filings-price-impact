@@ -98,7 +98,8 @@ def s01(ctx):
        outputs=["universe.parquet", "firms_per_year.csv", "submissions/"],
        assertions=[">= n_stocks unique firms (full) or failure report", "selection reads no price returns"],
        card="Firms common to our OHLCV files and the HF 10-K corpus, mapped to CIK; S&P-500 members first, then a seeded "
-            "sector-stratified fill. Survivorship-aware, not survivorship-free.")
+            "sector-stratified fill of non-members; every firm carries sp_bucket (SP500 / NonSP500). SURVIVOR-ONLY: the OHLCV "
+            "set holds current listings only, so firms that delisted before 2026 are absent (survivorship-biased).")
 def s02(ctx):
     from .market.prices import LocalTriframeProvider
     from .sec.submissions import fetch_submissions, fetch_ticker_map
@@ -195,7 +196,22 @@ def s02(ctx):
                           balanced=cfg["run_profile"] == "pilot")
     sel["tickers_history"] = sel.apply(lambda r: json.dumps(sorted(set([r.ticker] + json.loads(r.sec_tickers or "[]")))), axis=1)
     sel = sel.drop(columns=["_len"])
+    from .evaluation.buckets import firm_bucket
+    sel["sp_bucket"] = firm_bucket(sel.ever_sp500)
     ns = int(sel.selected.sum())
+    # survivorship, quantified: historical S&P 500 members in the window vs those our survivor-only data can cover
+    in_win = sp[(sp.start_date <= en) & (sp.end_date.isna() | (sp.end_date >= st))]
+    hist = set(in_win.ticker.str.upper())
+    covered = set(sel[sel.eligible & sel.ever_sp500].ticker.str.upper())
+    still = set(sp[sp.end_date.isna()].ticker.str.upper())
+    cov = {"sp500_tickers_in_window": len(hist), "covered_by_eligible_universe": len(hist & covered),
+           "coverage_share": round(len(hist & covered) / max(1, len(hist)), 3),
+           "window_members_no_longer_in_index": len(hist - still),
+           "selected_sp500": int((sel.selected & sel.ever_sp500).sum()), "selected_non_sp500": int((sel.selected & ~sel.ever_sp500).sum()),
+           "eligible_sp500": int((sel.eligible & sel.ever_sp500).sum()), "eligible_non_sp500": int((sel.eligible & ~sel.ever_sp500).sum()),
+           "note": "ticker-level match against fja05680 (ticker changes and the list's early-year gaps make this approximate); "
+                   "members that delisted, merged or were acquired are missing from our survivor-only OHLCV data"}
+    write_json(ctx.out / "sp500_coverage.json", cov)
     if ns < n:
         msg = (f"universe: {ns} firms selected < target {n} (eligible {int(sel.eligible.sum())}); reasons: "
                f"{sel.exclusion_reason.value_counts().to_dict()}")
@@ -205,7 +221,8 @@ def s02(ctx):
     fpy = firms_per_year(sel, cfg["study"]["start"], cfg["study"]["end"])
     fpy.to_csv(ctx.out / "firms_per_year.csv", index=False)
     return {"candidates": int(len(sel)), "eligible": int(sel.eligible.sum()), "selected": ns,
-            "selected_sp500": int((sel.selected & sel.ever_sp500).sum()), "sec_requests": client.stats}
+            "selected_sp500": cov["selected_sp500"], "selected_non_sp500": cov["selected_non_sp500"],
+            "sp500_history_coverage": cov["coverage_share"], "sec_requests": client.stats}
 
 
 # =====================================================================================================  S03
@@ -382,6 +399,39 @@ def s04(ctx):
             "header_match_rate": None if mm is None else float(mm)}
 
 
+def preflight_projection(cfg: dict, manifest: pd.DataFrame, data_root, hot_root) -> dict:
+    """CPU-side preflight (hard rule 4, §13.3, G2): projected events, chunks, storage and GPU hours from the filing index,
+    before the long download. Constants come from the pilot (configs/default.yaml budget.preflight_*)."""
+    B = cfg["budget"]
+    t = manifest[manifest.download_task]
+    by = t.base_form.map(lambda f: "10-K" if str(f).startswith("10-K") else "10-Q" if str(f).startswith("10-Q") else "8-K")
+    cpf = {k: float(v) for k, v in B["preflight_chunks_per_filing"].items()}
+    chunks = float(sum(cpf.get(k, 10.0) * n for k, n in by.value_counts().items()))
+    n_enc = len(cfg["models"]["encoders"])
+    events = int(round(len(t) * 0.89))                       # events per filing on the pilot (same-day 8-Ks merge)
+    emb_gb = events * 768 * 2 * 2 * n_enc / 1e9 * 1.1          # mean + max pooled float16 vectors, +10% index
+    text_gb = len(t) * float(B["preflight_bytes_per_filing"]) / 1e9
+    gpu_b = chunks * n_enc / float(B["preflight_assumed_chunks_per_s"]) / 3600
+    gpu_c = (int(B["llm_teacher_filings"]) + int(B["llm_gold_filings"])) * float(B["preflight_llm_s_per_prompt"]) / 3600
+    rep = {"profile": cfg["run_profile"], "firms": int(t.cik.nunique()), "filings_to_download": int(len(t)),
+           "filings_by_form": by.value_counts().to_dict(), "est_events": events, "est_chunks": int(chunks),
+           "est_storage_gb": round(emb_gb + text_gb, 2), "est_embedding_gb": round(emb_gb, 2), "est_text_gb": round(text_gb, 2),
+           "est_gpu_hours_encoders": round(gpu_b, 2), "est_gpu_hours_llm": round(gpu_c, 2),
+           "est_sec_download_hours": round(len(t) * 1.6 / float(cfg["sec"]["max_rps"]) / 3600, 1),
+           "disk_free_gb": {"data_root": C.disk_free_gb(data_root), "hot_root": C.disk_free_gb(hot_root)},
+           "budget": {k: B[k] for k in ("max_storage_gb", "max_gpu_hours_b", "max_gpu_hours_c")}}
+    over = []
+    if rep["est_storage_gb"] > float(B["max_storage_gb"]):
+        over.append(f"storage {rep['est_storage_gb']} GB > max_storage_gb {B['max_storage_gb']}")
+    if gpu_b > float(B["max_gpu_hours_b"]):
+        over.append(f"encoder GPU hours {gpu_b:.1f} > max_gpu_hours_b {B['max_gpu_hours_b']}")
+    if gpu_c > float(B["max_gpu_hours_c"]):
+        over.append(f"LLM GPU hours {gpu_c:.1f} > max_gpu_hours_c {B['max_gpu_hours_c']}")
+    rep["over_budget"] = over
+    rep["passed"] = not over
+    return rep
+
+
 # =====================================================================================================  S05
 @stage("S05", "Download + parse + taxonomy + anonymize", "CPU", ["S04"],
        ["sec.max_8k_bytes", "sec.max_doc_bytes", "text.max_chars_per_section", "text.sections", "smoke", "taxonomy_version",
@@ -396,6 +446,12 @@ def s05(ctx):
     from .sec.client import resolve_user_agent
     cfg, S = ctx.cfg, ctx.cfg["sec"]
     m = C.manifest(ctx)
+    pf = preflight_projection(cfg, m, ctx.storage.data_root, ctx.storage.hot_root)
+    write_json(ctx.out / "preflight_projection.json", pf)
+    write_json(ctx.storage.manifests / "preflight_projection.json", pf)
+    if cfg["run_profile"] == "full" and not pf["passed"]:
+        raise RuntimeError(f"preflight (G2) refuses the full run before the download: {pf['over_budget']}; raise the budget "
+                           "in configs/default.yaml only as an explicit owner decision")
     tasks = m[m.download_task]
     u = C.universe(ctx).set_index("cik")
     fixture = ctx.services.get("fixture_root")
@@ -691,7 +747,7 @@ def _final_acceptance(m: pd.DataFrame, led: pd.DataFrame, cfg: dict, ctx=None) -
 # =====================================================================================================  S07
 @stage("S07", "Events + clocks", "CPU", ["S06", "S03"], ["timing", "study", "targets.horizons", "contam_window_sessions",
                                                           "taxonomy_version"],
-       outputs=["events.parquet", "usable_cutoff.json", "event_counts.csv"],
+       outputs=["events.parquet", "usable_cutoff.json", "event_counts.csv", "filing_manifest_timed.parquet"],
        assertions=["four timestamps", "buckets", "earnings types", "overlaps", "event construction reads no price fields"],
        card="One row per event (periodic filing or same-day 8-K group) with acceptance / public / feature-ready / decision times.")
 def s07(ctx):
@@ -734,6 +790,21 @@ def s07(ctx):
                                                 "json_rule_n": acc.attrs.get("json_rule_n"),
                                                 "timing_policy": timing_policy_label(cfg)})
     ctx.write(events_to_parquet_safe(ev), "events.parquet")
+    # SPEC.md §16 filing_manifest contract: acceptance time, timestamp quality and period of report are only known after the
+    # SGML headers are read (S05, D-047), so the complete per-filing manifest is written here
+    fm = mm.drop(columns=[c for c in ("items_list", "item_titles") if c in mm.columns]).merge(
+        led[["accession", "url", "status", "checksum", "header_period", "header_acceptance_raw"]].rename(
+            columns={"status": "parse_status_s05", "header_period": "period_of_report"}), on="accession", how="left",
+        suffixes=("", "_s05"))
+    fm["items_raw"] = mm["items_list"].map(lambda x: ",".join(map(str, x))).values
+    fm["items_source"] = np.where(mm.accession.map(lambda a: bool(str(hitems.get(a) or ""))), "sgml_header_or_json", "json")
+    fm["acceptance_raw"] = fm.get("header_acceptance_raw")
+    for c in ("url", "checksum"):
+        if f"{c}_s05" in fm:
+            fm[c] = fm[f"{c}_s05"].where(fm[f"{c}_s05"].notna(), fm[c])
+            fm = fm.drop(columns=[f"{c}_s05"])
+    fm["parse_status"] = fm.pop("parse_status_s05")
+    ctx.write(fm, "filing_manifest_timed.parquet")
     cnt = ev.groupby(["event_type", "session_bucket"]).size().unstack(fill_value=0)
     cnt.to_csv(ctx.out / "event_counts.csv")
     return {"events": int(len(ev)), "by_type": ev.event_type.value_counts().to_dict(),
@@ -807,6 +878,11 @@ def lm_path(ctx) -> Path:
         r.raise_for_status()
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(r.content)
+    pin = C.roster(ctx.cfg)["lexical"]["loughran_mcdonald"].get("sha256_verified_2026_10_23")
+    got = file_sha256(p)
+    if pin and got != pin and not ctx.services.get("fixture_root"):   # hard rule 12 (offline fixtures use a tiny list)
+        raise RuntimeError(f"Loughran-McDonald dictionary sha256 {got} != pinned {pin} (configs/models.yaml); "
+                           "verify the new file and update the pin as a logged decision")
     return p
 
 

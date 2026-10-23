@@ -26,26 +26,32 @@ def utcnow() -> str:
 
 
 def git_commit() -> str:
-    """Git commit of the repo; in notebook-embedded mode the build commit plus a source hash stand in."""
+    """Git commit of the code that produced an artifact, with a '-dirty' suffix when the package, configs or tests have
+    uncommitted changes. In notebook-embedded mode (no .git) the notebook's build stamp (the commit of the embedded code,
+    itself '-dirty' if the build had uncommitted code) plus the source hash stand in."""
     env = os.environ.get("SECPRICE_BUILD_COMMIT")
+    here = Path(__file__).resolve().parent
     try:
-        out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10,
-                             cwd=Path(__file__).resolve().parent)
+        out = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, cwd=here)
         if out.returncode == 0 and out.stdout.strip():
-            return out.stdout.strip()
+            st = subprocess.run(["git", "status", "--porcelain", "--", "src", "configs", "tests"], capture_output=True,
+                                text=True, timeout=10, cwd=here.parents[1])
+            dirty = st.returncode == 0 and bool(st.stdout.strip())
+            return out.stdout.strip() + ("-dirty" if dirty else "")
     except Exception:
         pass
     return f"embedded:{env or 'unknown'}:src-{code_hash()}"
 
 
 def code_hash() -> str:
+    """Hash of the package source with line endings normalised (identical code hashes identically on Windows and Colab)."""
     global _CODE_HASH
     if _CODE_HASH is None:
         h = hashlib.sha256()
         base = Path(__file__).resolve().parent
         for p in sorted(base.rglob("*.py")):
             h.update(p.relative_to(base).as_posix().encode())
-            h.update(p.read_bytes())
+            h.update(p.read_bytes().replace(b"\r\n", b"\n"))
         _CODE_HASH = h.hexdigest()[:12]
     return _CODE_HASH
 

@@ -13,7 +13,7 @@ and *Run all*. Profiles: `smoke` (default) → `pilot` → `full` (G2: pilot don
 **Local (CPU stages and tests, no credits).**
 ```bash
 uv venv .venv --python 3.12 && uv pip install -e ".[dev,gpu]"
-pytest                                   # 43 unit tests + 1 offline integration smoke (gate G1)
+pytest                                   # unit + offline integration tests (gate G1); network tests are opt-in
 export SEC_USER_AGENT="Your Name you@example.com" DATA_ROOT=/path/to/sec-price-study
 secprice run --profile smoke --stages S00-S12 S20 S21
 secprice prereg-freeze --profile smoke && secprice run --profile smoke --stages S13-S18 S22 S24
@@ -28,22 +28,29 @@ secprice prereg-freeze --profile smoke && secprice run --profile smoke --stages 
 
 ## Run order on Colab (Pro+)
 Inputs already sit in `MyDrive/sec-price-study/inputs` (979 OHLCV files, frozen yfinance gap-fill, LM dictionary, HF census,
-factor / S&P 500 / SIC caches). Pilot Part 1 has been run and its artifacts are in `MyDrive/sec-price-study/pilot`; stage
-hashes do not depend on the machine, so Colab skips those stages.
+factor / S&P 500 / SIC caches). The owner waived the pilot gate (decision log D-058): G2 = opt-in (already set in the notebook)
++ the preflight budget check, which the notebook prints after S04 and S05 enforces before the download. Stage hashes do not
+depend on the machine, so any stage already on Drive is skipped.
 
 | Step | Runtime | Settings in the first code cell | Stages |
 |---|---|---|---|
-| 1. pilot Part 2 | A100 | `RUN_PROFILE="pilot"`, `PART="gpu"` | S13-S17 (embeddings, ChronoBERT vintages, L5/L7, G3, fine-tuning, RAG, distillation) |
-| 2. pilot Part 3 | CPU | `RUN_PROFILE="pilot"`, `PART="cpu2"` | S18 dev holdout + MCS/PBO + G4 freeze, S22 backtest, S24 report (S19 stays sealed) |
-| 3. full Part 1 | CPU High-RAM | `RUN_PROFILE="full"`, `PART="cpu1"`, `OWNER_OVERRIDES["full"]["owner_opt_in_full"]=True` | S00-S12, S20-S21 (~9 h EDGAR at 6 req/s, ~2.5 h S11) |
-| 4. full Part 2 | A100 | `PART="gpu"` | S13-S17 (~3-6 h) |
-| 5. full Part 3 | CPU | `PART="cpu2"` | S18, S22, S24 |
-| 6. lockbox | CPU/GPU | `OWNER_OVERRIDES["lockbox"]["unlock_locked_test"]=True` after reviewing S18 | S19, scored once |
+| 1. full Part 1 | CPU High-RAM | `RUN_PROFILE="full"`, `PART="cpu1"` | S00-S12, S20-S21 (~9 h EDGAR at 6 req/s, resumable; ~2.5 h S11) |
+| 2. full Part 2 | A100 | `PART="gpu"` | S13-S17: GPU preflight, embeddings, ChronoBERT vintages, L5/L7, G3, fine-tuning, RAG, distillation (~3-6 h) |
+| 3. full Part 3 | CPU | `PART="cpu2"` | S18 dev holdout + MCS/PBO + G4 freeze, S22 backtest, S24 report (S19 stays sealed) |
+| 4. lockbox | CPU/GPU | `OWNER_OVERRIDES["lockbox"]["unlock_locked_test"]=True` after reviewing S18 | S19, scored once; then S22 and S24 again |
 
 Restart the runtime when switching between CPU and GPU. Fine-tuning runs only if G3 passes unless
-`gates.owner_override_g3_finetune=True` (results then labelled EXPLORATORY). Track C (S23) needs the gold annotations.
+`gates.owner_override_g3_finetune=True` (results then labelled EXPLORATORY). Track C (S23) needs the gold annotations
+(`secprice gold export|import|agreement`).
 
-## Pilot Part 1 results (local CPU, 23 Oct 2026)
+## S&P 500 vs non-S&P 500 vs combined
+The 500 firms are S&P 500 members (in the study window, pinned fja05680 list) first, then a seeded, sector-stratified fill of
+non-members. Every result is reported for each bucket and combined (decision log D-056): composition, the combined models scored
+per bucket (walk-forward, development holdout, locked test), bucket-only models against the pooled model on identical rows,
+Track A CARs and CAR paths, SUE drift, and the backtest restricted to each bucket's names. The universe is **survivor-only**
+(current listings): results are biased towards survivors (D-057).
+
+## Pilot Part 1 results (engineering evidence; local CPU, 23 Oct 2026)
 40 sector-balanced S&P 500 firms, 2012-01 to 2026-07: 11,370 filings parsed (SGML acceptance header for every one), 10,105
 events, all timestamp quality A; release-EPS parser agrees with XBRL on 79.8% of usable-confidence releases (45 probable full-year values withheld, D-052); leakage audit
 passes and catches all 4 planted leaks.

@@ -79,7 +79,7 @@ def decide(proba: np.ndarray, prior: np.ndarray, n_train: int | None = None) -> 
 
 
 def classification_metrics(y: np.ndarray, proba: np.ndarray, prior: np.ndarray, yhat: np.ndarray | None = None,
-                           coverage_levels=(1.0, 0.5, 0.25, 0.1)) -> dict:
+                           coverage_levels=(1.0, 0.5, 0.25, 0.1), ece_max: float = 0.10) -> dict:
     from sklearn.metrics import (average_precision_score, cohen_kappa_score, log_loss, matthews_corrcoef,
                                  roc_auc_score)
     y = np.asarray(y).astype(int)
@@ -118,6 +118,7 @@ def classification_metrics(y: np.ndarray, proba: np.ndarray, prior: np.ndarray, 
     out["ece"] = ece_top(proba, y)
     out["guardrail_logloss_ok"] = (out["logloss"] is not None and out["logloss_prior"] is not None
                                    and out["logloss"] <= out["logloss_prior"])
+    out["guardrail_ece_ok"] = out["ece"] is not None and out["ece"] <= ece_max     # pre-registered ece_max (0.10)
     out["cm"] = cm.tolist()
     conf = proba.max(1)
     order = np.argsort(-conf, kind="stable")

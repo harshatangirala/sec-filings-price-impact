@@ -54,7 +54,8 @@ def main(argv=None) -> int:
     elif a.cmd == "status":
         print(P.status(a.profile).to_string(index=False))
     elif a.cmd == "preflight":
-        print(P.run(["S13"], a.profile, force=True))
+        print(json.dumps(P.preflight(a.profile), indent=1, default=str))      # CPU projection before the download (G2)
+        print("GPU preflight with a measured benchmark: secprice run --stages S13 --force")
     elif a.cmd == "prereg-freeze":
         print(P.prereg_freeze(a.profile, force=a.force))
     elif a.cmd == "freeze":
@@ -66,7 +67,7 @@ def main(argv=None) -> int:
     elif a.cmd == "env":
         print(P.run(["S00"], a.profile, force=True))
     elif a.cmd == "gold":
-        print(P.run(["S12"], a.profile, force=True))
+        print(json.dumps(P.gold(a.action, a.profile), indent=1, default=str))
     elif a.cmd == "sync":
         print(P.sync(a.direction, a.local, a.remote, a.profile))
     return 0

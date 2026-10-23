@@ -30,3 +30,21 @@ def test_offline_smoke_end_to_end(world):
     assert (la.status != "fail").all()
     st = P.status("smoke", offline_overrides(), data_root=root)
     assert set(st[st.stage.isin(stages)].status) == {"done"}
+
+
+def test_per_horizon_censoring(world):
+    """SPEC.md §18.1 #7: a target is censored exactly when its exit session is after the usable cutoff; censored rows carry
+    no label; longer horizons are censored at least as often as shorter ones."""
+    root, w = world
+    services = {"fixture_root": w["sec"], "factors": w["factors"]}
+    P.run(["S08"], "smoke", offline_overrides(), data_root=root, hot_root=root / "_hot", services=services, with_deps=True)
+    r = P.make_runner("smoke", offline_overrides(), root, root / "_hot")
+    tg = pd.read_parquet(root / "smoke" / "S08" / r.stage_hash("S08") / "targets.parquet")
+    uc = json.loads((root / "smoke" / "S07" / r.stage_hash("S07") / "usable_cutoff.json").read_text())
+    cut = int(uc["usable_cutoff_idx"])
+    assert (tg.censored == (tg.exit_idx > cut) | tg.censored).all()
+    assert (tg[tg.exit_idx > cut].censored).all()
+    assert tg[tg.censored].label3.isna().all() and tg[tg.censored].ar_mm.isna().all()
+    share = tg[tg.target_def == "T_trade"].groupby("horizon").censored.mean().sort_index()
+    assert share.is_monotonic_increasing, share.to_dict()
+    assert share.iloc[-1] > 0, "the fixture should censor the longest horizon near the usable cutoff"

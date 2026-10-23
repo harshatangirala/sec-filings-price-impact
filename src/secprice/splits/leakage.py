@@ -111,7 +111,8 @@ def audit(events, feat, targets, splits, sue_src, universe, cfg, extra: dict) ->
     rows.append(_row(13, "same-firm overlaps -> flags + clean cohort", "pass", f"clean events: {clean} of {len(events)}"))
     rows.append(_row(14, "survivorship -> universe table + wording", "info",
                      f"delisted firms in universe: {int(universe.get('delisted_flag', pd.Series(dtype=bool)).sum())}; "
-                     "universe is survivorship-aware, not survivorship-free"))
+                     "SURVIVOR-ONLY universe (current listings only, survivorship-biased): stated in the report, reported "
+                     "with the share of historical S&P 500 members our data covers"))
     cens = int(targets.censored.sum())
     rows.append(_row(15, "right-censoring -> per horizon", "pass", f"censored target rows dropped: {cens}"))
     rows.append(_row(16, "retrieval leakage -> historical index time filter; separate current path",

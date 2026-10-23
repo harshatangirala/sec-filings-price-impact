@@ -81,6 +81,12 @@ def events(ctx) -> pd.DataFrame:
     return ev
 
 
+def event_buckets(ctx) -> pd.DataFrame:
+    """event_id -> sp_bucket (S&P 500 vs non-S&P 500, firm level) and point-in-time membership (D-056)."""
+    from .evaluation.buckets import event_buckets as _eb
+    return _eb(events(ctx), universe(ctx))
+
+
 def factors(ctx) -> pd.DataFrame:
     return read(ctx, "S03", "factors.parquet")
 

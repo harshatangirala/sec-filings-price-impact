@@ -22,7 +22,8 @@ from .storage import write_json
 PCOLS_ = ["p_down", "p_side", "p_up"]
 PRIMARY_METRICS = ["macro_f1", "accuracy", "balanced_accuracy", "weighted_f1", "auc_macro_ovr", "prauc_macro", "kappa", "mcc",
                    "logloss", "logloss_prior", "brier", "ece", "acc_at_50", "macro_f1_at_50", "acc_at_25", "macro_f1_at_25",
-                   "acc_at_10", "macro_f1_at_10", "f1_up", "f1_down", "f1_sideways", "auc_up", "auc_down"]
+                   "acc_at_10", "macro_f1_at_10", "f1_up", "f1_down", "f1_sideways", "auc_up", "auc_down",
+                   "guardrail_logloss_ok", "guardrail_ece_ok"]
 
 
 class Results:
@@ -35,7 +36,7 @@ class Results:
             ci: dict | None, n_events, n_firms, n_dates, n_overlap, tuned: str, extra: dict | None = None):
         for k in PRIMARY_METRICS + ["r2", "oos_r2_vs_hist_mean", "mae", "rmse", "spearman", "directional_accuracy",
                                     "rank_ic_mean", "rank_ic_t", "rank_ic_icir", "qlike"]:
-            if k in metrics and metrics[k] is not None and not isinstance(metrics[k], (list, dict)):
+            if k in metrics and metrics[k] is not None and not isinstance(metrics[k], (list, dict, str)):
                 row = {"run_id": run_id, "track": "B", "rung": rung, "model_id": model_id, "revision": revision,
                        "leaderboard": leaderboard, "cohort": cohort, "target_def": target_def, "horizon": horizon,
                        "block": block, "event_set": event_set, "coverage": 1.0, "metric": k, "value": float(metrics[k]),
@@ -251,6 +252,8 @@ def s11(ctx):
                 cert = enet_certificate(Xtr[-n:], lab.loc[tr, "y"].to_numpy()[-n:], lab.loc[tr, "w"].to_numpy()[-n:],
                                         best_params.get("L6|enet") or {"C": 0.1, "l1_ratio": 0.5})
                 write_json(ctx.out / "enet_certificate.json", cert)
+    if best_l6:
+        bucket_analysis(ctx, lad, res, preds, lab, common, best_l6["head"], best_params, prim, nb, seed)
     rl = res.frame()
     rl["config_counter"] = lad.config_counter
     ctx.write(rl, "results_long.parquet")
@@ -263,6 +266,48 @@ def s11(ctx):
         shutil.copy2(study_db, ctx.out / "optuna.sqlite3")
     write_json(ctx.out / "cohorts.json", {"common_primary_n": int(len(common)), "labelled_primary_n": int(len(ids))})
     return {"common_cohort": int(len(common)), "labelled": int(len(ids)), "best_L6": best_l6, "configs_tried": lad.config_counter}
+
+
+def bucket_analysis(ctx, lad: Ladder, res: Results, preds: list, lab, common, head, best_params, prim, nb, seed) -> None:
+    """S&P 500 vs non-S&P 500 vs combined (owner request, D-056).
+    (1) composition of each bucket; (2) the combined (pooled) walk-forward predictions scored per bucket;
+    (3) bucket-only models (same rung, head and tuned parameters, same folds) and a paired test, on identical rows,
+    of pooled minus bucket-only macro-F1: does training on both groups help each group?"""
+    from .evaluation.buckets import composition, pooled_vs_bucket, score_predictions
+    bk = C.event_buckets(ctx)
+    bmap = bk.set_index("event_id").sp_bucket
+    allp = pd.concat(preds, ignore_index=True) if preds else pd.DataFrame()
+    tdef, h = prim["target_def"], prim["horizon"]
+    key = [f"common|L0|prior|-|{tdef}|h{h}|default"] + [f"common|{r}|{head}|-|{tdef}|h{h}|tuned" for r in ("L1", "L2", "L3", "L4", "L6")]
+    sc = score_predictions(allp[allp.run_id.isin(key)] if len(allp) else allp, bk, nb, seed)
+    if len(sc):
+        sc["rung"] = sc.run_id.str.split("|").str[1]
+    sc.to_csv(ctx.out / "bucket_scores.csv", index=False)
+    labs = pd.DataFrame({"event_id": lab.index, "label3": lab["y"].values})
+    feat = C.read(ctx, "S09", "features.parquet")
+    composition(C.events(ctx), bk, C.universe(ctx), labs, feat).to_csv(ctx.out / "bucket_composition.csv", index=False)
+    rows = []
+    min_rows = max(100, int(ctx.cfg["tuning"].get("min_train_rows", 50)))
+    for rung in ("L2", "L6"):
+        bp = best_params.get(f"{rung}|{head}", {})
+        rid = f"common|{rung}|{head}|-|{tdef}|h{h}|tuned"
+        pooled = allp[allp.run_id == rid] if len(allp) else allp
+        for b in ("SP500", "NonSP500"):
+            ids_b = common[common.map(bmap).fillna("NonSP500") == b]
+            row = {"rung": rung, "head": head, "sp_bucket": b, "bucket_events": int(len(ids_b))}
+            if len(ids_b) < min_rows:
+                rows.append({**row, "note": f"fewer than {min_rows} events in the bucket"})
+                continue
+            r, s, brid = _run_and_record(lad, res, preds, rung, head, bp, lab, ids_b, f"bucket_{b}", tdef, h,
+                                         "tuned_transferred", n_boot=nb, seed=seed)
+            if r["preds"].empty:
+                rows.append({**row, "note": "no walk-forward predictions"})
+                continue
+            cmp = pooled_vs_bucket(pooled[pooled.event_id.isin(ids_b)], r["preds"], nb, seed)
+            rows.append({**row, "bucket_only_macro_f1": (s.get("pooled") or {}).get("macro_f1"),
+                         "bucket_only_ci_low": (s.get("ci") or {}).get("ci_low"), "bucket_only_ci_high": (s.get("ci") or {}).get("ci_high"),
+                         **cmp})
+    pd.DataFrame(rows).to_csv(ctx.out / "bucket_pooled_vs_own.csv", index=False)
 
 
 def adversarial(lad: Ladder, ids, lab) -> list[dict]:
@@ -371,6 +416,8 @@ def s13(ctx):
             raise RuntimeError(f"preflight: embedding storage {storage_gb:.1f} GB > budget")
         if gpu_h_b is not None and gpu_h_b > float(cfg["budget"]["max_gpu_hours_b"]):
             raise RuntimeError(f"preflight: projected encoder GPU hours {gpu_h_b:.1f} > budget.max_gpu_hours_b")
+        if gpu_h_c is not None and gpu_h_c > float(cfg["budget"]["max_gpu_hours_c"]):
+            raise RuntimeError(f"preflight: projected LLM GPU hours {gpu_h_c:.1f} > budget.max_gpu_hours_c")
     return rep
 
 
@@ -952,19 +999,9 @@ def s18(ctx):
        card="The locked test (2023-01-01 to the usable cutoff), scored once after the G4 freeze.")
 def s19(ctx):
     cfg = ctx.cfg
-    if not cfg["lockbox"].get("unlock_locked_test"):
-        raise RuntimeError("lockbox sealed: set lockbox.unlock_locked_test: true in the owner settings to score the locked test once")
-    g4 = ctx.storage.manifests / "g4_hash.txt"
-    frozen = json.loads((ctx.dep("S18") / "frozen_architecture.json").read_text())
-    if not g4.exists() or g4.read_text().strip() != frozen["g4_hash"]:
-        raise RuntimeError("G4 hash missing or does not match the frozen architecture")
+    frozen = json.loads((ctx.dep("S18") / "frozen_architecture.json").read_text()) if cfg["lockbox"].get("unlock_locked_test") else {}
+    relabel = lockbox_guard(cfg, ctx.storage.manifests, frozen)
     log_p = ctx.storage.manifests / "lockbox_log.json"
-    relabel = False
-    if log_p.exists():
-        if not cfg["lockbox"].get("acknowledge_reuse"):
-            raise RuntimeError(f"locked test already scored ({log_p.read_text()}); set lockbox.acknowledge_reuse: true "
-                               "to rescore it as a DEVELOPMENT block")
-        relabel = True
     lad = build_ladder(ctx, with_emb=True, with_ext=True)
     prim = cfg["targets"]["primary"]
     lab = lad.labelled(prim["target_def"], prim["horizon"])
@@ -1012,6 +1049,23 @@ def s19(ctx):
     return {"block": block, "rows": int(len(rl)), "notes": notes}
 
 
+def lockbox_guard(cfg: dict, manifests: Path, frozen: dict) -> bool:
+    """Single-use lockbox (SPEC.md §6.1, §17.2): sealed unless unlocked; needs the G4 hash of the frozen architecture;
+    a second scoring is refused unless acknowledge_reuse, which relabels the block as development. Returns relabel."""
+    if not cfg["lockbox"].get("unlock_locked_test"):
+        raise RuntimeError("lockbox sealed: set lockbox.unlock_locked_test: true in the owner settings to score the locked test once")
+    g4 = Path(manifests) / "g4_hash.txt"
+    if not g4.exists() or g4.read_text().strip() != frozen.get("g4_hash"):
+        raise RuntimeError("G4 hash missing or does not match the frozen architecture")
+    log_p = Path(manifests) / "lockbox_log.json"
+    if log_p.exists():
+        if not cfg["lockbox"].get("acknowledge_reuse"):
+            raise RuntimeError(f"locked test already scored ({log_p.read_text()}); set lockbox.acknowledge_reuse: true "
+                               "to rescore it as a DEVELOPMENT block")
+        return True
+    return False
+
+
 def _ft_locked(ctx, lad, lab, ids, f) -> pd.DataFrame | None:
     """Retrain a fine-tuned finalist on all pre-test data with its selected grid point; None without a GPU."""
     import torch
@@ -1048,7 +1102,7 @@ def _ft_locked(ctx, lad, lab, ids, f) -> pd.DataFrame | None:
        assertions=["entry-rule assertions"],
        card="Economic-relevance check of the frozen T_trade model (signal P(Up)-P(Down), horizon h=5).")
 def s22(ctx):
-    from .backtest.engine import carhart_alpha, daily_book, perf, positions, thresholds
+    from .backtest.engine import carhart_alpha, daily_book, exposure_stats, perf, positions, thresholds
     cfg, B = ctx.cfg, ctx.cfg["backtest"]
     frozen = json.loads((ctx.dep("S18") / "frozen_architecture.json").read_text())
     ch = frozen.get("primary_model")
@@ -1078,40 +1132,55 @@ def s22(ctx):
     ev = lad.ev
     lo, hi = thresholds((wf.p_up - wf.p_down).values, float(B["short_pct"]), float(B["long_pct"]))
     rows, daily = [], []
+    bmap = C.event_buckets(ctx).set_index("event_id").sp_bucket
+    n_trials = int(sum(pd.read_parquet(ctx.dep(s) / "results_long.parquet").config_counter.max() for s in ("S11", "S15")))
+    min_names = int(B["min_names_per_side"])
     for bname, p in blocks.items():
         if p.empty:
             continue
-        sig = pd.DataFrame({"event_id": p.event_id, "ticker": ev.loc[p.event_id, "ticker"].values,
-                            "entry_idx": ev.loc[p.event_id, "ttrade_entry_idx"].values.astype(int), "score": (p.p_up - p.p_down).values})
-        for lag in (0, int(B["lag_sessions_sensitivity"])):
-            pos = positions(sig, lo, hi, h, lag)
-            # entry-rule assertion: the open of the entry session is at or after decision time
-            if lag == 0 and len(pos):
-                ent_open = pd.Series([cal.open_time(int(i)) for i in pos.entry], index=pos.index)
-                dec = pd.to_datetime(ev.loc[pos.event_id, "decision_time"]).values
-                assert (ent_open.values >= dec).all(), "backtest entry before decision_time"
-            for cost in B["costs_bps"]:
-                d = daily_book(pos, panel, spy, len(cal), float(B["max_weight"]), int(B["min_names_per_side"]), float(cost),
-                               float(B["borrow_bps_per_year"]))
-                d["date"] = cal.sessions
-                act = d[(d.n_long > 0) | (d.n_short > 0)]
-                if act.empty:
-                    continue
-                a0, a1 = act.index.min(), act.index.max()
-                d = d.loc[a0:a1]
-                n_trials = int(sum(pd.read_parquet(ctx.dep(s) / "results_long.parquet").config_counter.max() for s in ("S11", "S15")))
-                for leg, col in (("long_only", "long_ret"), ("long_minus_spy_matched", "long_excess_spy"), ("long_short_hypothetical", "ls_ret")):
-                    pm = perf(d[col].values, n_trials)
-                    rows.append({"block": bname, "lag": lag, "cost_bps": cost, "leg": leg, **pm})
-                ca = carhart_alpha(d.long_hold.values, pd.DatetimeIndex(d.date), fac)
-                rows.append({"block": bname, "lag": lag, "cost_bps": cost, "leg": "long_hold_component_carhart",
-                             "ann_return": ca.get("alpha_ann"), "sharpe": None, "note": json.dumps(ca)})
-                ent = d.long_entry - d.spy_long_entry
-                rows.append({"block": bname, "lag": lag, "cost_bps": cost, "leg": "long_entry_day_vs_spy_open_close",
-                             "ann_return": float(ent.mean() * 252), "n_days": int((d.n_long > 0).sum())})
-                daily.append(d.assign(block=bname, lag=lag, cost_bps=cost))
+        sig_all = pd.DataFrame({"event_id": p.event_id, "ticker": ev.loc[p.event_id, "ticker"].values,
+                                "entry_idx": ev.loc[p.event_id, "ttrade_entry_idx"].values.astype(int),
+                                "score": (p.p_up - p.p_down).values})
+        sig_all["sp_bucket"] = sig_all.event_id.map(bmap).fillna("NonSP500")
+        # same frozen model and the same training-period thresholds; only the tradable names differ by bucket (D-056)
+        for bucket in ("Combined", "SP500", "NonSP500"):
+            sig = sig_all if bucket == "Combined" else sig_all[sig_all.sp_bucket == bucket]
+            if sig.empty:
+                continue
+            for lag in (0, int(B["lag_sessions_sensitivity"])):
+                pos = positions(sig, lo, hi, h, lag)
+                # entry-rule assertion: the open of the entry session is at or after decision time
+                if lag == 0 and len(pos):
+                    ent_open = pd.Series([cal.open_time(int(i)) for i in pos.entry], index=pos.index)
+                    dec = pd.to_datetime(ev.loc[pos.event_id, "decision_time"]).values
+                    assert (ent_open.values >= dec).all(), "backtest entry before decision_time"
+                for cost in B["costs_bps"]:
+                    d = daily_book(pos, panel, spy, len(cal), float(B["max_weight"]), min_names, float(cost),
+                                   float(B["borrow_bps_per_year"]))
+                    d["date"] = cal.sessions
+                    act = d[(d.n_long > 0) | (d.n_short > 0)]
+                    if act.empty:
+                        continue
+                    a0, a1 = act.index.min(), act.index.max()
+                    d = d.loc[a0:a1]
+                    base = {"block": bname, "sp_bucket": bucket, "lag": lag, "cost_bps": cost}
+                    ex = exposure_stats(d, min_names)
+                    for leg, col in (("long_only", "long_ret"), ("long_minus_spy_matched", "long_excess_spy"),
+                                     ("long_short_hypothetical", "ls_ret")):
+                        rows.append({**base, "leg": leg, **perf(d[col].values, n_trials), **ex})
+                    for leg, series in (("long_hold_component_carhart", d.long_hold.values),
+                                        ("long_short_hold_component_carhart", (d.long_hold - d.short_hold).values)):
+                        ca = carhart_alpha(series, pd.DatetimeIndex(d.date), fac)
+                        rows.append({**base, "leg": leg, "ann_return": ca.get("alpha_ann"), "carhart_alpha_ann": ca.get("alpha_ann"),
+                                     "carhart_alpha_t": ca.get("alpha_t"), "sharpe": None, "note": json.dumps(ca)})
+                    ent = d.long_entry - d.spy_long_entry
+                    rows.append({**base, "leg": "long_entry_day_vs_spy_open_close", "ann_return": float(ent.mean() * 252),
+                                 "n_days": int((d.n_long > 0).sum())})
+                    daily.append(d.assign(block=bname, sp_bucket=bucket, lag=lag, cost_bps=cost))
     bt = pd.DataFrame(rows)
-    bt["wording"] = "economic-relevance check, not an investable strategy (borrow, capacity and delisting data unknown)"
+    bt["wording"] = ("economic-relevance check, not an investable strategy: shorts are hypothetical (no claim of borrow "
+                     f"availability; assumed borrow cost {B['borrow_bps_per_year']} bps/yr), capacity is not modelled, and the "
+                     "survivor-only universe has no delisting returns")
     bt.to_csv(ctx.out / "backtest.csv", index=False)
     if daily:
         ctx.write(pd.concat(daily, ignore_index=True), "backtest_daily.parquet")

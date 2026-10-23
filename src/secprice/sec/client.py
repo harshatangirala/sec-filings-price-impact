@@ -6,11 +6,15 @@ import hashlib
 import json
 import os
 import threading
+import zlib
 import time
 from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+
+
+_ZMAGIC = b"ZC1\x00"          # compressed cache entry marker (older raw entries are still read)
 
 
 class SECBlockedError(RuntimeError):
@@ -56,8 +60,9 @@ def resolve_user_agent(env_name: str = "SEC_USER_AGENT") -> str:
 class SECClient:
     def __init__(self, user_agent: str, max_rps: float = 6, cache_dir: str | os.PathLike | None = None,
                  cache_days: float = 30, timeout_s: float = 60, max_retries: int = 6, backoff_base_s: float = 2.0,
-                 blocked_403_limit: int = 20, log=None):
+                 blocked_403_limit: int = 20, log=None, cache_max_bytes: int = 0):
         self.ua = user_agent
+        self.cache_max_bytes = int(cache_max_bytes or 0)   # 0 = cache every response; >0 = skip larger bodies (disk budget)
         self.limiter = RateLimiter(max_rps)
         self.cache_dir = Path(cache_dir) if cache_dir else None
         if self.cache_dir:
@@ -77,7 +82,7 @@ class SECClient:
     def from_config(cls, cfg: dict, cache_dir, log=None) -> "SECClient":
         s = cfg["sec"]
         return cls(resolve_user_agent(s["user_agent_env"]), s["max_rps"], cache_dir, s["cache_days"], s["timeout_s"],
-                   s["max_retries"], s["backoff_base_s"], s.get("blocked_403_limit", 20), log)
+                   s["max_retries"], s["backoff_base_s"], s.get("blocked_403_limit", 20), log, s.get("cache_max_bytes", 0))
 
     def _session(self) -> requests.Session:
         sess = getattr(self._local, "sess", None)
@@ -101,6 +106,8 @@ class SECClient:
             with self._lock:
                 self.stats["cache_hits"] += 1
             data = cp.read_bytes()
+            if data.startswith(_ZMAGIC):
+                data = zlib.decompress(data[len(_ZMAGIC):])
             return None if data == b"__404__" else data
         attempt = 0
         while True:
@@ -124,10 +131,10 @@ class SECClient:
                         self.stats["bytes"] += len(data)
                         self.stats["truncated"] += int(truncated)
                         self._consec_403 = 0
-                    if cp:
+                    if cp and (not self.cache_max_bytes or len(data) <= self.cache_max_bytes):
                         cp.parent.mkdir(parents=True, exist_ok=True)
-                        tmp = cp.with_suffix(".tmp")
-                        tmp.write_bytes(data)
+                        tmp = cp.with_suffix(f".{os.getpid()}.{threading.get_ident()}.tmp")
+                        tmp.write_bytes(_ZMAGIC + zlib.compress(data, 6))      # filings are text: ~5-10x smaller on disk
                         os.replace(tmp, cp)
                     return data
                 r.close()

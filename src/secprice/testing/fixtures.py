@@ -81,7 +81,8 @@ def make_world(root: Path, seed: int = 7) -> dict:
             for d in days[(days.month.isin([2, 5, 8, 11])) & (days.day <= 7)][::5]:
                 yf_rows.append((tk, d, np.nan, np.nan, np.nan, np.nan, np.nan, 0.45, 0.0))
         tickers_ex.append([cik, name, tk, "NYSE"])
-        sp_rows.append((tk, "2010-01-01", "" if tk != "CCC" else "2022-12-31"))
+        if tk != "CCC":                               # CCC is never an S&P 500 member: both index buckets are exercised (D-056)
+            sp_rows.append((tk, "2010-01-01", "" if tk != "BBB" else "2022-12-31"))   # BBB leaves the index (point-in-time flag)
         # ---------------- filings
         filings = []
         sub_docs = {}

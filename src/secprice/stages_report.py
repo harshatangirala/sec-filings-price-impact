@@ -87,12 +87,25 @@ def s20(ctx):
         tabs.append(group_table(ex.rename(columns={"categories": "category"}), "category", [wname(-1, 1), wname(0, 1), wname(2, 20)], clean_col))
     gt = pd.concat(tabs, ignore_index=True)
     gt["fdr_family"] = "track_a_car"
+    # S&P 500 vs non-S&P 500 vs combined (D-056): its own FDR family, so the original family's adjustment is unchanged
+    from .evaluation.buckets import expand
+    db = expand(d, C.event_buckets(ctx))
+    db["event_type_x_sp_bucket"] = db.event_type + " | " + db.sp_bucket
+    bcols = [wname(-1, 1), wname(0, 1), wname(0, 5), wname(2, 20), wname(2, 60), wname(-20, -2), "abn_log_volume_0_1",
+             "vol_response_0_1"]
+    btab = pd.concat([group_table(db, "sp_bucket", bcols, clean_col),
+                      group_table(db, "event_type_x_sp_bucket", [wname(-1, 1), wname(0, 1), wname(2, 60)], clean_col)],
+                     ignore_index=True)
+    btab["fdr_family"] = "track_a_car_sp_bucket"
+    gt = pd.concat([gt, btab], ignore_index=True)
     gt["p_value"] = gt["p"]
     gt = apply_families(gt[gt.p_value.notna()], q=float(cfg["fdr"]["q"]))
     gt.to_csv(ctx.out / "track_a_groups.csv", index=False)
     cp = car_paths(ev, panel, spy, cfg)
     cp_clean = car_paths(ev[~ev[clean_col]], panel, spy, cfg)
     pd.concat([cp.assign(event_set="all"), cp_clean.assign(event_set="clean")]).to_csv(ctx.out / "car_paths.csv", index=False)
+    car_paths(expand(ev, C.event_buckets(ctx)[["event_id", "sp_bucket"]]), panel, spy, cfg,
+              group_col="sp_bucket").to_csv(ctx.out / "car_paths_sp_bucket.csv", index=False)
     # correlations: tone persistence, release vs later periodic filing, filing tone vs CAR (Spearman + partial)
     F = C.read(ctx, "S09", "features.parquet")
     m = d.merge(F[["event_id"] + [c for c in F.columns if c in ("lm_net_tone", "chg_lm_net_tone", "chg_cosine", "novelty_share",
@@ -226,6 +239,22 @@ def s21(ctx):
     else:
         add("SUE-conditioned post-earnings drift", "verified releases", None, trivial_bps(60, tb),
             note=f"only {int(rel.sue_event.notna().sum())} verified releases with SUE_release")
+    # the same SUE drift test within each index bucket (D-056); own FDR family, exploratory decomposition
+    bmap = C.event_buckets(ctx).set_index("event_id").sp_bucket
+    for b, lab_b in (("SP500", "S&P 500 members"), ("NonSP500", "non-S&P 500 firms")):
+        rb = rel[rel.event_id.map(bmap).fillna("NonSP500") == b].copy()
+        nsue = int(rb.sue_event.notna().sum())
+        if nsue >= 50:
+            rb["q_sue"] = prior_quarter_quintiles(rb, "sue_event")
+            res_b = spread_test(rb, "q_sue", car, "cik", "trackA_day0", nb, seed)
+            signs_b = subperiod_signs(rb.dropna(subset=["q_sue"]), "q_sue", car) if res_b else None
+            add(f"SUE-conditioned post-earnings drift (Q5-Q1) [{lab_b}]", f"verified releases of {lab_b}; {car}; "
+                "prior-quarter breakpoints within the bucket", res_b, trivial_bps(60, tb), signs_b,
+                note="bucket decomposition of the combined test (exploratory; robustness checks only on the combined test)")
+            rows[-1]["fdr_family"] = "drift_sp_bucket"
+        else:
+            rows.append({"test": f"SUE-conditioned post-earnings drift (Q5-Q1) [{lab_b}]", "fdr_family": "drift_sp_bucket",
+                         "n": nsue, "verdict": "inconclusive/low power", "note": f"only {nsue} verified releases with SUE_release"})
     # momentum benchmarks (never attributed to filings)
     u = C.universe(ctx)
     mb = momentum_benchmark(panel, u.ticker.tolist(), cfg["study"]["start"], cfg["study"]["end"])
@@ -427,10 +456,17 @@ def collect(ctx):
     ph = ctx.storage.manifests / "prereg_hash.txt"
     facts["prereg_hash"] = ph.read_text().strip() if ph.exists() else "not frozen"
     # ---------------- data integrity
+    spc = _opt(ctx, "S02", "sp500_coverage.json", "json") or {}
     facts["universe_text"] = (
-        f"Universe: **{len(usel)} unique firms** (target {cfg['universe']['n_stocks']}) common to our OHLCV files and the HF 10-K corpus, "
-        f"{int(usel.ever_sp500.sum())} of them S&P 500 members at some point in {cfg['study']['start']} to {cfg['study']['end']} "
-        f"(fja05680/sp500 @ {cfg['universe']['sp500_commit'][:8]}). Candidates: {len(u)}; eligible: {int(u.eligible.sum())}. "
+        f"Universe: **{len(usel)} unique firms** (target {cfg['universe']['n_stocks']}) common to our OHLCV files and the HF 10-K corpus: "
+        f"**{int(usel.ever_sp500.sum())} S&P 500 members** (at some point in {cfg['study']['start']} to {cfg['study']['end']}, "
+        f"fja05680/sp500 @ {cfg['universe']['sp500_commit'][:8]}) and **{int((~usel.ever_sp500.astype(bool)).sum())} non-members** "
+        "(seeded, sector-stratified fill); results are reported for each bucket and combined. "
+        "**Survivor-only:** every firm is a current listing, so firms that delisted, merged or were acquired before 2026 are absent "
+        "(survivorship-biased; drift and backtest results are biased towards survivors)"
+        + (f"; our data covers about {spc['covered_by_eligible_universe']} of the {spc['sp500_tickers_in_window']} tickers that were "
+           f"S&P 500 members in the window ({spc['coverage_share']:.0%}, ticker-level, approximate). " if spc else ". ")
+        + f"Candidates: {len(u)}; eligible: {int(u.eligible.sum())}. "
         f"Exclusions: {u.exclusion_reason.value_counts().to_dict()}. Usable cutoff {uc['usable_cutoff']} "
         f"(last price {uc['last_price_date']}, last document {uc['last_document_date']}); final month partial: {uc['final_month_partial']}. "
         "Firms per year are reported separately below; 500 firms per year is never claimed.")
@@ -453,7 +489,9 @@ def collect(ctx):
                                "Public availability is ASSUMED (acceptance + lag), not observed.")
     hfa = ctx.dep("S01") / "hf_dataset_audit.md"
     facts["hf_text"] = hfa.read_text(encoding="utf-8").split("## Filings by year")[0] if hfa.exists() else "n/a"
-    facts["data_limitations"] = ["Daily bars only; the universe is survivorship-aware, not survivorship-free (all firms are current listings).",
+    facts["data_limitations"] = ["SURVIVOR-ONLY universe: all firms are current listings (no delisted, merged or acquired firms), so the "
+                                 "sample is survivorship-biased, not merely survivorship-aware; drift and backtest results overstate what "
+                                 "a point-in-time universe would show. Daily bars only.",
                                  "Free prices are weak on delistings; local OHLCV is split-adjusted and dividends come from Yahoo actions.",
                                  "Selected sections only (10-K Items 1/1A/7/7A, 10-Q MD&A/market risk/risk factors, 8-K items + EX-99).",
                                  "SUE coverage is limited before the XBRL era (2009); release-EPS parsing is heuristic (QA vs XBRL reported).",
@@ -512,6 +550,11 @@ def collect(ctx):
              & (rl.target_def == prim["target_def"]) & (rl.horizon == prim["horizon"])]
     facts["ladder"] = lad[["rung", "model_id", "revision", "cohort", "tuned", "leaderboard", "mean_fold_score", "value", "ci_low",
                            "ci_high", "n_events"]].rename(columns={"value": "pooled_macro_f1", "revision": "encoder"}).sort_values(["cohort", "rung"])
+    gr = rl[(rl.block == "walk_forward_pooled") & (rl.event_set == "all") & (rl.target_def == prim["target_def"])
+            & (rl.horizon == prim["horizon"]) & (rl.cohort == "common") & rl.tuned.isin(["tuned", "default"])
+            & rl.metric.isin(["logloss", "logloss_prior", "guardrail_logloss_ok", "ece", "guardrail_ece_ok"])]
+    facts["guardrails"] = gr.pivot_table(index=["rung", "model_id", "revision", "tuned"], columns="metric", values="value").reset_index() \
+        if len(gr) else None
     tb = _csv(ctx.dep("S11") / "ladder_summary.csv")
     t15 = _opt(ctx, "S15", "emb_ladder_summary.csv", "csv")
     tba = pd.concat([tb.assign(encoder="-"), t15] if t15 is not None else [tb.assign(encoder="-")], ignore_index=True)
@@ -558,10 +601,17 @@ def collect(ctx):
     ti = rl[(rl.metric == "macro_f1") & (rl.block == "walk_forward_pooled") & (rl.event_set == "all") & rl.target_def.isin(["T_info", "T_trade"])
             & (rl.horizon == 1) & (rl.cohort == "common")]
     facts["tinfo_vs_ttrade"] = ti[["rung", "model_id", "target_def", "tuned", "value", "n_events"]] if len(ti) else None
-    facts["backtest"] = _opt(ctx, "S22", "backtest.csv", "csv")
-    if facts["backtest"] is not None:
-        facts["backtest"] = facts["backtest"][[c for c in ("block", "lag", "cost_bps", "leg", "ann_return", "ann_vol", "sharpe",
-                                                           "deflated_sharpe_prob", "max_drawdown", "n_days") if c in facts["backtest"]]]
+    bt_all = _opt(ctx, "S22", "backtest.csv", "csv")
+    facts["backtest"] = None
+    if bt_all is not None:
+        btc = bt_all[bt_all.sp_bucket == "Combined"] if "sp_bucket" in bt_all else bt_all
+        facts["backtest"] = btc[[c for c in ("block", "lag", "cost_bps", "leg", "ann_return", "ann_vol", "sharpe", "deflated_sharpe_prob",
+                                             "max_drawdown", "carhart_alpha_ann", "carhart_alpha_t", "turnover_long_daily",
+                                             "avg_names_long", "avg_names_short", "share_days_short_in_cash", "n_days") if c in btc]]
+        facts["backtest_text"] = (bt_all.wording.iloc[0] if "wording" in bt_all and len(bt_all) else "") + \
+            ". Turnover is the mean daily one-way turnover; 'short in cash' = days the short leg had fewer than " \
+            f"{cfg['backtest']['min_names_per_side']} names and held cash."
+    _bucket_facts(ctx, facts, cfg, prim, bt_all)
     # ---------------- Track C, fit, extensions, limitations
     gs = _opt(ctx, "S12", "gold_status.json", "json") or {}
     cv = _opt(ctx, "S23", "content_validity.csv", "csv")
@@ -602,6 +652,15 @@ def collect(ctx):
             eb.append(f"Majority-class baseline macro-F1: {l0.value.iloc[0]:.3f}.")
     if g3:
         eb.append(f"G3 (text lift >= {cfg['gates']['text_lift']} with CI excluding 0): {'passed' if g3.get('passed') else 'not passed'}.")
+    sc = facts.get("sp_scores_wf")
+    if sc is not None and len(sc) and "rung" in sc:
+        l6 = sc[sc.rung == "L6"].set_index("sp_bucket")
+        comp = facts.get("sp_composition")
+        nfirms = comp.set_index("sp_bucket").firms.to_dict() if comp is not None and len(comp) else {}
+        if len(l6):
+            eb.append("S&P 500 vs non-S&P 500 (combined L6 model, walk-forward macro-F1): " + "; ".join(
+                f"{bb} {l6.loc[bb, 'macro_f1']:.3f} [{l6.loc[bb, 'ci_low']:.3f}, {l6.loc[bb, 'ci_high']:.3f}]"
+                + (f" ({int(nfirms[bb])} firms)" if bb in nfirms else "") for bb in ("SP500", "NonSP500", "Combined") if bb in l6.index) + ".")
     ht = facts.get("hypothesis_tests")
     if ht is not None and len(ht):
         eb.append("Drift verdicts: " + "; ".join(f"{r.test}: {r.verdict}" for r in ht.head(3).itertuples(index=False)))
@@ -609,6 +668,70 @@ def collect(ctx):
     figures(ctx, F, facts, ev, u, usel, man, mm, led, tg, rl, fpy)
     facts["figures"] = F.write_index()
     return facts, facts["figures"]
+
+
+def _bucket_facts(ctx, facts, cfg, prim, bt_all) -> None:
+    """S&P 500 vs non-S&P 500 vs combined (owner request, D-056): every number comes from stage artifacts."""
+    from .evaluation.buckets import LABELS, score_predictions
+    nb, seed = int(cfg["bootstrap"]["n"]), int(cfg["seed"])
+    comp = _opt(ctx, "S11", "bucket_composition.csv", "csv")
+    facts["sp_composition"] = comp
+    sc = _opt(ctx, "S11", "bucket_scores.csv", "csv")
+    facts["sp_scores_wf"] = sc[[c for c in ("rung", "sp_bucket", "macro_f1", "ci_low", "ci_high", "n_events", "n_firms",
+                                            "auc_macro_ovr", "logloss", "logloss_prior", "power") if c in sc]] if sc is not None else None
+    facts["sp_pooled_vs_own"] = _opt(ctx, "S11", "bucket_pooled_vs_own.csv", "csv")
+    bk = C.event_buckets(ctx)
+    tag = f"|{prim['target_def']}|h{prim['horizon']}|"
+    later = []
+    for stage_id, name, block in (("S18", "dev_predictions.parquet", "development holdout"),
+                                  ("S19", "locked_predictions.parquet", "locked test")):
+        p = _opt(ctx, stage_id, name)
+        if p is not None and len(p) and {"run_id", "y", "yhat", "date"} <= set(p.columns):
+            p = p[p.run_id.astype(str).str.contains(tag, regex=False)]
+            s = score_predictions(p, bk, nb, seed)
+            if len(s):
+                later.append(s.assign(block=block))
+    facts["sp_scores_later"] = pd.concat(later, ignore_index=True)[["block", "run_id", "sp_bucket", "macro_f1", "ci_low", "ci_high",
+                                                                    "n_events", "power"]] if later else None
+    ta = _opt(ctx, "S20", "track_a_groups.csv", "csv")
+    if ta is not None and "group_by" in ta:
+        x = ta[(ta.group_by == "sp_bucket") & ta.measure.isin(["car_m1_1", "car_0_1", "car_2_60", "car_m20_m2", "abn_log_volume_0_1"])]
+        facts["sp_track_a"] = x[[c for c in ("group", "event_set", "measure", "mean", "t", "p_adj_bh", "n") if c in x]]
+    ht = _opt(ctx, "S21", "hypothesis_tests.csv", "csv")
+    if ht is not None and "fdr_family" in ht:
+        facts["sp_drift"] = ht[ht.test.str.startswith("SUE-conditioned")][[c for c in ("test", "estimate", "ci_low", "ci_high", "p_value",
+                                                                                     "p_adj_bh", "n", "verdict") if c in ht]]
+    if bt_all is not None and "sp_bucket" in bt_all:
+        b = bt_all[(bt_all.lag == 0) & (bt_all.cost_bps == min(cfg["backtest"]["costs_bps"]))
+                   & bt_all.leg.isin(["long_only", "long_minus_spy_matched", "long_short_hypothetical"])]
+        facts["sp_backtest"] = b[[c for c in ("block", "sp_bucket", "leg", "ann_return", "sharpe", "deflated_sharpe_prob", "max_drawdown",
+                                              "avg_names_long", "avg_names_short", "share_days_short_in_cash", "n_days") if c in b]]
+    # computed-only reading of the decomposition
+    txt = ["Buckets: " + "; ".join(f"**{k}** = {v}" for k, v in LABELS.items()) + ". The bucket is a firm attribute from the pinned "
+           "fja05680 list; models are trained on the combined data unless stated, and every bucket uses the same folds."]
+    if comp is not None and len(comp):
+        c = comp.set_index("sp_bucket")
+        for bb in ("SP500", "NonSP500"):
+            if bb in c.index:
+                r = c.loc[bb]
+                txt.append(f"{LABELS[bb]}: {int(r.firms)} firms, {int(r.events):,} events ({r.events_per_firm:.0f} per firm), "
+                           f"8-K share {r.share_8k:.0%}"
+                           + (f", median log market cap {r.median_log_mcap:.2f}" if "median_log_mcap" in r and pd.notna(r.median_log_mcap) else "")
+                           + (f", SUE available for {r.sue_available_share:.0%} of events" if "sue_available_share" in r and pd.notna(r.sue_available_share) else "")
+                           + ".")
+    if sc is not None and len(sc):
+        l6 = sc[sc.rung == "L6"].set_index("sp_bucket")
+        if len(l6):
+            txt.append("Combined L6 model, walk-forward macro-F1 by bucket: " + "; ".join(
+                f"{bb} {l6.loc[bb, 'macro_f1']:.3f} [{l6.loc[bb, 'ci_low']:.3f}, {l6.loc[bb, 'ci_high']:.3f}] (n={int(l6.loc[bb, 'n_events'])})"
+                for bb in ("Combined", "SP500", "NonSP500") if bb in l6.index) + ". Bucket CIs that overlap do not show a difference.")
+    pv = facts.get("sp_pooled_vs_own")
+    if pv is not None and len(pv) and "pooled_minus_bucket_macro_f1" in pv:
+        for r in pv[pv.pooled_minus_bucket_macro_f1.notna()].itertuples(index=False):
+            txt.append(f"{r.rung}, {r.sp_bucket} rows: pooled model minus bucket-only model = {r.pooled_minus_bucket_macro_f1:+.3f} "
+                       f"[{r.ci_low:+.3f}, {r.ci_high:+.3f}], bootstrap p {r.p_boot:.2f} (n={int(r.n_events)}): "
+                       + ("pooling helps" if r.ci_low > 0 else "pooling hurts" if r.ci_high < 0 else "no detectable difference") + ".")
+    facts["sp_text"] = " ".join(txt)
 
 
 def _filter_main(df):
@@ -772,6 +895,14 @@ def figures(ctx, F, facts, ev, u, usel, man, mm, led, tg, rl, fpy):
     mp = _opt(ctx, "S18", "mcs_pbo.json", "json")
     F.safe("F40", "MCS / PBO diagnostics", lambda i, t: _f40(F, i, t, mp) if mp else F.skip(i, t, "S18 not run"))
     F.safe("FX1", "Optimisation diagnostics", lambda i, t: _fx1(ctx, F, i, t, tri))
+    sc = facts.get("sp_scores_wf")
+    F.safe("FX2", "Macro-F1 by index bucket", lambda i, t: F.bars_ci(
+        i, t, sc[sc.rung.isin(["L0", "L2", "L6"])].rename(columns={"rung": "label", "macro_f1": "value"}), hue="sp_bucket")
+        if sc is not None and len(sc) and "rung" in sc else F.skip(i, t, "bucket analysis not run"))
+    cpb = _opt(ctx, "S20", "car_paths_sp_bucket.csv", "csv")
+    F.safe("FX3", "CAR paths by index bucket", lambda i, t: F.lines(i, t, {g: (x.rel_day, x.caar * 100) for g, x in cpb.groupby("group")},
+                                                                     "session relative to day 0", "CAAR (%)")
+           if cpb is not None and len(cpb) else F.skip(i, t, "not run"))
 
 
 def _f05(F, i, t, ev):

@@ -81,9 +81,27 @@ class Context:
         except Exception:
             return None
 
+    def input_hashes(self) -> dict:
+        """Upstream stage hashes and the sha256 of every upstream parquet artifact (SPEC.md §16 'input artifact hashes')."""
+        if getattr(self, "_inputs", None) is None:
+            out = {}
+            for d in self.spec.deps:
+                p = self.dep_or_none(d)
+                if p is None:
+                    continue
+                arts = {}
+                for m in sorted(p.glob("*.manifest.json")):
+                    try:
+                        arts[m.name[: -len(".manifest.json")]] = json.loads(m.read_text(encoding="utf-8")).get("sha256")
+                    except (OSError, ValueError):
+                        arts[m.name[: -len(".manifest.json")]] = None
+                out[d] = {"stage_hash": p.name, "artifacts": arts}
+            self._inputs = out
+        return self._inputs
+
     def write(self, df, name: str, inputs: dict | None = None) -> Path:
         return self.storage.write_parquet(df, self.out / name, self.stage_id, self.stage_hash, self.started,
-                                          inputs, self.warnings)
+                                          inputs if inputs is not None else self.input_hashes(), self.warnings)
 
     def warn(self, msg: str) -> None:
         self.warnings.append(msg)
@@ -139,7 +157,7 @@ class Runner:
         todo = self.order(stage_ids) if with_deps else list(stage_ids)
         results = {}
         manifest = _load_json(self.timings_path) or {"stages": {}}
-        manifest.update({"profile": self.cfg["run_profile"], "config_hash": config_hash(self.cfg)})
+        manifest.update({"profile": self.cfg["run_profile"], "config_hash": config_hash(self.cfg), **_run_provenance(self.cfg)})
         for sid in todo:
             spec = REGISTRY[sid]
             h = self.stage_hash(sid)
@@ -178,6 +196,34 @@ class Runner:
             self.log.info(f"{sid} done in {wall:.1f}s")
             results[sid] = "done"
         return results
+
+
+def _run_provenance(cfg: dict) -> dict:
+    """run_manifest.json fields (SPEC.md §19; addendum P0.3): code version, model revisions, data-source versions and the
+    timing policy (public lag and decision latency are assumptions and travel with every run)."""
+    from .config import load_side_config
+    from .storage import code_hash, git_commit
+    out = {"git_commit": git_commit(), "code_hash": code_hash(), "timing_policy": dict(cfg.get("timing", {}))}
+    try:
+        rost = load_side_config(cfg, "models.yaml")
+        revs = {}
+        for sec in ("encoders", "reranker", "llm", "judge", "student", "ner"):
+            for k, v in (rost.get(sec) or {}).items():
+                if "model_id" in v:
+                    revs[k] = f"{v['model_id']}@{v.get('revision')}"
+                elif "revisions" in v:
+                    revs[k] = {"template": v.get("model_id_template"), "revisions": v["revisions"]}
+        out["model_revisions"] = revs
+        out["lexicon"] = rost.get("lexical")
+    except Exception as e:                         # never block a run on provenance bookkeeping
+        out["model_revisions"] = f"unavailable ({type(e).__name__})"
+    m, u, h = cfg.get("market", {}), cfg.get("universe", {}), cfg.get("hf", {})
+    out["data_sources"] = {"hf_dataset": f"{h.get('repo')}@{h.get('revision')}",
+                           "sp500_membership": f"{u.get('sp500_repo')}@{u.get('sp500_commit')}",
+                           "prices": {"provider": m.get("price_provider"), "local_ohlcv_subdir": m.get("local_ohlcv_subdir"),
+                                      "yfinance": m.get("yfinance"), "frozen_file": "inputs/yf_frozen.parquet"},
+                           "factors": m.get("factors"), "sec": "EDGAR submissions JSON, archives (SGML), companyfacts"}
+    return out
 
 
 def _gpu_time() -> float:

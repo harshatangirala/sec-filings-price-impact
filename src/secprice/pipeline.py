@@ -108,6 +108,56 @@ def unlock_test(profile=None, overrides=None, data_root=None, acknowledge_reuse=
     return run(["S19"], profile, ov, force=True, data_root=data_root, services=services)
 
 
+def preflight(profile=None, overrides=None, data_root=None, hot_root=None) -> dict:
+    """CPU preflight (G2) from the S04 filing index: projected events, chunks, storage and GPU hours vs the budget."""
+    from .stages_data import preflight_projection
+    r = make_runner(profile, overrides, data_root, hot_root)
+    p = r.storage.profile_root / "S04" / r.stage_hash("S04") / "filing_manifest.parquet"
+    if not p.exists():
+        raise RuntimeError("run S04 first: the preflight projects from the filing index")
+    return preflight_projection(r.cfg, pd.read_parquet(p), r.storage.data_root, r.storage.hot_root)
+
+
+def gold(action: str, profile=None, overrides=None, data_root=None, hot_root=None) -> dict:
+    """`secprice gold export|import|agreement` (SPEC.md §17.2, §12).
+    export: (re)write the stratified sample, CSV templates and annotation guide (S12).
+    import: validate the completed files in DATA_ROOT/inputs/gold against the frozen sample, then import them (S12).
+    agreement: Cohen's kappa per field on items labelled by two annotators."""
+    from . import common as C
+    from .gold.tools import cohen_kappa, import_gold
+    r = make_runner(profile, overrides, data_root, hot_root)
+    sdir = r.storage.profile_root / "S12" / r.stage_hash("S12")
+    if action == "export":
+        run(["S12"], profile, overrides, force=True, data_root=data_root, hot_root=hot_root)
+        return {"templates": sorted(str(p) for p in (sdir / "templates").glob("*"))}
+    if not (sdir / "gold_sample.parquet").exists():
+        raise RuntimeError("run `secprice gold export` first: the frozen gold sample does not exist yet")
+    if action == "import":
+        g, errs = import_gold(r.storage.inputs / "gold", pd.read_parquet(sdir / "gold_sample.parquet"), C.question_bank(r.cfg))
+        if len(g):
+            run(["S12"], profile, overrides, force=True, data_root=data_root, hot_root=hot_root)
+        st = json.loads((sdir / "gold_status.json").read_text()) if (sdir / "gold_status.json").exists() else {}
+        return {"valid_rows": int(len(g)), "errors": errs, "status": st}
+    if action == "agreement":
+        p = sdir / "gold_labels.parquet"
+        if not p.exists():
+            return {"note": "no imported labels; run `secprice gold import` first"}
+        g = pd.read_parquet(p)
+        out = []
+        for f, gf in g.groupby("field"):
+            n_ann = gf.groupby("event_id").annotator.nunique()
+            both = gf[gf.event_id.isin(n_ann[n_ann > 1].index)]
+            if both.annotator.nunique() < 2:
+                continue
+            a, b = sorted(both.annotator.unique())[:2]
+            x = both[both.annotator == a].drop_duplicates("event_id").set_index("event_id").present_b
+            y = both[both.annotator == b].drop_duplicates("event_id").set_index("event_id").present_b
+            j = x.index.intersection(y.index)
+            out.append({"field": f, "n_items": int(len(j)), "kappa_present": cohen_kappa(x.loc[j], y.loc[j])})
+        return {"agreement": out or "no items labelled by two annotators (single-rater, provisional)"}
+    raise ValueError(f"unknown gold action {action!r}")
+
+
 def sync(direction: str, src_root, dst_root, profile: str, stages: list[str] | None = None) -> list[str]:
     """Copy stage artifacts (and inputs) between DATA_ROOTs (local <-> Drive)."""
     src, dst = Path(src_root), Path(dst_root)

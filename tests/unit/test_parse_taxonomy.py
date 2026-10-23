@@ -86,3 +86,35 @@ def test_ex13_mdna_found_under_varied_annual_report_titles():
         out = mdna_from_ex13(text)
         assert out is not None and out["method"] == "ex13_title" and len(out["text"]) > 3000, title
     assert mdna_from_ex13("Letter\n\nFinancial review of the year was positive.\n\n" + body) is None   # not a heading line
+
+
+def test_sec_cache_is_compressed_and_size_capped(tmp_path):
+    """Disk budget for the full run: cached bodies are zlib-compressed; bodies above cache_max_bytes are not cached."""
+    from secprice.sec.client import _ZMAGIC, SECClient
+
+    class _Resp:
+        def __init__(self, body):
+            self.status_code, self._b = 200, body
+
+        def iter_content(self, n):
+            for i in range(0, len(self._b), n):
+                yield self._b[i:i + n]
+
+        def close(self):
+            pass
+
+    calls = []
+
+    class _Sess:
+        def get(self, url, timeout=None, stream=None):
+            calls.append(url)
+            return _Resp(b"<html>" + b"filing text " * (10 if "small" in url else 5000) + b"</html>")
+
+    c = SECClient("Test User test@example.com", max_rps=100, cache_dir=tmp_path, cache_max_bytes=1000)
+    c._session = lambda: _Sess()
+    small = c.get("https://www.sec.gov/small")
+    big = c.get("https://www.sec.gov/big")
+    files = list(tmp_path.rglob("*.bin"))
+    assert len(files) == 1 and files[0].read_bytes().startswith(_ZMAGIC)        # only the small body, compressed
+    assert c.get("https://www.sec.gov/small") == small and len(calls) == 2         # served from the cache
+    assert c.get("https://www.sec.gov/big") == big and len(calls) == 3             # large body re-fetched, never cached

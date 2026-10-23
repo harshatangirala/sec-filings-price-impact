@@ -2,7 +2,7 @@
 # Must finish on a laptop CPU (except the optional GPU smoke). SPEC.md §3, addendum P1.5.
 universe:
   n_stocks: 5
-  fixed_tickers: [AAPL, MSFT, JNJ, XOM, JPM]
+  fixed_tickers: [AAPL, MSFT, JNJ, XOM, GPI]   # 4 S&P 500 + 1 non-member (GPI) so both index buckets run (D-061)
 study:
   start: "2021-01-01"
   end: "2023-12-31"

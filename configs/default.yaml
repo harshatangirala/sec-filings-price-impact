@@ -12,6 +12,7 @@ sec:
   max_rps: 6                  # SEC ceiling is 10; default 6
   user_agent_env: SEC_USER_AGENT
   cache_days: 30
+  cache_max_bytes: 0          # 0 = cache every response (zlib-compressed); full profile caps it to fit the disk budget
   timeout_s: 60
   max_retries: 6
   backoff_base_s: 2.0
@@ -210,6 +211,12 @@ budget:
   max_error_rate: 0.05
   llm_teacher_filings: 3000
   llm_gold_filings: 250
+  # CPU-side preflight before the EDGAR download (G2; refuses `full` when a budget would be exceeded). Constants were
+  # measured on the pilot (11,370 filings): sections -> chunks per filing, parsed-text bytes per filing.
+  preflight_chunks_per_filing: {"10-K": 62, "10-Q": 26, "8-K": 10}
+  preflight_bytes_per_filing: 20000
+  preflight_assumed_chunks_per_s: 400       # per encoder on an A100, conservative; S13 re-measures with a micro-benchmark
+  preflight_llm_s_per_prompt: 20
 
 lockbox:
   unlock_locked_test: false     # S19 runs only when the owner sets this true (single use, logged)

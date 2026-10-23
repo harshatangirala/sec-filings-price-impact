@@ -30,8 +30,14 @@ def code(s):
 
 
 def commit() -> str:
+    """Commit of the embedded code (last commit touching src/configs/tests), '-dirty' when that code has uncommitted
+    changes. Workflow: commit the code, build the notebook, commit the notebook - the stamp then names the code commit."""
     try:
-        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip() or "uncommitted"
+        c = subprocess.run(["git", "log", "-1", "--format=%h", "--", "src", "configs", "tests"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.strip() or "uncommitted"
+        d = subprocess.run(["git", "status", "--porcelain", "--", "src", "configs", "tests"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.strip()
+        return c + ("-dirty" if d else "")
     except Exception:
         return "unknown"
 
@@ -55,12 +61,13 @@ Jul 2026**. On that panel it runs three separate tracks:
 **How to run.** Set the owner settings in the first code cell, then *Runtime → Run all*. Every stage is resumable: re-running skips
 stages whose `_SUCCESS` marker matches; the EDGAR download (S05) checkpoints per firm.
 
-1. **smoke** (default, hard rule 4): 5 firms, 2021–2023, ~30–60 min on CPU. Verifies the whole chain on real data.
-2. **pilot**: ~40 sector-balanced firms from 2012 — a few hours (download dominated).
-3. **full**: 500 firms, 2000–2026. Gate **G2** requires a completed pilot and `owner_opt_in_full: True`. Expect **~10–14 h**
-   for the EDGAR download/parse on a CPU runtime (fair-access limit 6 requests/s), then **~3–6 h of A100** for embeddings,
-   tuning and fine-tuning. Recommended: run **Part 1 on a CPU (High-RAM) runtime**, switch to **A100** for Part 2, back to CPU for
-   Part 3 (`PART` setting). Restart the runtime when switching.
+1. **smoke** (default, hard rule 4): 5 firms (4 S&P 500 + 1 non-member), 2021–2023, ~20–30 min on CPU. Verifies the chain on real data.
+2. **full**: 500 firms (S&P 500 members first, then non-members), 2000–2026, reported as **S&P 500 / non-S&P 500 / combined**.
+   Gate **G2** = your opt-in + the preflight budget check, which runs before the download (the owner waived the pilot, D-058).
+   Expect **~10–14 h** for the EDGAR download/parse on a CPU runtime (fair-access limit 6 requests/s; S05 stops cleanly after
+   `s05_max_wall_hours` and resumes on re-run), then **~3–6 h of A100** for embeddings, tuning and fine-tuning. Run **Part 1 on a
+   CPU (High-RAM) runtime**, switch to **A100** for Part 2, back to CPU for Part 3 (`PART` setting). Restart when switching.
+3. **pilot** (optional): ~40 sector-balanced firms from 2012.
 
 **Rules this notebook enforces** (SPEC.md §0.2): SEC filings only as text; no news; four timestamps per event; features available no
 later than decision time; the report contains computed values only; association ≠ causation; prediction ≠ profitability;
@@ -70,7 +77,7 @@ Repository build: `{commit()}` · Artifacts: `MyDrive/sec-price-study/<profile>/
 """))
     C.append(md("## 0. Owner settings"))
     C.append(code("""
-RUN_PROFILE = "smoke"      # "smoke" -> "pilot" -> "full"   (hard rule 4: smoke is the default)
+RUN_PROFILE = "smoke"      # "smoke" -> "full" ("pilot" optional)   (hard rule 4: smoke is the default)
 PART = "all"               # "cpu1" (S00-S12, S20-S21) | "gpu" (S13-S17) | "cpu2" (S18-S24) | "all"
 DRIVE_FOLDER = "sec-price-study"
 
@@ -81,7 +88,8 @@ OWNER_OVERRIDES = {
     "rag": {"run_extraction_without_gold": False},        # True = teacher/student extraction without gold-val (EXPLORATORY)
     "lockbox": {"unlock_locked_test": False,              # True only after reviewing the development-holdout results
                 "acknowledge_reuse": False},
-    "full": {"owner_opt_in_full": False, "require_pilot_success": True},
+    "full": {"owner_opt_in_full": True,                   # owner opted in to the full study (2026-10-23)
+             "require_pilot_success": False},             # owner waived the pilot gate (D-058); the preflight still applies
     # Colab sessions can disconnect. S05 (the long EDGAR download, ~9 h for 500 firms) stops cleanly after this many hours;
     # run the same cell again and finished firms are skipped. 0 = no limit.
     "sec": {"s05_max_wall_hours": 8},
@@ -269,14 +277,19 @@ display(P.status(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT))
          "S02 maps our tickers to SEC CIKs, keeps firms that are also in the HF 10-K corpus and file 10-K/10-Q, then selects "
          "S&P-500 members first and fills the rest with a seeded, sector-stratified draw (no price returns are read).",
          "run(['S00', 'S01', 'S02'])\nu = show('S02', 'universe.parquet', 5)\nshow('S02', 'firms_per_year.csv', 30)\n"
-         "print(u.selected.sum() if u is not None else None, 'firms selected')"),
+         "print(u.selected.sum() if u is not None else None, 'firms selected')\n"
+         "if u is not None: print(u[u.selected].sp_bucket.value_counts().to_dict(), '(S&P 500 / non-S&P 500)')\n"
+         "show('S02', 'sp500_coverage.json')"),
         ("S03 calendar, prices, corporate actions, factors",
          "NYSE sessions (holidays, early closes), our split-adjusted bars + yfinance warm-up, raw / split-adjusted / total-return "
          "series, SPY, Kenneth French FF5 + momentum.", "run(['S03'])\nshow('S03', 'price_coverage.csv', 10)"),
         ("S04 EDGAR index + coverage audit",
          "Every 10-K / 10-Q / 8-K in the window with corrected acceptance times (verified rule; SGML header sample), periodic "
          "expectations and reason codes. 8-Ks carry no expectation.",
-         "run(['S04'])\nshow('S04', 'data_coverage_summary.md')\nshow('S04', 'ts_quality_by_year.csv', 30)"),
+         "run(['S04'])\nshow('S04', 'data_coverage_summary.md')\nshow('S04', 'ts_quality_by_year.csv', 30)\n"
+         "pf = P.preflight(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT, HOT_ROOT)   # G2 budget check before the long download\n"
+         "print(json.dumps(pf, indent=1, default=str))\n"
+         "if RUN_PROFILE == 'full' and not pf['passed']: raise RuntimeError(f\"preflight refuses the full run: {pf['over_budget']}\")"),
         ("S05 download + parse + taxonomy + anonymize (long, resumable)",
          "Downloads primary documents / full 8-K submissions at ≤ 6 requests/s with your User-Agent, extracts the target sections "
          "(Exhibit-13 fallback for MD&A by reference), masks firm names and tickers. If the runtime disconnects, re-run this cell: "
@@ -296,7 +309,9 @@ display(P.status(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT))
         ("S11 baselines L0–L4, L6 (default and tuned)",
          "Majority, price, metadata, accounting and lexical baselines and the best structured set, with Optuna tuning on walk-forward "
          "macro-F1, loss curves, learning curves, adversarial validation, permutation null and the elastic-net convexity certificate.",
-         "run(['S11'])\nshow('S11', 'ladder_summary.csv', 40)\nshow('S11', 'fit_diagnosis.csv', 40)\nshow('S11', 'enet_certificate.json')"),
+         "run(['S11'])\nshow('S11', 'ladder_summary.csv', 40)\nshow('S11', 'fit_diagnosis.csv', 40)\nshow('S11', 'enet_certificate.json')\n"
+         "show('S11', 'bucket_composition.csv')       # S&P 500 vs non-S&P 500 vs combined (D-056)\n"
+         "show('S11', 'bucket_scores.csv', 30)\nshow('S11', 'bucket_pooled_vs_own.csv')"),
         ("S12 gold-set export / import (Track C)",
          "Stratified gold sample from training-period filings and annotation templates in Drive. Annotate them (gold-test blind), put "
          "the completed CSVs in `inputs/gold/`, then re-run S12 with force=True.", "run(['S12'])\nshow('S12', 'gold_status.json')"),

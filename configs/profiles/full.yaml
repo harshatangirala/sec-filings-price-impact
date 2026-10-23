@@ -1,4 +1,9 @@
-# full: the defaults in configs/default.yaml (SPEC.md §3). G2 must pass first: pilot completed,
-# preflight within budget, owner opt-in (`owner_opt_in_full: true` in the notebook owner settings).
+# full: the defaults in configs/default.yaml (SPEC.md §3). G2 must pass first: owner opt-in (`owner_opt_in_full: true`) and
+# the preflight budget check, which runs before the EDGAR download. The owner waived the pilot requirement on 2026-10-23
+# (`require_pilot_success: false` in the notebook owner settings; decision log D-058).
 full:
   require_pilot_success: true
+sec:
+  # ~200k filings: caching every raw body would need well over 100 GB; keep small responses (JSON, headers, prefixes)
+  # and let large bodies stream (the parsed sections are what the later stages read)
+  cache_max_bytes: 400000

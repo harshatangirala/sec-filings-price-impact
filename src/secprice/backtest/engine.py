@@ -92,6 +92,18 @@ def daily_book(pos: pd.DataFrame, panel, spy: dict, n_sessions: int, max_w: floa
     return d
 
 
+def exposure_stats(d: pd.DataFrame, min_names: int) -> dict:
+    """Turnover and exposure of the daily book (SPEC.md §11.7): average names held, share of days each leg is invested,
+    share of days a leg holds cash because it has fewer than min_names positions, mean daily one-way turnover."""
+    nl, ns = d.n_long.to_numpy(float), d.n_short.to_numpy(float)
+    return {"avg_names_long": float(nl[nl > 0].mean()) if (nl > 0).any() else 0.0,
+            "avg_names_short": float(ns[ns > 0].mean()) if (ns > 0).any() else 0.0,
+            "share_days_long_invested": float((nl >= min_names).mean()), "share_days_short_invested": float((ns >= min_names).mean()),
+            "share_days_long_in_cash": float(((nl > 0) & (nl < min_names)).mean()),
+            "share_days_short_in_cash": float(((ns > 0) & (ns < min_names)).mean()),
+            "turnover_long_daily": float(d.turnover_long.mean()), "turnover_short_daily": float(d.turnover_short.mean())}
+
+
 def perf(r: np.ndarray, n_trials: int, rf: np.ndarray | None = None) -> dict:
     from ..evaluation.mcs_pbo import deflated_sharpe
     from scipy.stats import kurtosis, skew

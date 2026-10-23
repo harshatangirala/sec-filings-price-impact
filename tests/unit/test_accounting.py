@@ -113,3 +113,26 @@ def test_full_year_eps_in_q4_release_is_withheld():
     rel2 = rel.copy(); rel2.loc[3, "period_end"] = "2000-02-15"
     assert not flag_suspect_annual(rel2, {1: "1231"}).suspect_annual.any()
     assert not flag_suspect_annual(rel.iloc[3:], {1: "1231"}).suspect_annual.any()
+
+
+def test_release_eps_losses_text_tables_undifferentiated_and_multiyear():
+    """Real 2004-2011 release formats (early-era run, D-066): loss wording, plain-text tables, EPS without 'diluted',
+    five-year summary tables."""
+    from secprice.parse.eps_release import USABLE_CONFIDENCE, _text_table_row, parse_release_eps as p
+    r = p("For the second quarter the company reported a net loss of $25.3 million, or $0.80 per diluted share, compared "
+          "with net income of $0.40 per diluted share a year ago.")
+    assert r["eps_diluted"] == -0.80                                  # sign from 'net loss'; '25.3' is not a sentence end
+    assert p("Diluted earnings per share were $0.20, compared with a loss of $0.05 per share.")["eps_diluted"] == 0.20
+    assert p("Second quarter net loss per diluted share was $0.31.")["eps_diluted"] == -0.31
+    assert _text_table_row("Diluted $ 0.08 $ (0.05)") == "Diluted | 0.08 | (0.05)"
+    assert _text_table_row("Diluted (0.04) 0.27") == "Diluted | (0.04) | 0.27"   # parenthesis stays with the value
+    assert _text_table_row("Diluted 16,983 15,198") is None                      # share counts are not EPS
+    t = "Three months ended September 30, 2004\n(In thousands, except per share data)\nEarnings per share\nDiluted $ 0.08 $ (0.05)\n" \
+        "Weighted average shares\nDiluted 16,953 15,182"
+    assert p(t)["eps_diluted"] == 0.08 and p(t)["parse_confidence"] == "medium_table"
+    u = p("Third quarter earnings per share were $0.39, up from $0.33.")
+    assert u["eps_diluted"] == 0.39 and u["parse_confidence"] == "medium_undiff" and "medium_undiff" in USABLE_CONFIDENCE
+    assert p("We expect earnings per share for the third quarter to come in between $0.55 to $0.59.")["eps_diluted"] is None
+    five = "\n".join(["Selected financial data", "2010", "", "2009", "", "2008", "", "2007", "", "2006", "",
+                      "Net income per common share - assuming dilution (dollars) | 6.22 | 3.98 | 8.69"])
+    assert p(five)["eps_diluted"] is None                             # a multi-year summary, not the quarter

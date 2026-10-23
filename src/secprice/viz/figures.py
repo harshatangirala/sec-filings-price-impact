@@ -12,7 +12,7 @@ CAPTIONS = {
     "F01": "Coverage heatmap: share of observed filings that parsed into at least one section, by year x form. Pale cells = parser or download gaps.",
     "F02": "Audit reason codes by year (periodic-filing expectations only; 8-Ks have no expectation).",
     "F03": "8-K category availability by year under taxonomy v1 (legacy items before 2004-08-23).",
-    "F04": "Universe: unique firms (constant) vs firms with prices and firms in the S&P 500 each year. Survivorship-aware, not survivorship-free.",
+    "F04": "Universe: unique firms (constant) vs firms with prices and firms in the S&P 500 each year. Survivor-only universe (current listings; survivorship-biased).",
     "F05": "Timestamp quality (A exact / B date-only / C uncertain) and session buckets by year.",
     "F06": "Pre-publication window (last close -> acceptance) and the share of events whose clock changes under public-lag sensitivity.",
     "F07": "Event-clock diagram: acceptance, assumed public time, decision time; T_info base/exit; T_trade entry/exit.",
@@ -50,6 +50,10 @@ CAPTIONS = {
     "F39": "Adversarial validation ROC per fold (an AUC near 0.5 does not prove a split is unbiased).",
     "F40": "Selection diagnostics: Model Confidence Set membership and PBO (diagnostics only).",
     "FX1": "Supplementary - optimisation diagnostics: Optuna best-so-far objective per trial and the elastic-net convexity certificate (equal objective from several random starts = global optimum of that convex problem; tree and transformer optima are validation-selected, not global).",
+    "FX2": "Supplementary - S&P 500 vs non-S&P 500 vs combined: walk-forward macro-F1 of the combined L0/L2/L6 models scored on each "
+           "bucket, with month-block bootstrap CIs (overlapping CIs do not show a difference).",
+    "FX3": "Supplementary - average cumulative abnormal return path (market model) by index bucket, all event types "
+           "(association only; survivor-only universe).",
 }
 
 

@@ -33,13 +33,52 @@ _V = r"(\(?-?\$?\s*\d*\.\d{2}\)?)"
 _PROSE = [
     (re.compile(r"diluted\s+(?:earnings|eps)[^.$]{0,40}?(?:was|were|of)\s+\$\s*(\(?\d*\.\d{2}\)?)\s+GAAP", re.I), "medium_gaap_marked"),
     (re.compile(r"\$\s*(\(?\d*\.\d{2}\)?)\s+(?:per|a)\s+diluted\s+(?:common\s+)?share", re.I), "medium"),
-    (re.compile(r"(?:diluted\s+(?:earnings|net\s+income|income|eps)[^.$]{0,50}?|\(assuming\s+dilution\)\s*|"
+    (re.compile(r"(?:diluted\s+(?:earnings|net\s+income|income|eps|net\s+loss|loss)[^.$]{0,50}?|\(assuming\s+dilution\)\s*|"
                 r"assuming\s+dilution[^.$]{0,30}?)(?:of|was|were|totaled|to|:)\s*" + _V, re.I), "medium"),
     (re.compile(r"diluted\s+earnings\s+per\s+share[^.]{0,80}?were\s+\$[\d.,]+\s+(?:million|billion)\s+and\s+" + _V, re.I), "medium"),
     (re.compile(r"(?:net\s+income|net\s+earnings|earnings|net\s+profit)[^.]{0,80}?,?\s+or\s+\$\s*(\(?\d*\.\d{2}\)?)\s+per\s+(?:common\s+)?share", re.I),
      "low"),
+    # undifferentiated EPS ("earnings per share were $0.67"; older releases rarely say "diluted"): own class, validated vs XBRL
+    (re.compile(r"(?:net\s+)?(?:earnings|income|loss)\s+per\s+(?:common\s+)?(?:diluted\s+)?share[^.$]{0,40}?(?:of|was|were|totaled|to|:)\s*"
+                + _V, re.I), "medium_undiff"),
+    (re.compile(r"(?:net\s+income|net\s+earnings|earnings|net\s+profit|net\s+loss|loss)\s+(?:of|were|was)\s+\$\s*(\(?\d*\.\d{2}\)?)\s+"
+                r"per\s+(?:common\s+)?share", re.I), "medium_undiff"),
 ]
-USABLE_CONFIDENCE = {"high", "medium", "medium_table", "medium_gaap_marked"}   # SUE_release uses only these; 'low' stays for QA
+# plain-text table rows (no cell separators, common before ~2008): "Diluted $ 0.08 $ (0.05)" -> "Diluted | 0.08 | (0.05)"
+_TXT_ROW = re.compile(r"^\s*(?P<label>(?:[A-Za-z][A-Za-z ,'\u2019()/&\-]{0,70}?[\s\-\u2013\u2014:(])?(?:diluted|dilution|basic)\b"
+                      r"[A-Za-z ,'\u2019()/&\-]{0,30}?)"
+                      r"\s*[:\-\u2013\u2014]?\s*(?P<vals>\$?\s*\(?-?\d*\.\d{2}\)?(?:\s+\$?\s*\(?-?[\d,]*\.?\d*\)?)*)\s*$", re.I)
+
+
+def _sentence_start(text: str, pos: int) -> int:
+    """Start of the sentence containing pos: the last sentence end (., ! or ? followed by whitespace, never a decimal point)
+    or blank line within 600 characters."""
+    lo = max(0, pos - 600)
+    last = lo
+    for m in re.finditer(r"(?<!\d)[.!?](?=\s)|\n\s*\n", text[lo:pos]):
+        last = lo + m.end()
+    return last
+
+
+def _loss_governs(prefix: str) -> bool:
+    """True when the nearest results word before the number is 'loss' (not income / earnings / profit)."""
+    lo = [m.end() for m in re.finditer(r"\bloss(es)?\b", prefix, re.I)]
+    gi = [m.end() for m in re.finditer(r"\b(income|earnings|profit)\b", prefix, re.I)]
+    return bool(lo) and (not gi or lo[-1] > gi[-1])
+
+
+def _text_table_row(line: str) -> str | None:
+    if "|" in line:
+        return None
+    m = _TXT_ROW.match(line)
+    if not m:
+        return None
+    label, vals_txt = m.group("label").rstrip(), m.group("vals")
+    if label.endswith("("):                      # "Diluted (0.04)": the parenthesis belongs to the value (a negative)
+        label, vals_txt = label[:-1].rstrip(), "(" + vals_txt.lstrip()
+    vals = re.findall(r"\(?-?[\d,]*\.?\d+\)?", vals_txt)
+    return label + " | " + " | ".join(vals) if vals else None
+USABLE_CONFIDENCE = {"high", "medium", "medium_table", "medium_gaap_marked", "medium_undiff"}   # SUE_release uses only these; 'low' stays for QA
 
 
 def results_release_score(text: str) -> int:
@@ -98,7 +137,7 @@ def parse_release_eps(text: str) -> dict:
             lines.append(cur.strip() + " | " + nxt.strip())
             i = nxt_i + 1
             continue
-        lines.append(cur)
+        lines.append(_text_table_row(cur) or cur)
         i += 1
     best = None
     # 1) table rows: every candidate is scored; the best GAAP total-EPS row under an income-statement heading wins
@@ -119,6 +158,11 @@ def parse_release_eps(text: str) -> dict:
         above = " ".join(lines[max(0, i - 8):i])
         if _ANNUAL.search(above) and not re.search(r"quarter|three\s+months|13\s+weeks", above, re.I):
             continue                                   # an annual / outlook table, not the quarter
+        win = lines[max(0, i - 60):i]
+        yrs = {x.strip().strip("|").strip() for x in win if re.fullmatch(r"\s*\|?\s*(?:19[89]\d|20[0-3]\d)\s*\|?\s*", x)}
+        yrs |= set(re.findall(r"(?<!\d)(?:19[89]\d|20[0-3]\d)(?!\d)", " ".join(lines[max(0, i - 14):i])))
+        if len(yrs) >= 3 and not re.search(r"quarter|three\s+months|13\s+weeks", " ".join(win[-30:]), re.I):
+            continue                                   # a multi-year summary (selected financial data), not the quarter
         v = _row_value(line)
         if v is None:
             continue
@@ -146,7 +190,7 @@ def parse_release_eps(text: str) -> dict:
         for rx, conf in _PROSE:
             hit = None
             for m in rx.finditer(head):
-                s0 = head.rfind(".", 0, m.start()) + 1
+                s0 = _sentence_start(head, m.start())
                 sentence = head[s0:m.end()]
                 if _ANNUAL.search(sentence) and not re.search(r"quarter", sentence, re.I):
                     continue
@@ -156,8 +200,11 @@ def parse_release_eps(text: str) -> dict:
                     hit = m
                     break
             if hit:
-                out["eps_diluted"] = _to_float(hit.group(hit.lastindex))
-                best = ("diluted", out["eps_diluted"], conf, hit.group(0)[:200])
+                v = _to_float(hit.group(hit.lastindex))
+                if v is not None and v > 0 and _loss_governs(head[_sentence_start(head, hit.start()):hit.start(hit.lastindex)]):
+                    v = -v                             # "net loss of $25 million, or $0.80 per diluted share" -> -0.80
+                out["eps_diluted"] = v
+                best = ("diluted", v, conf, hit.group(0)[:200])
                 break
     if best:
         out["parse_confidence"] = best[2] if best[0] == "diluted" else "basic_fallback"
