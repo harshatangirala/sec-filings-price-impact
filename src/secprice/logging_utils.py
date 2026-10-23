@@ -36,6 +36,10 @@ class ErrorRateExceeded(RuntimeError):
     pass
 
 
+class StageIncomplete(RuntimeError):
+    """A resumable stage stopped cleanly at its wall-clock budget; run it again to continue (nothing is lost)."""
+
+
 class ErrorTracker:
     """Counts successes/failures; raises when the failure share exceeds budget.max_error_rate after min_n items."""
 

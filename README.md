@@ -45,7 +45,7 @@ Restart the runtime when switching between CPU and GPU. Fine-tuning runs only if
 
 ## Pilot Part 1 results (local CPU, 23 Oct 2026)
 40 sector-balanced S&P 500 firms, 2012-01 to 2026-07: 11,370 filings parsed (SGML acceptance header for every one), 10,105
-events, all timestamp quality A; release-EPS parser agrees with XBRL on 78.5% of usable-confidence releases; leakage audit
+events, all timestamp quality A; release-EPS parser agrees with XBRL on 79.8% of usable-confidence releases (45 probable full-year values withheld, D-052); leakage audit
 passes and catches all 4 planted leaks.
 
 | Track B, T_trade h=1, 3-class, walk-forward (2 folds, n = 2,871) | macro-F1 [95% block-bootstrap CI] |
@@ -53,14 +53,23 @@ passes and catches all 4 planted leaks.
 | L1 price only (CatBoost, tuned) | 0.362 [0.342, 0.383] |
 | L2 metadata (elastic net) | 0.396 [0.380, 0.412] |
 | L4 text: lexical + change + novelty + TF-IDF (LightGBM, tuned) | 0.391 [0.373, 0.412] |
-| L6 all CPU features (LightGBM, tuned, validation-selected) | 0.396 [0.378, 0.411] |
-| Permutation null (10 within-month label shuffles) | mean 0.328; none reached 0.395 (p ≤ 0.09) |
+| L6 all CPU features (LightGBM, tuned, validation-selected) | 0.396 [0.378, 0.415] |
+| Permutation null (10 within-month label shuffles) | mean 0.322; none reached 0.396 (p ≤ 0.09) |
 
 Validation-selected, not a global optimum (the elastic-net certificate shows only that its convex loss reached the same
-optimum from 3 starts). L6 does not beat L2 metadata alone (0.396 vs 0.396); training F1 0.66 against validation 0.40 flags
+optimum from 3 starts). L6 does not beat L2 metadata alone (0.396 vs 0.396); training F1 0.85 against validation 0.40 flags
 overfitting; adversarial AUC ≈ 1 reflects drift in filing vocabulary (covariate shift), not leakage (D-051). Track A: SUE
-post-earnings drift Q5-Q1 = -3.2% [-5.3%, -1.1%] (weak/mixed; opposite sign to classic PEAD in this small sample); text
+post-earnings drift Q5-Q1 = -2.5% [-4.7%, -0.6%], p = 0.10 (weak/mixed; opposite sign to classic PEAD in this small sample); text
 beyond momentum not supported. Association is not causation; prediction is not profitability.
+
+## Early-era check (2000-2004, real filings)
+Six firms, 361 filings, 317 events, run on real EDGAR data before any full run (decision log D-052/D-053). It found and fixed two
+defects (Exhibit 13 MD&A under "FINANCIAL REVIEW" titles; full-year EPS read as a quarter). Expect for 2000-2008: quality B/C
+timestamps (no usable SGML acceptance time before ~2003), no SUE before ~2004-05, and a common cohort that is mostly 2009+.
+
+## Long runs on Colab
+`sec.s05_max_wall_hours` (notebook default 8) makes the EDGAR download stop cleanly and say so; run the same cell again and finished
+firms are skipped. Dependency pins are in `requirements.lock`; all 26 ChronoBERT vintages are pinned to commit SHAs.
 
 ## Labelling (Track C)
 S12 writes `gold_*_filings_template.csv` and `gold_passages_template.csv` + `ANNOTATION_GUIDE.md` into the S12 folder.

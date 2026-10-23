@@ -192,3 +192,38 @@ def infer_quarter_end(filing_date, fiscal_year_end: str | None) -> tuple[str | N
             for y in (fd.year - 1, fd.year) for m in q_months]
     ends = sorted(e for e in ends if e <= fd - pd.Timedelta(days=7))
     return (ends[-1].date().isoformat(), "inferred_fiscal_calendar") if ends else (None, "none")
+
+
+def flag_suspect_annual(rel: pd.DataFrame, fye_by_cik: dict | None = None, ratio: float = 2.0, min_prior: int = 2) -> pd.DataFrame:
+    """Fiscal Q4 releases quote both quarter and full-year EPS; a parser can pick the full-year number. Point-in-time check:
+    a parsed EPS whose magnitude exceeds `ratio` x the largest quarterly EPS the firm released earlier (>= `min_prior` earlier
+    values, public time strictly before) is marked 'suspect_annual' (not in USABLE_CONFIDENCE: QA only, never a SUE input).
+    Applied only to releases whose period ends within 45 days of the fiscal year end (when that is known).
+    Conservative: a genuine jump above `ratio` x the prior maximum is also withheld (SUE unavailable, never wrong)."""
+    out = rel.copy()
+    if out.empty or "eps_diluted" not in out:
+        return out
+    out["suspect_annual"] = False
+    order = out.sort_values("public_available_time", kind="stable").index
+    seen: dict = {}
+    for i in order:
+        r = out.loc[i]
+        v = r.eps_diluted
+        if not (bool(r.is_results_release) and pd.notna(v) and r.parse_confidence in USABLE_CONFIDENCE):
+            continue
+        prior = seen.setdefault(r.cik, [])
+        q4 = True
+        fye = (fye_by_cik or {}).get(r.cik)
+        if fye and pd.notna(r.period_end):
+            fm = int(str(fye)[:2]) if str(fye)[:2].isdigit() else None
+            if fm:
+                pe = pd.Timestamp(r.period_end)
+                fe = pd.Timestamp(year=pe.year, month=fm, day=1) + pd.offsets.MonthEnd(0)
+                q4 = min(abs((pe - fe).days), abs((pe - fe.replace(year=pe.year - 1)).days),
+                         abs((pe - fe.replace(year=pe.year + 1)).days)) <= 45
+        if q4 and len(prior) >= min_prior and abs(v) > ratio * max(abs(p) for p in prior[-4:]):
+            out.loc[i, "suspect_annual"] = True
+            out.loc[i, "parse_confidence"] = "suspect_annual"
+            continue                                   # not added to the firm's quarterly history
+        prior.append(float(v))
+    return out

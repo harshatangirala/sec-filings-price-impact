@@ -13,7 +13,7 @@ import pandas as pd
 from . import common as C
 from .config import config_hash, file_sha256, get, text_sha256
 from .events.timestamps import acceptance_from_sources, derive_times, header_to_et, json_to_et, timing_policy_label
-from .logging_utils import ErrorRateExceeded, ErrorTracker
+from .logging_utils import ErrorRateExceeded, ErrorTracker, StageIncomplete
 from .runner import stage
 from .storage import write_json
 
@@ -416,8 +416,15 @@ def s05(ctx):
                      "filings": g[["cik", "filer_cik", "accession", "form", "primary_doc", "filing_date"]].to_dict("records")})
     t0 = time.time()
     done, crashes = 0, []
+    wall = float(S.get("s05_max_wall_hours") or 0) * 3600
+
+    def _over():
+        return wall > 0 and time.time() - t0 > wall
+
     if nproc == 1:
         for j in jobs:
+            if _over():
+                break
             r = run_firm_safe(j)
             done += 1
             if r.get("blocked"):
@@ -428,6 +435,8 @@ def s05(ctx):
         with ProcessPoolExecutor(max_workers=nproc, mp_context=_mp_ctx()) as ex:
             futs = {ex.submit(run_firm_safe, j): j["cik"] for j in jobs}
             for f in as_completed(futs):
+                if f.cancelled():
+                    continue
                 r = f.result()
                 done += 1
                 if r.get("blocked"):
@@ -436,8 +445,15 @@ def s05(ctx):
                     raise RuntimeError(r["blocked"])
                 if r.get("crash"):
                     crashes.append(r)
+                if _over():
+                    for ff in futs:
+                        ff.cancel()
                 if done % 10 == 0 or done == len(jobs):
                     ctx.log.info(f"S05 firms {done}/{len(jobs)} in {time.time() - t0:.0f}s")
+    n_ledger = len(list((ctx.out / "ledger").glob("*.parquet"))) if (ctx.out / "ledger").exists() else 0
+    if n_ledger < len(jobs) and _over():
+        raise StageIncomplete(f"S05 reached its {wall / 3600:.1f} h wall-clock budget with {n_ledger}/{len(jobs)} firms done; "
+                              "run the same cell again to continue (finished firms are skipped).")
     if crashes:
         ctx.warn(f"{len(crashes)} firm jobs crashed: {[c['crash'][:120] for c in crashes[:5]]}")
     led = pd.concat([pd.read_parquet(p) for p in sorted((ctx.out / "ledger").glob("*.parquet"))], ignore_index=True)
@@ -588,6 +604,11 @@ def s06(ctx):
                                           "source_line", "period_end", "period_source", "candidate_modern",
                                           "candidate_legacy_equivalent"])
     rel = rel.merge(ft[["accession", "public_available_time", "decision_time"]], on="accession", how="left")
+    from .parse.eps_release import flag_suspect_annual
+    fye_map = {int(c): u.loc[c, "fiscal_year_end"] for c in u.index if "fiscal_year_end" in u.columns}
+    rel = flag_suspect_annual(rel, fye_map)
+    if len(rel) and rel.get("suspect_annual", pd.Series(dtype=bool)).any():
+        ctx.warn(f"{int(rel.suspect_annual.sum())} release EPS values withheld as probable full-year figures (suspect_annual)")
     # QA: release EPS vs first-reported XBRL for the same quarter (QA only, never an input)
     from .features.accounting import _qkey
     rel["qkey"] = _qkey(pd.to_datetime(rel["period_end"])) if len(rel) else pd.Series(dtype="Int64")

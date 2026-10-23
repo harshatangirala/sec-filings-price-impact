@@ -38,6 +38,10 @@ TITLE_ONLY = {
     "10K_1A": r"^\s*risk\s+factors\s*$",
     "10K_7A": r"^\s*quantitative\s+and\s+qualitative\s+disclosures?\s+about\s+market\s+risk",
 }
+# Annual-report exhibits (EX-13) name the MD&A in many ways ("FINANCIAL REVIEW", "Management Discussion", ...). Used for EX-13 only.
+EX13_MDNA_TITLE = (r"^\s*(management.{0,4}s?\s+discussion(\s+and\s+analysis)?(\s+of\s+(financial\s+condition|results)[\w\s,&]{0,60})?"
+                   r"|financial\s+review|financial\s+review\s+and\s+analysis|review\s+of\s+operations|"
+                   r"financial\s+(condition\s+and\s+)?results\s+of\s+operations)\s*:?\s*$")
 _ROMAN = {"1": "I", "2": "II", "i": "I", "ii": "II", "iii": "III", "iv": "IV"}
 
 
@@ -140,12 +144,13 @@ def extract_sections(text: str, form: str, max_chars: int = 300000) -> dict[str,
     return out
 
 
-def _title_only(text: str, sid: str):
-    rx = TITLE_ONLY.get(sid)
+def _title_only(text: str, sid: str, rx_override: str | None = None):
+    rx = rx_override or TITLE_ONLY.get(sid)
     if not rx:
         return None
     best = None
-    pat = re.compile(rx, re.I)
+    # line-anchored override patterns need re.M (the slice below spans several lines); built-in patterns keep their behaviour
+    pat = re.compile(rx, re.I | re.M) if rx_override else re.compile(rx, re.I)
     starts = [m.start() for m in re.finditer(r"(?m)^.{0,200}$", text) if pat.match(text[m.start():m.start() + 200])]
     stops = [m.start() for m in re.finditer(
         r"(?mi)^\s*(item\s*\d|quantitative\s+and\s+qualitative|financial\s+statements\s+and\s+supplementary|"
@@ -161,6 +166,8 @@ def _title_only(text: str, sid: str):
 def mdna_from_ex13(text: str, max_chars: int = 300000) -> dict | None:
     """MD&A located by title inside an annual-report exhibit (EX-13)."""
     span = _title_only(text, "10K_7")
+    if not span or span[1] - span[0] < 1500:
+        span = _title_only(text, "10K_7", EX13_MDNA_TITLE)
     if not span or span[1] - span[0] < 1500:
         return None
     s, e = span

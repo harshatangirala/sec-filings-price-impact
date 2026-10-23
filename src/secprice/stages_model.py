@@ -403,6 +403,8 @@ def s14(ctx):
             vint = chrono_vintage(y, spec["vintages"]) if enc == "chrono_bert" else None
             mid = spec["model_id_template"].format(year=vint) if vint else spec["model_id"]
             rev = (spec.get("revisions") or {}).get(str(vint)) if vint else spec.get("revision")
+            if not rev:
+                raise RuntimeError(f"{mid}: no pinned revision in configs/models.yaml (hard rule 12)")
             if loaded != mid:
                 if mdl is not None:
                     unload(mdl)

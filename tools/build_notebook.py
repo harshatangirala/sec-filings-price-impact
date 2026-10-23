@@ -82,6 +82,9 @@ OWNER_OVERRIDES = {
     "lockbox": {"unlock_locked_test": False,              # True only after reviewing the development-holdout results
                 "acknowledge_reuse": False},
     "full": {"owner_opt_in_full": False, "require_pilot_success": True},
+    # Colab sessions can disconnect. S05 (the long EDGAR download, ~9 h for 500 firms) stops cleanly after this many hours;
+    # run the same cell again and finished firms are skipped. 0 = no limit.
+    "sec": {"s05_max_wall_hours": 8},
 }
 """))
     C.append(md("""
@@ -122,11 +125,16 @@ except Exception as e:
 """))
     C.append(md("Install only what is missing, pinned against the runtime's own core libraries (torch / pandas / numpy are never reinstalled)."))
     C.append(code("""
-need = {"catboost": "catboost", "optuna": "optuna", "arch": "arch", "pandas_market_calendars": "pandas_market_calendars",
-        "reportlab": "reportlab", "lmformatenforcer": "lm-format-enforcer", "yfinance": "yfinance", "lightgbm": "lightgbm",
-        "statsmodels": "statsmodels", "markdown": "markdown", "jsonschema": "jsonschema", "openpyxl": "openpyxl",
-        "transformers": "transformers", "pytest": "pytest", "nbformat": "nbformat", "lxml": "lxml"}
-missing = [pkg for mod, pkg in need.items() if importlib.util.find_spec(mod) is None]
+# Add-on pins verified by the test suite and the pilot (requirements.lock). Runtime core libraries are never reinstalled.
+PINS = {"catboost": "1.2.10", "optuna": "5.0.0", "arch": "8.0.0", "pandas_market_calendars": "5.5.0", "reportlab": "5.1.0",
+        "lm-format-enforcer": "0.11.3", "yfinance": "1.7.0", "lightgbm": "4.7.0", "statsmodels": "0.15.0",
+        "transformers": "5.20.2", "markdown": "3.11.2", "jsonschema": "4.26.0", "openpyxl": "3.1.5", "pytest": "9.1.1",
+        "nbformat": "5.11.1", "lxml": "6.1.3"}
+from importlib import metadata as _md
+def _ver(pkg):
+    try: return _md.version(pkg)
+    except Exception: return None
+missing = [f"{k}=={v}" for k, v in PINS.items() if _ver(k) != v]
 pins = []
 for mod in ("torch", "pandas", "numpy", "scipy", "sklearn", "pyarrow"):
     try:
@@ -137,10 +145,16 @@ for mod in ("torch", "pandas", "numpy", "scipy", "sklearn", "pyarrow"):
 Path("/tmp").mkdir(exist_ok=True)
 Path("/tmp/secprice_constraints.txt").write_text("\\n".join(pins))
 if missing:
-    print("installing:", missing)
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-c", "/tmp/secprice_constraints.txt", *missing], check=True)
+    print("installing pinned:", missing)
+    r = subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-c", "/tmp/secprice_constraints.txt", *missing])
+    if r.returncode != 0:
+        # a pin conflicts with this runtime: install each package alone, keep the pin where possible, report the rest
+        for spec in missing:
+            r1 = subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-c", "/tmp/secprice_constraints.txt", spec])
+            if r1.returncode != 0:
+                print("WARNING: could not install", spec, "- using the runtime's version", _ver(spec.split("==")[0]))
 import transformers
-print("ready; transformers", transformers.__version__, "| missing installed:", missing)
+print("ready; transformers", transformers.__version__, "| pinned installs attempted:", missing)
 """))
     C.append(md("""
 ## 2. Package source (embedded from the repository — do not edit here)
@@ -234,6 +248,16 @@ chk = {"ohlcv_1day files": len(list((inp / "ohlcv_1day").glob("*.parquet"))) if 
        "HF census": (inp / "hf_census_5da7e3c8b920.parquet").exists()}
 print(json.dumps(chk, indent=1))
 assert chk["ohlcv_1day files"] > 0, "copy the OHLCV parquet files to DATA_ROOT/inputs/ohlcv_1day first"
+# fail fast, before any long stage
+if PART in ("all", "cpu1") and len(os.environ.get("SEC_USER_AGENT", "").split()) < 2:
+    raise RuntimeError("Add the Colab secret SEC_USER_AGENT = 'Your Name your.email@example.com' (SEC fair-access policy), then re-run.")
+if PART == "gpu":
+    import torch
+    assert torch.cuda.is_available(), "PART='gpu' needs a GPU runtime: Runtime > Change runtime type > A100, then restart and re-run."
+free_gb = shutil.disk_usage(HOT_ROOT).free / 1e9
+print(f"free disk at HOT_ROOT: {free_gb:.0f} GB")
+if RUN_PROFILE == "full" and free_gb < 60:
+    print("WARNING: the full profile caches filings and a chunk store on local disk; free at least ~60 GB (or use a High-RAM/large-disk runtime).")
 display(P.status(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT))
 """))
     # ---------------- Part 1

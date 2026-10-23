@@ -12,7 +12,7 @@ from typing import Callable
 import numpy as np
 
 from .config import config_hash, subset_hash
-from .logging_utils import get_logger
+from .logging_utils import StageIncomplete, get_logger
 from .storage import Storage, utcnow, write_json
 
 
@@ -158,6 +158,11 @@ class Runner:
             gpu_t0 = _gpu_time()
             try:
                 info = spec.func(ctx) or {}
+            except StageIncomplete as e:
+                self.log.warning(f"{sid} INCOMPLETE (resumable): {e}")
+                manifest["stages"][sid] = {"status": "incomplete", "error": str(e)[:500], "at": utcnow()}
+                write_json(self.timings_path, manifest)
+                raise
             except Exception as e:
                 self.log.error(f"{sid} failed: {e}\n{traceback.format_exc()}")
                 manifest["stages"][sid] = {"status": "failed", "error": str(e)[:500], "at": utcnow()}

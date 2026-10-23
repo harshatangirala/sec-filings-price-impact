@@ -75,3 +75,14 @@ def test_coverage_reason_codes_no_8k_expectation():
     assert cov.set_index("year").loc[2020, "reason_code"] == "OK"
     assert cov.set_index("year").loc[2021, "reason_code"] == "MISSING_10K"
     assert not any("8-K" in c for c in cov.columns)
+
+
+def test_ex13_mdna_found_under_varied_annual_report_titles():
+    """Real EX-13s head the MD&A 'FINANCIAL REVIEW' (AXP, PFE) or 'Management Discussion' (IBM); found on 1999-2004 filings."""
+    from secprice.parse.sections import mdna_from_ex13
+    body = "Revenues rose on higher volume and pricing across all segments of the business. " * 60
+    for title in ("FINANCIAL REVIEW", "Management Discussion", "MANAGEMENT'S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS"):
+        text = f"Letter to shareholders\n\n{title}\n\n{body}\n\nConsolidated Statements of Income\n\nnumbers"
+        out = mdna_from_ex13(text)
+        assert out is not None and out["method"] == "ex13_title" and len(out["text"]) > 3000, title
+    assert mdna_from_ex13("Letter\n\nFinancial review of the year was positive.\n\n" + body) is None   # not a heading line

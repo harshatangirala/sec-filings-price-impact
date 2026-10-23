@@ -20,6 +20,7 @@ sec:
   max_8k_bytes: 15000000      # full submission .txt read cap for 8-Ks
   max_doc_bytes: 40000000
   blocked_403_limit: 20       # consecutive 403s -> pause and report (hard rule 13)
+  s05_max_wall_hours: 0       # 0 = unlimited; >0 = S05 stops cleanly after this many hours (re-run resumes per firm)
   header_check_sample: 150    # periodic filings whose SGML header is fetched to re-verify the JSON timestamp rule
   batch_size: 400             # parse checkpoint batch
 

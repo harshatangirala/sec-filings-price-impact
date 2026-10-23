@@ -97,3 +97,19 @@ def test_release_eps_parser_formats():
     r = parse_release_eps(t)
     assert r["eps_diluted"] == pytest.approx(0.97) and r["parse_confidence"] == "high"
     assert parse_release_eps("Diluted earnings per share, excluding specified items, were $1.30")["eps_diluted"] is None
+
+
+def test_full_year_eps_in_q4_release_is_withheld():
+    """Found on real 1999-2003 releases (AXP $5.42 and XOM $3.23 are full-year figures; the quarters were ~$1.4 and $1.01)."""
+    from secprice.parse.eps_release import flag_suspect_annual
+    t = pd.to_datetime(["1999-04-20", "1999-07-20", "1999-10-20", "2000-01-25", "2000-04-20"], utc=True)
+    rel = pd.DataFrame({"accession": list("abcde"), "cik": 1, "is_results_release": True, "eps_diluted": [1.30, 1.41, 1.42, 5.42, 1.44],
+                        "parse_confidence": "medium", "period_end": ["1999-03-31", "1999-06-30", "1999-09-30", "1999-12-31", "2000-03-31"],
+                        "public_available_time": t})
+    out = flag_suspect_annual(rel, {1: "1231"})
+    assert out.set_index("accession").suspect_annual.to_dict() == {"a": False, "b": False, "c": False, "d": True, "e": False}
+    assert out.set_index("accession").loc["d", "parse_confidence"] == "suspect_annual"
+    # a non-Q4 quarter with a big jump is kept (the check applies at the fiscal year end only); too little history is kept
+    rel2 = rel.copy(); rel2.loc[3, "period_end"] = "2000-02-15"
+    assert not flag_suspect_annual(rel2, {1: "1231"}).suspect_annual.any()
+    assert not flag_suspect_annual(rel.iloc[3:], {1: "1231"}).suspect_annual.any()
