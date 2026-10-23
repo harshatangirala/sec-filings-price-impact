@@ -1,0 +1,46 @@
+# Pre-registration (SPEC.md §2, §15; addendum P0.1). Hashed by `secprice prereg-freeze` before any
+# development-holdout scoring. Do not edit after freezing: a changed hash is logged as a protocol deviation.
+version: 2
+frozen_by: owner
+primary:
+  track: B
+  target_def: T_trade          # addendum P0.1: primary Track B target is genuinely prospective
+  horizon: 1
+  kind: label3                 # Up / Sideways / Down of the abnormal return
+  metric: macro_f1_walk_forward_mean
+  guardrails:
+    logloss_not_worse_than_prior: true
+    ece_max: 0.10
+complementary:
+  - {track: A, target_def: T_info, horizons: [1, 2, 5, 20, 60], note: "information response / event study; never presented as a prospective forecast"}
+  - {track: B, target_def: T_info, horizon: 1, kind: label3, note: "separate model; never the signal for the T_trade backtest"}
+labels:
+  k: 0.5
+  k_sensitivity: [0.25, 0.75]
+timing_policy: "point-in-time evaluation under an assumed availability/processing-latency policy: public = acceptance + 5 min (assumed), decision = public + 30 min"
+hypotheses:
+  core:
+    H1: "SEC text adds out-of-time predictive value beyond price, metadata and accounting baselines (L7/L8 vs L6, common cohort)"
+    H2: "Changes in filing language add more value than absolute sentiment alone (change+novelty vs LM levels inside L4/L7)"
+    H3: "Validated structured event extraction adds value beyond frozen embeddings and lexical features (L8 vs L7)"
+    H4: "Strict point-in-time model vintages perform differently from retrospective static checkpoints (ChronoBERT vintage vs static encoders, identical rows and heads)"
+  extension:
+    H5: "A stacked multi-tower ensemble beats the best single model"
+    H6: "Richer RAG designs beat hybrid + rerank"
+    H7: "Analogue retrieval or time-series models add value"
+    H8: "Gains shrink under strict timestamps, costs, clean-event filtering and the locked test"
+coverage_levels: [1.0, 0.5, 0.25, 0.1]
+fdr_families:
+  ladder_lifts: "L1..L8 vs L6 lifts on the primary target (common cohort)"
+  hypotheses_core: "H1-H4"
+  track_a_car: "CAR windows x forms x categories (all-event)"
+  drift: "drift tests in SPEC.md §10.2"
+  extensions: "H5-H8"
+trivial_effect_bps: {h_le_2: 10, h_5: 25, h_ge_20: 50}
+backtest:
+  signal: "s = P(Up) - P(Down) from the frozen T_trade model"
+  horizon: 5
+  thresholds: "long if s >= training-period 80th pct; short if s <= 20th pct"
+gates:
+  G3_text_lift_macro_f1: 0.01
+selection_rule: "validation-selected (walk-forward mean macro-F1; tie-break lower std, then simpler model within one bootstrap SE)"

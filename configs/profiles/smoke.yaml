@@ -1,0 +1,56 @@
+# smoke: 5 firms, 2021-2023, ~10 filings per firm-form, one encoder, LLM on <= 20 filings.
+# Must finish on a laptop CPU (except the optional GPU smoke). SPEC.md §3, addendum P1.5.
+universe:
+  n_stocks: 5
+  fixed_tickers: [AAPL, MSFT, JNJ, XOM, JPM]
+study:
+  start: "2021-01-01"
+  end: "2023-12-31"
+market:
+  warmup_start: "2019-06-01"
+text:
+  predecessor_lookback_years: 1
+  max_chunks_per_section: 6
+accounting:
+  predecessor_lookback_years: 4
+smoke:
+  max_filings_per_firm_form: 16
+splits:
+  min_train_years: 1
+  val_block_years: 1
+  dev_years: 0.5
+  dev_start: "2023-01-01"
+  locked_test_start: "2023-07-01"
+  embargo_days: 30
+  stress_folds: 2
+  purge_horizon_sessions: 20
+targets:
+  horizons: [1, 2, 5, 20]
+contam_window_sessions: 20
+models:
+  encoders: [bge_base]
+  embed_batch: 16
+  pca_dims: 8
+distill:
+  teacher_filings: 20
+  epochs: 1
+tuning:
+  trials: {lightgbm: 3, catboost: 2, enet: 3}
+  min_train_rows: 12
+  min_test_rows: 3
+  permutations: 3
+  timeout_s_per_study: 300
+  finetune_grid:
+    lr: [2.0e-5]
+    batch: [8]
+    epochs: 1
+    weight_decay: [0.0]
+    max_trials: 1
+  finetune_max_train_events: 200
+bootstrap:
+  n: 100
+budget:
+  llm_teacher_filings: 20
+  llm_gold_filings: 20
+backtest:
+  min_names_per_side: 1

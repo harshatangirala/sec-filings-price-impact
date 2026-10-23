@@ -1,0 +1,106 @@
+# Core roster + provenance ledger (SPEC.md §6.4, §7.1). Revisions verified on the Hugging Face Hub 2026-10-23.
+# stated_cutoff: a date only when the card documents one; otherwise "unknown" -> retrospective leaderboard only.
+encoders:
+  sec_bert:
+    model_id: nlpaueb/sec-bert-base
+    revision: d511591f5e74052afdab08f1f14c4ff2a1e55749
+    card_url: https://huggingface.co/nlpaueb/sec-bert-base
+    license: cc-by-sa-4.0
+    training_corpus: "260,773 10-K filings 1993-2019 (model card)"
+    stated_cutoff: "2019-12-31"
+    fine_tune_data: none
+    task: masked-LM encoder
+    labels: none
+    pooling: mean
+    max_len: 512
+  finbert_tone:
+    model_id: yiyanghkust/finbert-tone
+    revision: 4921590d3c0c3832c0efea24c8381ce0bda7844b
+    card_url: https://huggingface.co/yiyanghkust/finbert-tone
+    license: "not stated on card"
+    training_corpus: "10-K/10-Q (2.5B tokens), earnings calls (1.3B), analyst reports (1.1B); tone fine-tune on analyst-report sentences"
+    stated_cutoff: unknown
+    fine_tune_data: "analyst-report sentences (tone)"
+    task: tone classifier (Neutral/Positive/Negative)
+    labels: [Neutral, Positive, Negative]
+    pooling: mean
+    max_len: 512
+    native_outputs: true
+  chrono_bert:
+    model_id_template: "manelalab/chrono-bert-v1-{year}1231"
+    vintages: [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+               2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+    revisions:
+      "1999": 972f0d46401d074be2adda28c3e2baafa3419e14
+      "2024": 2478c3bd4a676e2e7bdc72f8100262b39bde4b0d
+    card_url: https://huggingface.co/collections/manelalab/chronobert
+    license: mit
+    training_corpus: "timestamped open-source text; each vintage trained only on text up to its date"
+    stated_cutoff: vintage   # vintage YYYY1231
+    fine_tune_data: none
+    task: masked-LM encoder (ModernBERT architecture)
+    labels: none
+    pooling: mean
+    max_len: 512             # 1,024-token context; chunks are shared across encoders (same rows, same inputs)
+    vintage_rule: "event year Y uses vintage Y-1; years after the last vintage use the last vintage (still precedes the event)"
+  bge_base:
+    model_id: BAAI/bge-base-en-v1.5
+    revision: a5beb1e3e68b9ab74eb54cfd186867f64f240e1a
+    card_url: https://huggingface.co/BAAI/bge-base-en-v1.5
+    license: mit
+    training_corpus: "general web-scale text (card); no date cutoff stated"
+    stated_cutoff: unknown
+    fine_tune_data: contrastive retrieval pairs
+    task: sentence embedding (CLS, normalized); dense retriever
+    labels: none
+    pooling: cls
+    max_len: 512
+reranker:
+  bge_reranker:
+    model_id: BAAI/bge-reranker-base
+    revision: 2cfc18c9415c912f9d8155881c133215df768a70
+    card_url: https://huggingface.co/BAAI/bge-reranker-base
+    license: mit
+    stated_cutoff: unknown
+llm:
+  qwen:
+    model_id: Qwen/Qwen2.5-7B-Instruct
+    revision: a09a35458c702b33eeacc393d103063234e8bc28
+    card_url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+    license: apache-2.0
+    stated_cutoff: unknown   # not precisely documented -> retrospective only (SPEC.md §7.1)
+    gated: false
+judge:
+  nli_judge:
+    model_id: cross-encoder/nli-deberta-v3-base
+    revision: 6c749ce3425cd33b46d187e45b92bbf96ee12ec7
+    card_url: https://huggingface.co/cross-encoder/nli-deberta-v3-base
+    license: apache-2.0
+    stated_cutoff: unknown
+    note: "faithfulness judge; deliberately not the generator (SPEC.md §9.2)"
+student:
+  modernbert_base:
+    model_id: answerdotai/ModernBERT-base
+    revision: 8949b909ec900327062f0ebf497f51aef5e6f0c8
+    card_url: https://huggingface.co/answerdotai/ModernBERT-base
+    license: apache-2.0
+    stated_cutoff: unknown
+ner:
+  bert_ner:
+    model_id: dslim/bert-base-NER
+    revision: d1a3e8f13f8c3566299d95fcfc9a8d2382a9affc
+    card_url: https://huggingface.co/dslim/bert-base-NER
+    license: mit
+    stated_cutoff: unknown
+    note: "PER/ORG only, for anonymization; never money (SPEC.md §7.1)"
+tabular:
+  lightgbm: {stated_cutoff: trained_on_folds}
+  catboost: {stated_cutoff: trained_on_folds}
+  enet: {stated_cutoff: trained_on_folds}
+lexical:
+  loughran_mcdonald:
+    source: "https://sraf.nd.edu/loughranmcdonald-master-dictionary/ (Google Sheet export of Loughran-McDonald_MasterDictionary_1993-2025)"
+    sheet_export_url: "https://docs.google.com/spreadsheets/d/1P3KtWuDyQT2Eu_VwTU3D2sEeQxR9dWCS/export?format=csv"
+    sha256_verified_2026_10_23: 147cb24a1687ccde60363a0fa29c62be4097debcc698c01a83e51bb8a176dbb3
+    license: "academic use free; commercial use needs a licence (loughranmcdonald@gmail.com)"
+    stated_cutoff: "dictionary words by year added; static word lists"

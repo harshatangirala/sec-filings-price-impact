@@ -1,0 +1,226 @@
+# All parameters (SPEC.md §3, §15). Profiles in configs/profiles/ overlay this file.
+# Owner overrides (notebook "Owner settings" cell) overlay the profile. Every override is logged.
+run_profile: smoke            # hard rule 4: smoke is the default; pilot/full need an explicit change
+seed: 20261023
+
+paths:
+  data_root_env: DATA_ROOT    # artifacts root: Drive folder on Colab, a project data folder locally
+  hot_root_env: HOT_ROOT      # fast scratch (Colab /content); raw HTTP cache lives here
+  inputs_dirname: inputs      # DATA_ROOT/inputs: owner-supplied files (OHLCV parquet, lexicon, caches)
+
+sec:
+  max_rps: 6                  # SEC ceiling is 10; default 6
+  user_agent_env: SEC_USER_AGENT
+  cache_days: 30
+  timeout_s: 60
+  max_retries: 6
+  backoff_base_s: 2.0
+  workers: 8                  # download threads sharing one rate limiter
+  parse_workers: 0            # 0 = os.cpu_count() - 1
+  max_8k_bytes: 15000000      # full submission .txt read cap for 8-Ks
+  max_doc_bytes: 40000000
+  blocked_403_limit: 20       # consecutive 403s -> pause and report (hard rule 13)
+  header_check_sample: 150    # periodic filings whose SGML header is fetched to re-verify the JSON timestamp rule
+  batch_size: 400             # parse checkpoint batch
+
+hf:
+  repo: JanosAudran/financial-reports-sec
+  revision: 5da7e3c8b920a586b8c36eecba4aaa0152a59a52
+  qa_sample_filings: 200      # 10-K section-parser QA against HF sections
+  qa_enabled: true
+  qa_max_shards: 2
+
+universe:
+  n_stocks: 500
+  source: sp500_fja05680
+  sp500_repo: fja05680/sp500
+  sp500_commit: a2430f2af0c79ddf0748e91de11bdeb1616ab5a7
+  require_hf_overlap: true    # owner: firms common to the HF 10-K corpus and our OHLCV data
+  require_ohlcv: true
+  exclude_foreign_filers: true
+  selection: sp500_first_then_seeded_sector_stratified
+  fixed_tickers: []           # profile may pin tickers (smoke)
+  ff12_url: https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/Siccodes12.zip
+
+study:
+  start: "2000-01-01"
+  end: "2026-07-31"           # owner: Jan 2000 - Jul 2026 (spec default 2026-10-31 is overridable)
+
+market:
+  warmup_start: "1998-01-01"
+  benchmark: SPY
+  calendar: NYSE
+  price_provider: local_triframe_plus_yfinance
+  local_ohlcv_subdir: ohlcv_1day          # DATA_ROOT/inputs/ohlcv_1day/<TICKER>.parquet (split-adjusted)
+  local_actions_file: yahoo_actions.parquet  # DATA_ROOT/inputs: dividends + splits cache
+  yfinance: {auto_adjust: false, actions: true, back_adjust: false, repair: false, interval: 1d}
+  seam_check_days: 40
+  factors:
+    ff5_url: https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip
+    mom_url: https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_daily_CSV.zip
+
+text:
+  predecessor_lookback_years: 2
+  sections:
+    "10-K": [10K_1, 10K_1A, 10K_7, 10K_7A]
+    "10-Q": [10Q_MDA, 10Q_MR, 10Q_RF]
+    "8-K": [8K_ITEMS, 8K_EX99]
+  max_chars_per_section: 300000
+  chunk_words: 350
+  chunk_overlap_words: 50
+  max_chunks_per_section: 24
+  drop_numeric_lines: true
+  model_text_chars: 12000     # characters per event fed to TF-IDF / fine-tuning text builders
+
+accounting:
+  predecessor_lookback_years: 4   # addendum P1.4: separate from text lookback, >= 4 years
+  sue_min_diffs: 4
+  sue_max_diffs: 8
+  eps_tags: [EarningsPerShareDiluted, EarningsPerShareBasic, EarningsPerShareBasicAndDiluted]
+  fact_tags: [Assets, Liabilities, StockholdersEquity, NetIncomeLoss, Revenues,
+              RevenueFromContractWithCustomerExcludingAssessedTax, SalesRevenueNet, OperatingIncomeLoss,
+              CashAndCashEquivalentsAtCarryingValue, LongTermDebt]
+  shares_tag: EntityCommonStockSharesOutstanding
+
+timing:
+  public_lag_minutes: 5
+  public_lag_sensitivity: [0, 15, 60]
+  decision_latency_minutes: 30
+  decision_latency_sensitivity: [10, 120]
+  date_only_assumed_time: "17:30"
+  json_rule_max_mismatch: 0.01   # share of header checks allowed to disagree before JSON times drop to quality C
+
+taxonomy_version: taxonomy_8k_v1
+
+targets:
+  horizons: [1, 2, 5, 20, 60]
+  primary: {target_def: T_trade, horizon: 1, kind: label3}       # addendum P0.1
+  complementary: {target_def: T_info, horizon: 1, kind: label3}
+  regression: [ar, vol_ratio, abs_std]
+  est_window: [-250, -30]
+  est_min_obs: 120
+  vol_post: [1, 20]
+  vol_pre: [-60, -5]
+  sensitivity_horizons: [1, 5]
+
+labels:
+  k: 0.5
+  k_sensitivity: [0.25, 0.75]
+
+contam_window_sessions: 60
+
+splits:
+  min_train_years: 8
+  val_block_years: 2
+  dev_years: 3
+  dev_start: "2020-01-01"
+  locked_test_start: "2023-01-01"
+  embargo_days: 90
+  stress_folds: 5
+  purge_horizon_sessions: 60
+
+models:
+  roster_file: configs/models.yaml
+  encoders: [sec_bert, finbert_tone, chrono_bert, bge_base]
+  max_seq_len: 512
+  embed_batch: 128
+  pca_dims: 64
+
+rag:
+  top_k: 8
+  bm25_k1: 1.5
+  bm25_b: 0.75
+  rrf_k: 60
+  rerank_top_n: 30
+  max_prompt_passages: 8
+  max_new_tokens: 1800        # 12 fields x (object + <= 2 short quotes); truncation would void the JSON
+  run_extraction_without_gold: false   # G3b cannot pass without gold-val; owner may set true (labelled exploratory)
+  prefill_dev_val: true                # LLM pre-fill for gold-dev/val templates only (never gold-test)
+
+distill:
+  teacher_filings: 3000
+  student_model: modernbert_base
+  epochs: 3
+  lr: 3.0e-5
+  batch: 16
+
+tuning:
+  sampler: tpe
+  pruner: median
+  heads: [lightgbm, catboost, enet]
+  trials: {lightgbm: 15, catboost: 6, enet: 8}
+  tuned_rungs: [L1, L2, L3, L4, L6]    # L4_levels / L4_change / L6_nochange inherit the parent rung's parameters
+  timeout_s_per_study: 5400
+  inner_val_frac: 0.15
+  min_train_rows: 50          # a fold with fewer training rows is skipped and reported
+  min_test_rows: 10
+  permutations: 10
+  finetune_grid:
+    lr: [1.0e-5, 2.0e-5, 3.0e-5]
+    batch: [8, 16]
+    epochs: 3
+    weight_decay: [0.0, 0.01]
+    max_trials: 12
+  finetune_max_train_events: 60000
+  finetune_eval_folds: last      # grid selection on the last walk-forward fold, chosen config refit per fold
+
+gates:
+  text_lift: 0.01
+  detector_min_precision: 0.80
+  extraction_min_f1: 0.70
+  faithfulness_min: 0.90
+  owner_override_g3_finetune: false   # true -> fine-tune even if G3 fails; results labelled exploratory
+
+audit:
+  auc_trigger: 0.65
+  f1_lift_trigger: 0.10
+  ece_max: 0.10
+  overfit_gap: 0.10
+  underfit_margin: 0.02
+  unstable_std: 0.03
+
+bootstrap:
+  n: 1000
+  block: month
+
+fdr:
+  q: 0.05
+
+trivial_effect_bps: {h_le_2: 10, h_5: 25, h_ge_20: 50}
+
+coverage_levels: [1.0, 0.5, 0.25, 0.1]
+
+backtest:
+  horizon: 5
+  long_pct: 0.80
+  short_pct: 0.20
+  max_weight: 0.05
+  min_names_per_side: 10
+  costs_bps: [10, 20]
+  borrow_bps_per_year: 50
+  lag_sessions_sensitivity: 1
+
+budget:
+  max_storage_gb: 60
+  max_gpu_hours_b: 10
+  max_gpu_hours_c: 8
+  max_error_rate: 0.05
+  llm_teacher_filings: 3000
+  llm_gold_filings: 250
+
+lockbox:
+  unlock_locked_test: false     # S19 runs only when the owner sets this true (single use, logged)
+  acknowledge_reuse: false
+
+extensions:
+  ext_encoders: false
+  ext_feature_models: false
+  ext_llms: false
+  ext_rag: false
+  ext_analogue: false
+  ext_timeseries: false
+  ext_stacking: false
+  ext_heavy: false
+  ext_generation_metrics: false
+  ext_data_modules: false
+  ext_app: false

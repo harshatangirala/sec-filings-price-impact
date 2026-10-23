@@ -1,0 +1,54 @@
+# Question bank v1 (SPEC.md §8), pre-registered. One JSON object per field:
+# {present: bool, direction: enum|null, magnitude: number|null, unit: str|null, certainty: low|medium|high,
+#  evidence: [{chunk_id, start, end, quote}]}
+version: question_bank_v1
+fields:
+  guidance:
+    question: "Does the filing initiate, raise, lower, withdraw or reaffirm forward-looking guidance?"
+    directions: [initiated, raised, lowered, withdrawn, reaffirmed]
+    path: current
+  results_tone:
+    question: "Does the filing describe results as better (beat) or worse (miss) than the prior year or expectations?"
+    directions: [beat, miss, mixed]
+    path: current
+  impairment:
+    question: "Does the filing report an impairment or write-down? Give the amount if stated."
+    directions: [recorded, reversed]
+    path: current
+  restructuring:
+    question: "Does the filing announce restructuring, layoffs or exit/disposal activities?"
+    directions: [announced, expanded, completed]
+    path: current
+  liquidity_stress:
+    question: "Does the filing disclose liquidity stress or going-concern doubt?"
+    directions: [going_concern, liquidity_stress]
+    path: current
+  financing_covenant:
+    question: "Does the filing disclose new financing, a covenant issue, waiver or default?"
+    directions: [new_financing, covenant_breach, waiver, default]
+    path: current
+  mna:
+    question: "Does the filing announce a merger, acquisition or disposition?"
+    directions: [acquisition, disposition, merger]
+    path: current
+  dividend:
+    question: "Does the filing announce a dividend change? Give the type and amount if stated."
+    directions: [initiated, increased, decreased, suspended, special, maintained]
+    path: current
+  buyback:
+    question: "Does the filing announce a share repurchase authorization or change?"
+    directions: [authorized, increased, suspended]
+    path: current
+  litigation_regulatory:
+    question: "Does the filing disclose new litigation or regulatory action against the company?"
+    directions: [new, settled, adverse_ruling]
+    path: current
+  management_change:
+    question: "Does the filing announce a change of CEO, CFO or board chair?"
+    directions: [departure, appointment]
+    path: current
+  risk_factor_change:
+    question: "Compared with the firm's prior filings, are risk factors new or removed?"
+    directions: [new, removed]
+    path: historical      # uses the historical evidence path (prior filings with public < decision)
+certainty_levels: [low, medium, high]

@@ -1,0 +1,79 @@
+# 8-K item taxonomy v1 (SPEC.md §5.2, §18.1 #11). Raw/legacy item -> category, with effective dates.
+# Modern items took effect 2004-08-23 (SEC Release 33-8400). Legacy Item 12 (Results of Operations) took
+# effect 2003-03-28 (Regulation G). Anything not listed maps to OTHER_OR_UNMAPPED (catch-all).
+version: taxonomy_8k_v1
+modern_effective: "2004-08-23"
+legacy_item12_effective: "2003-03-28"
+catch_all: OTHER_OR_UNMAPPED
+modern:
+  "1.01": material_agreement
+  "1.02": material_agreement
+  "1.03": bankruptcy
+  "1.04": mine_safety
+  "1.05": cybersecurity
+  "2.01": acquisition_disposition
+  "2.02": earnings
+  "2.03": financial_obligation
+  "2.04": financial_obligation
+  "2.05": restructuring_exit
+  "2.06": impairment
+  "3.01": delisting
+  "3.02": unregistered_sales
+  "3.03": security_rights
+  "4.01": auditor_change
+  "4.02": non_reliance_restatement
+  "5.01": control_change
+  "5.02": management_change
+  "5.03": bylaws_fiscal_year
+  "5.04": benefit_plan_blackout
+  "5.05": ethics_code
+  "5.06": shell_status
+  "5.07": shareholder_vote
+  "5.08": director_nomination
+  "6.01": abs
+  "6.02": abs
+  "6.03": abs
+  "6.04": abs
+  "6.05": abs
+  "6.06": abs
+  "6.10": abs
+  "7.01": reg_fd
+  "8.01": other_events
+  "9.01": exhibits
+legacy:
+  "1": control_change
+  "2": acquisition_disposition
+  "3": bankruptcy
+  "4": auditor_change
+  "5": other_events
+  "6": management_change
+  "7": exhibits
+  "8": bylaws_fiscal_year
+  "9": reg_fd
+  "10": ethics_code
+  "11": benefit_plan_blackout
+  "12": earnings
+# Legacy items that can carry an earnings release before Item 12 existed. They count as earnings only when
+# the exhibit content is confirmed as a results release (SPEC.md §5.2 "legacy equivalent").
+legacy_earnings_equivalents: ["5", "7", "9", "12"]
+# Text titles used when items metadata is missing (pre-2004 or absent): regex on ITEM INFORMATION / headings.
+title_patterns:
+  earnings: "results of operations"
+  material_agreement: "material definitive agreement"
+  acquisition_disposition: "acquisition or disposition"
+  management_change: "departure of directors|election of directors|appointment of certain officers|changes in registrant'?s certifying|resignations of registrant'?s directors"
+  reg_fd: "regulation fd"
+  other_events: "other events"
+  exhibits: "financial statements and exhibits"
+  restructuring_exit: "exit or disposal"
+  impairment: "material impairments"
+  financial_obligation: "direct financial obligation|triggering events"
+  auditor_change: "certifying accountant"
+  non_reliance_restatement: "non-reliance"
+  shareholder_vote: "submission of matters to a vote"
+  bylaws_fiscal_year: "amendments to articles|change in fiscal year"
+  delisting: "delisting|transfer of listing"
+  unregistered_sales: "unregistered sales"
+  bankruptcy: "bankruptcy or receivership"
+  control_change: "changes in control"
+  cybersecurity: "cybersecurity incidents"

@@ -1,0 +1,4 @@
+# full: the defaults in configs/default.yaml (SPEC.md §3). G2 must pass first: pilot completed,
+# preflight within budget, owner opt-in (`owner_opt_in_full: true` in the notebook owner settings).
+full:
+  require_pilot_success: true
