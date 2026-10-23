@@ -33,7 +33,7 @@ models, rag, gold, evaluation, track_a, backtest, viz, report, extensions, testi
 fixtures) | `docs/decision_log.md` | `tools/` (input preparation, notebook builder).
 
 ## Current milestone
-M0-M13 implemented; 44 tests pass on CPU (gate G1); notebook executes end to end on smoke (nbclient). Live smoke (5 firms)
+M0-M13 implemented; 49 tests pass on CPU (gate G1); notebook executes end to end on smoke (nbclient, clean data root); early-era 2000-2004 real-data run done (D-052). Live smoke (5 firms)
 and **pilot Part 1** (40 firms, 2012-2026-07, 11,370 filings, 10,105 events, all timestamps quality A) ran locally; the pilot
 artifacts are on Drive (`MyDrive/sec-price-study/pilot`). Next: owner runs pilot Part 2 (A100) + Part 3 on Colab, then full
-(G2: `owner_opt_in_full`), and annotates gold (Track C). Decisions D-001..D-051 in `docs/decision_log.md`.
+(G2: `owner_opt_in_full`), and annotates gold (Track C). Decisions D-001..D-055; audit in docs/audit_2026-10-23.md in `docs/decision_log.md`.
