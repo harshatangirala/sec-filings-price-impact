@@ -399,6 +399,14 @@ def s04(ctx):
             "header_match_rate": None if mm is None else float(mm)}
 
 
+def teacher_extraction_will_run(cfg: dict, inputs: Path) -> bool:
+    """The teacher extraction (budget.llm_teacher_filings) runs only after gold-val labels exist (G3b) or with the owner's
+    exploratory override (D-037); otherwise only the gold-sample LLM prompts run."""
+    g = Path(inputs) / "gold"
+    has_gold = g.exists() and any(g.glob("gold_*_filings_template*.csv"))
+    return bool(has_gold or get(cfg, "rag.run_extraction_without_gold", False))
+
+
 def preflight_projection(cfg: dict, manifest: pd.DataFrame, data_root, hot_root) -> dict:
     """CPU-side preflight (hard rule 4, §13.3, G2): projected events, chunks, storage and GPU hours from the filing index,
     before the long download. Constants come from the pilot (configs/default.yaml budget.preflight_*)."""
@@ -412,11 +420,14 @@ def preflight_projection(cfg: dict, manifest: pd.DataFrame, data_root, hot_root)
     emb_gb = events * 768 * 2 * 2 * n_enc / 1e9 * 1.1          # mean + max pooled float16 vectors, +10% index
     text_gb = len(t) * float(B["preflight_bytes_per_filing"]) / 1e9
     gpu_b = chunks * n_enc / float(B["preflight_assumed_chunks_per_s"]) / 3600
-    gpu_c = (int(B["llm_teacher_filings"]) + int(B["llm_gold_filings"])) * float(B["preflight_llm_s_per_prompt"]) / 3600
+    teacher = teacher_extraction_will_run(cfg, Path(data_root) / cfg["paths"].get("inputs_dirname", "inputs"))
+    prompts = (int(B["llm_teacher_filings"]) if teacher else 0) + int(B["llm_gold_filings"])
+    gpu_c = prompts * float(B["preflight_llm_s_per_prompt"]) / 3600
     rep = {"profile": cfg["run_profile"], "firms": int(t.cik.nunique()), "filings_to_download": int(len(t)),
            "filings_by_form": by.value_counts().to_dict(), "est_events": events, "est_chunks": int(chunks),
            "est_storage_gb": round(emb_gb + text_gb, 2), "est_embedding_gb": round(emb_gb, 2), "est_text_gb": round(text_gb, 2),
-           "est_gpu_hours_encoders": round(gpu_b, 2), "est_gpu_hours_llm": round(gpu_c, 2),
+           "est_gpu_hours_encoders": round(gpu_b, 2), "est_gpu_hours_llm": round(gpu_c, 2), "llm_prompts": prompts,
+           "teacher_extraction_runs": teacher,
            "est_sec_download_hours": round(len(t) * 1.6 / float(cfg["sec"]["max_rps"]) / 3600, 1),
            "disk_free_gb": {"data_root": C.disk_free_gb(data_root), "hot_root": C.disk_free_gb(hot_root)},
            "budget": {k: B[k] for k in ("max_storage_gb", "max_gpu_hours_b", "max_gpu_hours_c")}}

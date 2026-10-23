@@ -402,13 +402,16 @@ def s13(ctx):
         ctx.warn(f"micro-benchmark failed: {e}")
     n_encode = est_chunks * (len(encs))
     gpu_h_b = (n_encode / rate / 3600) if rate else None
-    llm_prompts = int(cfg["budget"]["llm_teacher_filings"]) + int(cfg["budget"]["llm_gold_filings"])
+    from .stages_data import teacher_extraction_will_run
+    teacher = teacher_extraction_will_run(cfg, ctx.storage.inputs)
+    llm_prompts = (int(cfg["budget"]["llm_teacher_filings"]) if teacher else 0) + int(cfg["budget"]["llm_gold_filings"])
     gpu_h_c = llm_prompts * 20 / 3600 if dev == "cuda" else None     # ~20 s per filing prompt (estimate, logged)
     rep = {"device": dev, "firms": int(ev.cik.nunique()), "events": int(len(ev)), "sections": int(len(si)),
            "est_chunks": est_chunks, "est_tokens": int(si.n_tokens_est.sum()) if len(si) else 0,
            "embedding_storage_gb": round(storage_gb, 2), "model_sizes_gb": sizes, "llm_prompts": llm_prompts,
            "disk_free_gb": {"data_root": C.disk_free_gb(ctx.storage.data_root), "hot_root": C.disk_free_gb(ctx.storage.hot_root)},
            "bench_chunks_per_s": rate, "projected_gpu_hours_encoders": gpu_h_b, "projected_gpu_hours_llm": gpu_h_c,
+           "teacher_extraction_runs": teacher,
            "budget": cfg["budget"]}
     write_json(ctx.out / "preflight.json", rep)
     if cfg["run_profile"] == "full":
