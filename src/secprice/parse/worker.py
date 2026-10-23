@@ -31,7 +31,8 @@ def _client(job: dict):
         return FixtureSECClient(job["fixture_root"])
     return SECClient(job["user_agent"], max_rps=job["rps_per_proc"], cache_dir=job["cache_dir"],
                      cache_days=job["cache_days"], timeout_s=job["timeout_s"], max_retries=job["max_retries"],
-                     backoff_base_s=job["backoff_base_s"], blocked_403_limit=job["blocked_403_limit"])
+                     backoff_base_s=job["backoff_base_s"], blocked_403_limit=job["blocked_403_limit"],
+                     cache_max_bytes=job.get("cache_max_bytes", 0))
 
 
 def _sec_rows(acc, cik, form, secs: dict, mask) -> list[dict]:

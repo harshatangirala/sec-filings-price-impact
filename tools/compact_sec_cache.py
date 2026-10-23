@@ -25,6 +25,10 @@ def main() -> None:
         b = p.read_bytes()
         before += len(b)
         if b.startswith(_ZMAGIC) or b == b"__404__":
+            if a.max_mb and b.startswith(_ZMAGIC) and len(zlib.decompress(b[len(_ZMAGIC):])) > a.max_mb * 1e6:
+                p.unlink()
+                dropped += 1
+                continue
             after += len(b)
             continue
         if a.max_mb and len(b) > a.max_mb * 1e6:

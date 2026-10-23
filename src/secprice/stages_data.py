@@ -476,7 +476,8 @@ def s05(ctx):
         tickers = json.loads(ur.tickers_history) if ur is not None else []
         jobs.append({"cik": int(cik), "out_dir": str(ctx.out), "fixture_root": fixture, "user_agent": ua,
                      "rps_per_proc": float(S["max_rps"]) / nproc, "cache_dir": str(ctx.storage.hot_root / "sec_cache"),
-                     "cache_days": S["cache_days"], "timeout_s": S["timeout_s"], "max_retries": S["max_retries"],
+                     "cache_days": S["cache_days"], "cache_max_bytes": int(S.get("cache_max_bytes") or 0),
+                     "timeout_s": S["timeout_s"], "max_retries": S["max_retries"],
                      "backoff_base_s": S["backoff_base_s"], "blocked_403_limit": S.get("blocked_403_limit", 20),
                      "names": [n for n in names if n], "tickers": tickers, "max_chars": int(cfg["text"]["max_chars_per_section"]),
                      "max_8k_bytes": int(S["max_8k_bytes"]), "max_doc_bytes": int(S["max_doc_bytes"]),

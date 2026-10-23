@@ -118,3 +118,12 @@ def test_sec_cache_is_compressed_and_size_capped(tmp_path):
     assert len(files) == 1 and files[0].read_bytes().startswith(_ZMAGIC)        # only the small body, compressed
     assert c.get("https://www.sec.gov/small") == small and len(calls) == 2         # served from the cache
     assert c.get("https://www.sec.gov/big") == big and len(calls) == 3             # large body re-fetched, never cached
+
+
+def test_s05_worker_client_honours_cache_cap(tmp_path):
+    """Regression (found in the full run): the per-firm worker built its SEC client without the profile's cache cap."""
+    from secprice.parse.worker import _client
+    job = {"fixture_root": None, "user_agent": "Test User test@example.com", "rps_per_proc": 1.0, "cache_dir": str(tmp_path),
+           "cache_days": 30, "timeout_s": 10, "max_retries": 2, "backoff_base_s": 2.0, "blocked_403_limit": 20,
+           "cache_max_bytes": 400000}
+    assert _client(job).cache_max_bytes == 400000
