@@ -104,6 +104,7 @@ def build_markdown(f: dict) -> str:
     a(md_table(f.get("track_a_main"), 40))
     a("\n### Drift tests and verdicts")
     a(md_table(f.get("hypothesis_tests"), 30))
+    a(f.get("drift_text", ""))
     a("\n## 5. Track B: prediction")
     a(f.get("trackb_text", ""))
     a("\n### Ladder (walk-forward, primary target)")

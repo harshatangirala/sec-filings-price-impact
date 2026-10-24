@@ -225,7 +225,8 @@ def s21(ctx):
         add("SUE-conditioned post-earnings drift (Q5-Q1, SUE_release)", f"verified releases; {car}; prior-quarter breakpoints",
             res, trivial_bps(60, tb), signs, clean_ok, cost_ok, lag_ok,
             f"one-session lag = {lag_col}; costs = 4 x {max(cfg['backtest']['costs_bps'])} bps round trip on the spread; "
-            "never a consensus-based PEAD replication")
+            "never a consensus-based PEAD replication; the verdict says nothing about direction: a negative Q5-Q1 is a "
+            "reversal, and the survivor-only universe (firms listed in 2026) biases low-SUE drift upwards (D-057, D-073)")
         x_sue = _xbrl_sue_for_releases(ctx, rel)
         if x_sue is not None and x_sue.notna().sum() >= 50:
             rx = rel.assign(sue_x=x_sue.values)
@@ -250,7 +251,8 @@ def s21(ctx):
             signs_b = subperiod_signs(rb.dropna(subset=["q_sue"]), "q_sue", car) if res_b else None
             add(f"SUE-conditioned post-earnings drift (Q5-Q1) [{lab_b}]", f"verified releases of {lab_b}; {car}; "
                 "prior-quarter breakpoints within the bucket", res_b, trivial_bps(60, tb), signs_b,
-                note="bucket decomposition of the combined test (exploratory; robustness checks only on the combined test)")
+                note="bucket decomposition of the combined test (exploratory; robustness checks only on the combined test; "
+                     "survivorship bias is likely larger for non-S&P firms)")
             rows[-1]["fdr_family"] = "drift_sp_bucket"
         else:
             rows.append({"test": f"SUE-conditioned post-earnings drift (Q5-Q1) [{lab_b}]", "fdr_family": "drift_sp_bucket",
@@ -539,6 +541,18 @@ def collect(ctx):
         main = ta[(ta.group_by == "event_type") & ta.measure.isin(["car_m1_1", "car_0_1", "car_2_60", "car4_m1_1", "car4_2_60"])]
         facts["track_a_main"] = main[["group", "event_set", "measure", "mean", "t", "p_adj_bh", "n"]]
     facts["hypothesis_tests"] = _opt(ctx, "S21", "hypothesis_tests.csv", "csv")
+    ht0 = facts["hypothesis_tests"]
+    if ht0 is not None and len(ht0):
+        sue = ht0[ht0.test.str.startswith("SUE-conditioned post-earnings drift (Q5-Q1, SUE_release)")]
+        if len(sue) and pd.notna(sue.estimate.iloc[0]):
+            r = sue.iloc[0]
+            direction = ("a REVERSAL (high-SUE firms underperform low-SUE firms after the announcement), the opposite of classic "
+                         "post-earnings drift" if r.estimate < 0 else "a continuation in the direction of the surprise")
+            facts["drift_text"] = (f"SUE-conditioned drift (Q5-Q1, CAR[+2,+60]) = {r.estimate:+.2%} [{r.ci_low:+.2%}, {r.ci_high:+.2%}], "
+                                   f"n={int(r.n):,}, verdict **{r.verdict}**: {direction}. The verdict rubric tests strength and "
+                                   "robustness, not direction. The universe is survivor-only: firms that delisted after bad news "
+                                   "are absent, which pushes low-SUE drift upwards; these data cannot separate that bias from a "
+                                   "genuine reversal. Never a consensus-based PEAD replication (decision log D-073).")
     if facts["hypothesis_tests"] is not None:
         facts["hypothesis_tests"] = facts["hypothesis_tests"][[c for c in ("test", "estimate", "ci_low", "ci_high", "p_value", "p_adj_bh", "n",
                                                                            "verdict") if c in facts["hypothesis_tests"]]]
