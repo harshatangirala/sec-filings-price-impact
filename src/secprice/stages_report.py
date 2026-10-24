@@ -472,6 +472,13 @@ def collect(ctx):
         f"Exclusions: {u.exclusion_reason.value_counts().to_dict()}. Usable cutoff {uc['usable_cutoff']} "
         f"(last price {uc['last_price_date']}, last document {uc['last_document_date']}); final month partial: {uc['final_month_partial']}. "
         "Firms per year are reported separately below; 500 firms per year is never claimed.")
+    pc = _opt(ctx, "S03", "price_coverage.csv", "csv")
+    if pc is not None and len(fpy) and {"first", "last"} <= set(pc.columns):
+        # S02 counts only the local OHLCV span; S03 knows the spliced series (yfinance warm-up before the local start)
+        f0, f1 = pd.to_datetime(pc["first"]), pd.to_datetime(pc["last"])
+        fpy = fpy.copy()
+        fpy["firms_with_prices"] = [int(((f0 <= pd.Timestamp(f"{y}-12-31")) & (f1 >= pd.Timestamp(f"{y}-01-01"))).sum())
+                                    for y in fpy.year]
     facts["firms_per_year"] = fpy
     mm = man.merge(led[["accession", "status", "n_sections"]], on="accession", how="left")
     mm["year"] = pd.to_datetime(mm.filing_date).dt.year
