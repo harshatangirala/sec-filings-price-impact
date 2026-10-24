@@ -265,6 +265,14 @@ def _where_is_my_data():
     lines = ["DATA_ROOT = %s (exists: %s)" % (DATA_ROOT, DATA_ROOT.exists())]
     if DATA_ROOT.exists():
         lines.append("  contents: %s" % sorted(p.name for p in DATA_ROOT.iterdir())[:30])
+        for sub in ("inputs", "inputs/ohlcv_1day", RUN_PROFILE):
+            q = DATA_ROOT / sub
+            if q.exists():
+                n_files = sum(1 for x in q.rglob("*") if x.is_file())
+                n_ok = sum(1 for _ in q.rglob("_SUCCESS"))
+                lines.append("  %-18s %6d files%s" % (sub + "/", n_files, ("  (%d finished stages; expected 16 for Part 1 of full)" % n_ok) if sub == RUN_PROFILE else ""))
+            else:
+                lines.append("  %-18s MISSING" % (sub + "/"))
     if IN_COLAB:
         top = Path("/content/drive/MyDrive")
         lines.append("  MyDrive folders that look relevant: %s" % sorted(p.name for p in top.iterdir() if "sec" in p.name.lower() or "price" in p.name.lower())[:20])
