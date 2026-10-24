@@ -656,6 +656,15 @@ def collect(ctx):
                             "Pretrained encoders without documented cutoffs (FinBERT-tone, BGE, Qwen, ModernBERT) appear only on the "
                             "retrospective leaderboard and support no clean-test claim.",
                             f"MCS / PBO are diagnostics only: {json.dumps(mp)[:400] if mp else 'not run'}"]
+    from .config import is_fast
+    sp = cfg.get("speed") or {}
+    if is_fast(cfg):
+        fa = sp["fast"]
+        facts["limitations"].append(
+            f"The GPU part ran in FAST mode (decision log D-074): encoders {fa['encoders']} instead of the four-model core roster, "
+            f"heads {fa['heads']} (no CatBoost), tuning trials {fa['trials']}, and no fine-tuning even if G3 passes. The L5/L7 comparison and "
+            "H1/H3/H4 therefore rest on fewer encoders and a lighter search than the spec's core study; the structured baselines "
+            "(L0-L6) and Track A are unaffected.")
     man_run = json.loads((ctx.storage.manifests / "run_manifest.json").read_text()) if (ctx.storage.manifests / "run_manifest.json").exists() else {}
     facts["resources"] = pd.DataFrame([{"stage": k, "wall_s": v.get("wall_s"), "status": v.get("status")} for k, v in man_run.get("stages", {}).items()])
     facts["decision_log"] = "docs/decision_log.md"

@@ -79,6 +79,7 @@ Repository build: `{commit()}` · Artifacts: `MyDrive/sec-price-study/<profile>/
     C.append(code("""
 RUN_PROFILE = "smoke"      # "smoke" -> "full" ("pilot" optional)   (hard rule 4: smoke is the default)
 PART = "all"               # "cpu1" (S00-S12, S20-S21) | "gpu" (S13-S17) | "cpu2" (S18-S24) | "all"
+SPEED = "fast"             # "fast": 2 encoders, no CatBoost, fewer trials, no fine-tuning (~12 h on Colab) | "full": spec core roster (~20+ h)
 DRIVE_FOLDER = "sec-price-study"
 
 # Study window: configs/default.yaml sets Jan 2000 - Jul 2026 for pilot/full (owner); smoke uses 2021-2023.
@@ -88,6 +89,7 @@ OWNER_OVERRIDES = {
     "rag": {"run_extraction_without_gold": False},        # True = teacher/student extraction without gold-val (EXPLORATORY)
     "lockbox": {"unlock_locked_test": False,              # True only after reviewing the development-holdout results
                 "acknowledge_reuse": False},
+    "speed": {"mode": SPEED},                              # depth of the GPU part (decision log D-074); logged in the report
     "full": {"owner_opt_in_full": True,                   # owner opted in to the full study (2026-10-23)
              "require_pilot_success": False},             # owner waived the pilot gate (D-058); the preflight still applies
     # Colab sessions can disconnect. S05 (the long EDGAR download, ~9 h for 500 firms) stops cleanly after this many hours;

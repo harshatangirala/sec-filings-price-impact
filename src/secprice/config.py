@@ -75,6 +75,8 @@ def load_config(profile: str | None = None, overrides: dict | None = None, root:
         for k, v in _flatten(overrides).items():
             applied.append({"key": k, "before": flat_before.get(k), "after": v})
     cfg["_meta"] = {"repo_root": str(root), "profile_file": str(prof_path), "owner_overrides": applied}
+    if is_fast(cfg):
+        cfg["models"]["encoders"] = list(cfg["speed"]["fast"]["encoders"])
     validate(cfg)
     return cfg
 
@@ -88,6 +90,24 @@ def _req(cond: bool, msg: str) -> None:
         raise ConfigError(msg)
 
 
+def is_fast(cfg: dict) -> bool:
+    """speed.mode=fast applies to the full profile only (smoke / pilot keep their own small settings; D-074)."""
+    return (cfg.get("speed") or {}).get("mode") == "fast" and cfg.get("run_profile") == "full"
+
+
+def gpu_heads(cfg: dict) -> list[str]:
+    """Heads used by the GPU part (S15): the spec heads, or the fast subset (D-074)."""
+    return list(cfg["speed"]["fast"]["heads"]) if is_fast(cfg) else list(cfg["tuning"]["heads"])
+
+
+def gpu_trials(cfg: dict) -> dict:
+    return dict(cfg["speed"]["fast"]["trials"]) if is_fast(cfg) else dict(cfg["tuning"]["trials"])
+
+
+def gpu_finetune_allowed(cfg: dict) -> bool:
+    return bool(cfg["speed"]["fast"]["finetune"]) if is_fast(cfg) else True
+
+
 def validate(cfg: dict) -> None:
     """Types, ranges and required sections (SPEC.md §15). Secrets are checked only when a stage needs them."""
     for sec in ["run_profile", "seed", "paths", "sec", "universe", "study", "market", "timing", "text",
@@ -96,6 +116,12 @@ def validate(cfg: dict) -> None:
         _req(sec in cfg, f"config section missing: {sec}")
     _req(cfg["run_profile"] in PROFILES, "run_profile invalid")
     _req(isinstance(cfg["seed"], int), "seed must be int")
+    sp = cfg.get("speed") or {}
+    _req(sp.get("mode", "full") in ("full", "fast"), "speed.mode must be 'full' or 'fast'")
+    if sp.get("mode") == "fast":
+        _req(set(sp["fast"]["heads"]) <= set(cfg["tuning"]["heads"]), "speed.fast.heads must be a subset of tuning.heads")
+        _req(all(e in cfg["models"]["encoders"] or e in ("sec_bert", "finbert_tone", "chrono_bert", "bge_base") for e in sp["fast"]["encoders"]),
+             "speed.fast.encoders must be core roster encoders")
     s = cfg["sec"]
     _req(0 < float(s["max_rps"]) <= 10, "sec.max_rps must be in (0, 10] (SEC ceiling 10)")
     _req(int(s["max_retries"]) >= 1, "sec.max_retries >= 1")

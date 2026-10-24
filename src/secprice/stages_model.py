@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from . import common as C
-from .config import canonical_json, get
+from .config import canonical_json, get, gpu_finetune_allowed, gpu_heads, gpu_trials
 from .evaluation.bootstrap import macro_f1_ci, paired_macro_f1_diff
 from .evaluation.metrics import classification_metrics, decide, power_label
 from .models.ladder import RUNGS, Ladder, fit_verdict, summarize
@@ -526,7 +526,7 @@ def _chunk_store(ctx, ev: pd.DataFrame) -> Path:
 
 # =====================================================================================================  S15
 @stage("S15", "L5 / L7 heads + tuning; G3; fine-tune top 2", "GPU", ["S11", "S14"],
-       ["tuning", "gates", "models", "bootstrap", "seed"],
+       ["tuning", "gates", "models", "bootstrap", "seed", "speed"],
        outputs=["results_long.parquet", "predictions.parquet", "g3.json", "h4.csv", "ft_curves.json"],
        assertions=["finalist caps", "default and tuned results", "fine-tune only if G3 passes (or labelled owner override)"],
        card="Embedding-only (L5) and structured + embedding (L7) heads per encoder; G3 decision; fine-tuning curves.")
@@ -546,16 +546,17 @@ def s15(ctx):
     db = ctx.storage.hot_root / f"optuna_S15_{ctx.stage_hash}.sqlite3"
     # re-score L6 on this (embedding-inclusive) common cohort with its tuned parameters: identical rows for the lift
     l6runs = {}
-    for head in cfg["tuning"]["heads"]:
+    heads, trials = gpu_heads(cfg), gpu_trials(cfg)           # spec heads, or the fast subset (speed.mode, D-074)
+    for head in heads:
         r, s, rid = _run_and_record(lad, res, preds, "L6", head, bp6.get(f"L6|{head}"), lab, common, "common_emb", prim["target_def"],
                                     prim["horizon"], "tuned", n_boot=nb, seed=seed)
         l6runs[head] = (r, s, rid)
     for enc in encs:
         for rung in ("L5", "L7"):
-            for head in cfg["tuning"]["heads"]:
+            for head in heads:
                 r0, s0, _ = _run_and_record(lad, res, preds, rung, head, None, lab, common, "common_emb", prim["target_def"],
                                             prim["horizon"], "default", enc=enc, curves=(rung == "L7"), n_boot=nb, seed=seed)
-                bp, _ = lad.tune(rung, head, lab, common, int(cfg["tuning"]["trials"].get(head, 10)),
+                bp, _ = lad.tune(rung, head, lab, common, int(trials.get(head, 10)),
                                  int(cfg["tuning"]["timeout_s_per_study"]), db, f"{rung}|{head}|{enc}", enc=enc)
                 r1, s1, rid = _run_and_record(lad, res, preds, rung, head, bp, lab, common, "common_emb", prim["target_def"],
                                               prim["horizon"], "tuned", enc=enc, n_boot=nb, seed=seed)
@@ -585,7 +586,7 @@ def s15(ctx):
     h4 = []
     if "chrono_bert" in encs and len(sm):
         for rung in ("L5", "L7"):
-            for head in cfg["tuning"]["heads"]:
+            for head in heads:
                 a = sm[(sm.rung == rung) & (sm.encoder == "chrono_bert") & (sm["head"] == head)]
                 if a.empty:
                     continue
@@ -606,7 +607,10 @@ def s15(ctx):
     # fine-tuning: top-2 encoders by L5 walk-forward F1, only if G3 passes (or owner override, labelled exploratory)
     ft_info = {"ran": False}
     override = bool(cfg["gates"].get("owner_override_g3_finetune"))
-    if (g3.get("passed") or override) and len(sm):
+    if g3.get("passed") and not gpu_finetune_allowed(cfg) and not override:
+        ft_info = {"ran": False, "reason": "speed.mode=fast: fine-tuning skipped although G3 passed (set speed.mode=full or the owner override)"}
+        ctx.warn(ft_info["reason"])
+    elif (g3.get("passed") or override) and len(sm):
         top2 = (sm[sm.rung == "L5"].groupby("encoder").tuned_mean_f1.max().sort_values(ascending=False).index[:2].tolist())
         ft_info = finetune_encoders(ctx, lad, lab, common, top2, res, preds, label="G3 passed" if g3.get("passed") else
                                     "EXPLORATORY: owner override, G3 not passed")

@@ -237,5 +237,13 @@ extensions:
   ext_data_modules: false
   ext_app: false
 
+speed:                        # GPU-part depth switch (decision log D-074); S00-S12 and S20-S21 never read it
+  mode: full                  # full = spec core roster and full tuning | fast = fewer encoders / heads / trials, no fine-tuning
+  fast:
+    encoders: [chrono_bert, bge_base]   # keeps the strict-vintage comparator (H4) and the dense retriever
+    heads: [lightgbm, enet]             # drops CatBoost, the slowest head on 100k+ rows
+    trials: {lightgbm: 8, enet: 4}
+    finetune: false                     # fine-tuning only with an explicit owner override
+
 runtime:                      # resource settings that never change results (no stage hash reads them)
   ladder_cache_max_gb: 2.0    # transformed TF-IDF / PCA blocks kept in memory (bytes-bounded, oldest evicted first)
