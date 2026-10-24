@@ -266,9 +266,9 @@ def flag_suspect_annual(rel: pd.DataFrame, fye_by_cik: dict | None = None, ratio
             fm = int(str(fye)[:2]) if str(fye)[:2].isdigit() else None
             if fm:
                 pe = pd.Timestamp(r.period_end)
-                fe = pd.Timestamp(year=pe.year, month=fm, day=1) + pd.offsets.MonthEnd(0)
-                q4 = min(abs((pe - fe).days), abs((pe - fe.replace(year=pe.year - 1)).days),
-                         abs((pe - fe.replace(year=pe.year + 1)).days)) <= 45
+                # month-ends built per year (a February fiscal year end is the 28th or the 29th)
+                fes = [pd.Timestamp(year=y, month=fm, day=1) + pd.offsets.MonthEnd(0) for y in (pe.year - 1, pe.year, pe.year + 1)]
+                q4 = min(abs((pe - fe).days) for fe in fes) <= 45
         if q4 and len(prior) >= min_prior and abs(v) > ratio * max(abs(p) for p in prior[-4:]):
             out.loc[i, "suspect_annual"] = True
             out.loc[i, "parse_confidence"] = "suspect_annual"

@@ -479,6 +479,7 @@ def s05(ctx):
         jobs.append({"cik": int(cik), "out_dir": str(ctx.out), "fixture_root": fixture, "user_agent": ua,
                      "rps_per_proc": float(S["max_rps"]) / nproc, "cache_dir": str(ctx.storage.hot_root / "sec_cache"),
                      "cache_days": S["cache_days"], "cache_max_bytes": int(S.get("cache_max_bytes") or 0),
+                     "retry_errors": bool(S.get("retry_failed_filings", True)),
                      "timeout_s": S["timeout_s"], "max_retries": S["max_retries"],
                      "backoff_base_s": S["backoff_base_s"], "blocked_403_limit": S.get("blocked_403_limit", 20),
                      "names": [n for n in names if n], "tickers": tickers, "max_chars": int(cfg["text"]["max_chars_per_section"]),

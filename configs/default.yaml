@@ -18,6 +18,7 @@ sec:
   backoff_base_s: 2.0
   workers: 8                  # download threads sharing one rate limiter
   parse_workers: 0            # 0 = os.cpu_count() - 1
+  retry_failed_filings: true  # a re-run of S05 re-fetches only filings that ended in a transient error
   max_parse_workers: 8        # cap on S05 processes; each gets max_rps / processes (12 works on a 15 GB laptop)
   max_8k_bytes: 15000000      # full submission .txt read cap for 8-Ks
   max_doc_bytes: 40000000

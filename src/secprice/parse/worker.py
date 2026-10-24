@@ -158,6 +158,8 @@ def run_firm(job: dict) -> dict:
     cik = int(job["cik"])
     done_flag = out / "ledger" / f"{cik:010d}.parquet"
     if done_flag.exists():
+        if job.get("retry_errors"):
+            return _retry_failed(job, out, cik, done_flag)
         return {"cik": cik, "skipped": True}
     client = _client(job)
     mask = build_masker(job["names"], job["tickers"])
@@ -181,6 +183,36 @@ def run_firm(job: dict) -> dict:
     os.replace(tmp, done_flag)
     return {"cik": cik, "skipped": False, "n": len(leds), "ok": int((led.status == "ok").sum()),
             "stats": getattr(client, "stats", {})}
+
+
+def _retry_failed(job: dict, out: Path, cik: int, done_flag: Path) -> dict:
+    """Re-process only the filings whose earlier attempt ended in a transient error (e.g. repeated HTTP 503) and replace
+    their rows; every other filing of the firm is untouched (sec.retry_failed_filings)."""
+    led = pd.read_parquet(done_flag)
+    bad = set(led.loc[led.status == "error", "accession"])
+    if not bad:
+        return {"cik": cik, "skipped": True}
+    client = _client(job)
+    mask = build_masker(job["names"], job["tickers"])
+    secs, exs, leds = [], [], []
+    for f in job["filings"]:
+        if f["accession"] in bad:
+            s_, e_, l_ = process_filing(client, f, mask, job["max_chars"], job["max_8k_bytes"], job["max_doc_bytes"])
+            secs += s_
+            exs += e_
+            leds.append(l_)
+    for sub, rows, cols in (("sections", secs, SECTION_COLS), ("exhibits", exs, EXHIBIT_COLS)):
+        p = out / sub / f"{cik:010d}.parquet"
+        old = pd.read_parquet(p) if p.exists() else pd.DataFrame(columns=cols)
+        new = pd.concat([old[~old.accession.isin(bad)], pd.DataFrame(rows, columns=cols)], ignore_index=True)
+        tmp = out / sub / f".tmp_{cik:010d}.parquet"
+        new.to_parquet(tmp, index=False, compression="zstd")
+        os.replace(tmp, p)
+    led2 = pd.concat([led[~led.accession.isin(bad)], pd.DataFrame(leds, columns=LEDGER_COLS)], ignore_index=True)
+    tmp = out / "ledger" / f".tmp_{cik:010d}.parquet"
+    led2.to_parquet(tmp, index=False, compression="zstd")
+    os.replace(tmp, done_flag)
+    return {"cik": cik, "skipped": False, "retried": len(bad), "ok": int((pd.DataFrame(leds).status == "ok").sum()) if leds else 0}
 
 
 def run_firm_safe(job: dict) -> dict:

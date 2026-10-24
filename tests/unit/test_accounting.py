@@ -136,3 +136,14 @@ def test_release_eps_losses_text_tables_undifferentiated_and_multiyear():
     five = "\n".join(["Selected financial data", "2010", "", "2009", "", "2008", "", "2007", "", "2006", "",
                       "Net income per common share - assuming dilution (dollars) | 6.22 | 3.98 | 8.69"])
     assert p(five)["eps_diluted"] is None                             # a multi-year summary, not the quarter
+
+
+def test_suspect_annual_handles_february_fiscal_year_end_in_leap_years():
+    """Regression (full run): FYE '0229' / period 2008-02-29 crashed the year shift."""
+    from secprice.parse.eps_release import flag_suspect_annual
+    t = pd.to_datetime(["2007-06-10", "2007-09-10", "2007-12-10", "2008-04-01"], utc=True)
+    rel = pd.DataFrame({"accession": list("abcd"), "cik": 7, "is_results_release": True, "eps_diluted": [0.5, 0.52, 0.55, 2.1],
+                        "parse_confidence": "medium", "period_end": ["2007-05-31", "2007-08-31", "2007-11-30", "2008-02-29"],
+                        "public_available_time": t})
+    out = flag_suspect_annual(rel, {7: "0229"}).set_index("accession")
+    assert out.loc["d", "suspect_annual"] and not out.loc["a":"c", "suspect_annual"].any()
