@@ -255,18 +255,44 @@ chk = {"ohlcv_1day files": len(list((inp / "ohlcv_1day").glob("*.parquet"))) if 
        "LM dictionary": (inp / "lexicons" / "Loughran-McDonald_MasterDictionary_1993-2025.csv").exists(),
        "HF census": (inp / "hf_census_5da7e3c8b920.parquet").exists()}
 print(json.dumps(chk, indent=1))
-assert chk["ohlcv_1day files"] > 0, "copy the OHLCV parquet files to DATA_ROOT/inputs/ohlcv_1day first"
+status = P.status(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT)
+part1_stages = [f"S{i:02d}" for i in range(0, 13)] + ["S20", "S21"]
+part1_done = bool((status[status.stage.isin(part1_stages)].status == "done").all())
+print("Part 1 stages (S00-S12, S20-S21) already done under DATA_ROOT/%s: %s" % (RUN_PROFILE, part1_done))
+
+def _where_is_my_data():
+    # what Colab can actually see, so a wrong folder / account / unfinished Drive upload is obvious
+    lines = ["DATA_ROOT = %s (exists: %s)" % (DATA_ROOT, DATA_ROOT.exists())]
+    if DATA_ROOT.exists():
+        lines.append("  contents: %s" % sorted(p.name for p in DATA_ROOT.iterdir())[:30])
+    if IN_COLAB:
+        top = Path("/content/drive/MyDrive")
+        lines.append("  MyDrive folders that look relevant: %s" % sorted(p.name for p in top.iterdir() if "sec" in p.name.lower() or "price" in p.name.lower())[:20])
+    return "\\n".join(lines)
+
+if not part1_done and chk["ohlcv_1day files"] == 0:
+    if PART in ("gpu", "cpu2"):
+        raise RuntimeError("Part 1 results are not under DATA_ROOT/%s, and re-running Part 1 takes ~15 h. Copy the folder "
+                           "'%s' from your computer's Google Drive (sec-price-study/%s, ~4.2 GB) into MyDrive/%s/ and wait until "
+                           "Drive shows it as fully uploaded, then re-run.\\n%s" % (RUN_PROFILE, RUN_PROFILE, RUN_PROFILE, DRIVE_FOLDER, _where_is_my_data()))
+    raise RuntimeError("The input files are not visible to Colab: expected MyDrive/%s/inputs/ohlcv_1day/*.parquet (979 files).\\n"
+                       "Fix: on your computer open Google Drive, check sec-price-study/inputs has finished uploading (no pending sync), "
+                       "that you are signed in to the SAME Google account as Colab, and that DRIVE_FOLDER above matches the folder name.\\n%s"
+                       % (DRIVE_FOLDER, _where_is_my_data()))
+if not part1_done and PART in ("gpu", "cpu2"):
+    raise RuntimeError("Part 1 is incomplete under DATA_ROOT/%s; run PART='cpu1' first (or copy the finished '%s' folder from Drive).\\n%s"
+                       % (RUN_PROFILE, RUN_PROFILE, _where_is_my_data()))
 # fail fast, before any long stage
-if PART in ("all", "cpu1") and len(os.environ.get("SEC_USER_AGENT", "").split()) < 2:
+if PART in ("all", "cpu1") and not part1_done and len(os.environ.get("SEC_USER_AGENT", "").split()) < 2:
     raise RuntimeError("Add the Colab secret SEC_USER_AGENT = 'Your Name your.email@example.com' (SEC fair-access policy), then re-run.")
 if PART == "gpu":
     import torch
-    assert torch.cuda.is_available(), "PART='gpu' needs a GPU runtime: Runtime > Change runtime type > A100, then restart and re-run."
+    assert torch.cuda.is_available(), "PART='gpu' needs a GPU runtime: Runtime > Change runtime type > A100 or H100, then restart and re-run."
 free_gb = shutil.disk_usage(HOT_ROOT).free / 1e9
 print(f"free disk at HOT_ROOT: {free_gb:.0f} GB")
-if RUN_PROFILE == "full" and free_gb < 60:
-    print("WARNING: the full profile caches filings and a chunk store on local disk; free at least ~60 GB (or use a High-RAM/large-disk runtime).")
-display(P.status(RUN_PROFILE, OWNER_OVERRIDES, DATA_ROOT))
+if RUN_PROFILE == "full" and free_gb < 60 and not part1_done:
+    print("WARNING: the full profile caches filings on local disk; free at least ~60 GB (or use a High-RAM/large-disk runtime).")
+display(status)
 """))
     # ---------------- Part 1
     C.append(md("""
