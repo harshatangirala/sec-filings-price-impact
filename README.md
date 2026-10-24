@@ -50,7 +50,7 @@ per bucket (walk-forward, development holdout, locked test), bucket-only models 
 Track A CARs and CAR paths, SUE drift, and the backtest restricted to each bucket's names. The universe is **survivor-only**
 (current listings): results are biased towards survivors (D-057).
 
-## Pilot Part 1 results (engineering evidence; local CPU, 23 Oct 2026)
+## Pilot Part 1 results (superseded by the full run; predates D-066 to D-073)
 40 sector-balanced S&P 500 firms, 2012-01 to 2026-07: 11,370 filings parsed (SGML acceptance header for every one), 10,105
 events, all timestamp quality A; release-EPS parser agrees with XBRL on 79.8% of usable-confidence releases (45 probable full-year values withheld, D-052); leakage audit
 passes and catches all 4 planted leaks.
@@ -79,10 +79,14 @@ Drive at `MyDrive/sec-price-study/full` (Colab skips these stages and starts at 
 | S06 accounting | 975,196 XBRL facts; 47,967 earnings releases, 34,661 with usable EPS, 82.7% agreement with XBRL (n=26,075); SUE for 59,490 filings |
 | S07 events | 190,947 events (141,300 8-K, 37,135 10-Q, 12,512 10-K); 96% timestamp quality A (every year from 2003: 100%); usable cutoff 2026-07-31 |
 | S09 / S10 | 130 features; 0 availability and 0 SUE-rule violations; leakage audit passes; 4/4 planted leaks caught; 6 walk-forward blocks 2008-2019, development holdout 2020-2022, locked test 2023 - Jul 2026 (sealed) |
-| S11 baselines (walk-forward, T_trade h=1, n=89,376) | L6 (LightGBM, tuned) macro-F1 0.401 [0.396, 0.405]; L2 metadata 0.377 [0.371, 0.384]; L1 price 0.368; L4 text 0.376; L3 accounting 0.356; L6 without filing-change features 0.401 |
+| S11 baselines (walk-forward, T_trade h=1, n=89,376) | L6 (LightGBM, tuned) macro-F1 0.401 [0.396, 0.405] vs majority 0.189 and a permutation null of 0.265 (max of 10: 0.276); L2 metadata 0.377 [0.371, 0.384]; L1 price 0.368; L4 text 0.376; L3 accounting 0.356; L6 without filing-change features 0.401; elastic-net convexity certificate spread 1e-9 |
+| S&P 500 vs non-S&P 500 | 353 / 147 firms, 137,541 / 53,406 events; non-members are smaller (median log market cap 21.4 vs 23.5) and more volatile; combined L6 scores 0.402 [0.397, 0.407] on S&P firms and 0.396 [0.389, 0.403] on the others (no detectable difference); pooling helps the non-S&P firms (pooled minus non-S&P-only model +0.008 [+0.000, +0.016], p=0.05) |
+| S20 / S21 Track A | CAR[-1,+1] +0.10% (t 4.6) and abnormal log volume +0.31 (t 45.8) around disclosures; SUE-conditioned drift Q5-Q1 -3.0% [-3.7%, -2.3%] (n=11,885), verdict 'supported' but a REVERSAL, likely inflated by the survivor-only universe (non-S&P -4.7% vs S&P -2.4%); text beyond momentum weak/mixed |
+| Report | `full/reports/results_report.html` (+ .pdf, .md): 35 figures; GPU-dependent sections (L5/L7/L8, H1, dev holdout, locked test, backtest, Track C) say 'not produced' until Part 2/3 run |
 
-The full run found and fixed seven defects that smaller runs could not show (decision log D-068, D-071, D-072), including two
-point-in-time leaks caught by the pipeline's own assertions.
+The full run found and fixed defects that smaller runs could not show (decision log D-068 to D-073), including two point-in-time
+leaks caught by the pipeline's own assertions (same-day 8-K groups, same-day 10-Q in a release's SUE) and a drift-verdict bug.
+The universe covers about 32% of the tickers that were S&P 500 members in 2000-2026 (survivor-only).
 
 ## Early-era check (2000-2004, real filings)
 Six firms, 361 filings, 317 events, run on real EDGAR data before any full run (decision log D-052/D-053). It found and fixed two

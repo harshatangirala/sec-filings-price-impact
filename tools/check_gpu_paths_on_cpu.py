@@ -39,7 +39,10 @@ r = train_eval("nlpaueb/sec-bert-base", rost["encoders"]["sec_bert"]["revision"]
                [texts[:4]], {"lr": 2e-5, "batch": 4, "weight_decay": 0.0, "epochs": 1}, 64, 0)
 print("finetune ok:", r["preds"][0].shape, "steps", len(r["curve"]["step"]), "evals", len(r["curve"]["inner_val_loss"]))
 
-gen = QwenGenerator("Qwen/Qwen2.5-0.5B-Instruct", None, field_schema(qb), max_new_tokens=700)
+# the pipeline token budget (rag.max_new_tokens): the 12-field schema does not fit in fewer tokens
+from secprice.config import load_config  # noqa: E402
+gen = QwenGenerator("Qwen/Qwen2.5-0.5B-Instruct", None, field_schema(qb),
+                    max_new_tokens=int(load_config("full")["rag"]["max_new_tokens"]))
 passages = [{"chunk_id": "c1", "text": texts[0]}, {"chunk_id": "c2", "text": texts[1]}]
 t0 = time.time()
 raw = gen(qb, passages)
