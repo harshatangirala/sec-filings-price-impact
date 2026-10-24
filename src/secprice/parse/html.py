@@ -12,7 +12,7 @@ _HTML_HINT = re.compile(r"<(html|body|div|p|table|font|br|span)\b", re.I)
 _SGML_JUNK = re.compile(r"</?(PAGE|S|C|FN|F\d|R\d|CAPTION|TABLE)>", re.I)
 _WS = re.compile(r"[ \t\f\v    ​]+")
 _MULTI_NL = re.compile(r"\n{3,}")
-_PAGE_LINE = re.compile(r"^\s*(page\s*)?[-–]?\s*\d{1,3}\s*[-–]?\s*$|^\s*table of contents\s*$", re.I)
+_PAGE_LINE = re.compile(r"^\s{0,3}(page\s{0,3})?[-–]?\s{0,3}\d{1,3}\s{0,3}[-–]?\s{0,3}$|^\s{0,3}table of contents\s{0,3}$", re.I)
 
 
 def decode(raw: bytes | str) -> str:
@@ -90,15 +90,19 @@ def _c1_map() -> dict:
 _C1 = _c1_map()
 
 
+_MULTI_PIPES = re.compile(r"\s*\|(?:\s*\|)+\s*")
+
+
 def normalize(text: str) -> str:
     text = _html.unescape(text).translate(_C1)
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     lines = []
     for line in text.split("\n"):
         line = _WS.sub(" ", line).strip()
-        line = re.sub(r"(\s*\|\s*)+$", "", line)
-        line = re.sub(r"^(\s*\|\s*)+", "", line)
-        line = re.sub(r"(\s*\|\s*){2,}", " | ", line)
+        # unambiguous forms (each run of whitespace belongs to exactly one group): the older (\s*\|\s*)+ backtracked
+        # exponentially on wide table rows with hundreds of empty cells (found on 2000s insurance statistical supplements)
+        line = line.strip(" |")                 # leading / trailing empty cells (the line is already whitespace-collapsed)
+        line = _MULTI_PIPES.sub(" | ", line)
         if not line or _PAGE_LINE.match(line):
             lines.append("")
             continue

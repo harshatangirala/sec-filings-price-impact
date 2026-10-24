@@ -13,7 +13,7 @@ _MONTHS = "january|february|march|april|may|june|july|august|september|october|n
 _DATE = re.compile(rf"\b({_MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})", re.I)
 _PERIOD = re.compile(rf"(three|3|thirteen|twelve|twelve-week|sixteen|quarter|fourth quarter|first quarter|second quarter|"
                      rf"third quarter|fiscal quarter)[\w\s\-]{{0,30}}(ended)\s+({_MONTHS})\s+(\d{{1,2}}),?\s+(\d{{4}})", re.I)
-_NUM = re.compile(r"(\(\s*\$?\s*(?:\d{1,3}(?:,\d{3})*)?\.\d{1,3}\s*\)?|-?\$?\s*(?:\d{1,3}(?:,\d{3})*)?\.\d{1,3})")
+_NUM = re.compile(r"(\(\s{0,3}\$?\s{0,3}(?:\d{1,3}(?:,\d{3})*)?\.\d{1,3}\s{0,3}\)?|-?\$?\s{0,3}(?:\d{1,3}(?:,\d{3})*)?\.\d{1,3})")
 _SHARES = re.compile(r"shares|weighted|average\s+number|outstanding", re.I)
 _ANNUAL = re.compile(r"full[- ]year|for\s+the\s+(fiscal\s+)?year|twelve\s+months|year\s+ended|annual|outlook|guidance|"
                      r"expects?|forecast|range\s+of|fiscal\s+20\d\d\s+(earnings|eps)", re.I)
@@ -47,7 +47,8 @@ _PROSE = [
 # plain-text table rows (no cell separators, common before ~2008): "Diluted $ 0.08 $ (0.05)" -> "Diluted | 0.08 | (0.05)"
 _TXT_ROW = re.compile(r"^\s*(?P<label>(?:[A-Za-z][A-Za-z ,'\u2019()/&\-]{0,70}?[\s\-\u2013\u2014:(])?(?:diluted|dilution|basic)\b"
                       r"[A-Za-z ,'\u2019()/&\-]{0,30}?)"
-                      r"\s*[:\-\u2013\u2014]?\s*(?P<vals>\$?\s*\(?-?\d*\.\d{2}\)?(?:\s+\$?\s*\(?-?[\d,]*\.?\d*\)?)*)\s*$", re.I)
+                      r"\s*[:\-\u2013\u2014]?\s*(?P<vals>\$?\s*\(?-?\d*\.\d{2}\)?(?:\s+(?:\$\s*)?\(?-?(?:[\d,]+(?:\.\d+)?|\.\d+)\)?)*)\s*$",
+                      re.I)
 
 
 def _sentence_start(text: str, pos: int) -> int:
