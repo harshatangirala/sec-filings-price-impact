@@ -407,6 +407,19 @@ def teacher_extraction_will_run(cfg: dict, inputs: Path) -> bool:
     return bool(has_gold or get(cfg, "rag.run_extraction_without_gold", False))
 
 
+def release_cluster_exclusions(filings: pd.DataFrame, release_accessions: set, window_days: int = 120) -> dict:
+    """{release accession: periodic accessions of the same firm filed on or after the release within the cluster window}.
+    Hard rule 7 / D-072: none of them may feed the release's SUE, whatever its acceptance time."""
+    per = filings[filings.form.isin(PERIODIC)][["cik", "accession", "filing_date"]].copy()
+    rel = filings[filings.accession.isin(release_accessions)][["cik", "accession", "filing_date"]].copy()
+    if per.empty or rel.empty:
+        return {}
+    per["fd"], rel["fd"] = pd.to_datetime(per.filing_date), pd.to_datetime(rel.filing_date)
+    j = rel.merge(per, on="cik", suffixes=("", "_p"))
+    j = j[(j.fd_p >= j.fd) & (j.fd_p <= j.fd + pd.Timedelta(days=window_days))]
+    return j.groupby("accession").accession_p.apply(set).to_dict()
+
+
 def preflight_projection(cfg: dict, manifest: pd.DataFrame, data_root, hot_root) -> dict:
     """CPU-side preflight (hard rule 4, §13.3, G2): projected events, chunks, storage and GPU hours from the filing index,
     before the long download. Constants come from the pilot (configs/default.yaml budget.preflight_*)."""
@@ -715,7 +728,11 @@ def s06(ctx):
     if len(evdf):
         evdf = evdf.drop_duplicates("accession")
         evdf["decision_time"] = pd.to_datetime(evdf["decision_time"], utc=True).dt.tz_convert("America/New_York")
-        sue, src = compute_sue_table(evdf, xh, rel_hist, int(A["sue_min_diffs"]), int(A["sue_max_diffs"]))
+        # hard rule 7: a release's own cluster (its next 10-Q/10-K, D-017) can never feed its SUE. Clusters are built in S07,
+        # so exclude conservatively here: every periodic filing of the firm filed on or after the release, within the
+        # 120-day cluster window (matters when such a filing is public before the release event's decision time, D-072)
+        cluster_later = release_cluster_exclusions(ft, set(usable.accession))
+        sue, src = compute_sue_table(evdf, xh, rel_hist, int(A["sue_min_diffs"]), int(A["sue_max_diffs"]), cluster_later)
     else:
         sue, src = pd.DataFrame(), pd.DataFrame(columns=["accession", "source_accession", "source_public_time", "source_kind"])
     if len(src) and len(evdf):

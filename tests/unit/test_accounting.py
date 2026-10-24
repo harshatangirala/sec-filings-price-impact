@@ -147,3 +147,16 @@ def test_suspect_annual_handles_february_fiscal_year_end_in_leap_years():
                         "public_available_time": t})
     out = flag_suspect_annual(rel, {7: "0229"}).set_index("accession")
     assert out.loc["d", "suspect_annual"] and not out.loc["a":"c", "suspect_annual"].any()
+
+
+def test_release_cluster_exclusions_cover_same_day_and_later_periodic_filings():
+    """D-072 (full run): a 10-Q filed minutes after the earnings 8-K on the same day was public before the release's
+    decision time and entered its SUE history; every periodic filing on/after the release within 120 days is excluded."""
+    import pandas as pd
+    from secprice.stages_data import release_cluster_exclusions
+    f = pd.DataFrame({"cik": [1, 1, 1, 1, 2], "accession": ["r1", "q_same_day", "q_later", "q_prior", "q_other_firm"],
+                      "form": ["8-K", "10-Q", "10-K", "10-Q", "10-Q"],
+                      "filing_date": ["2012-04-20", "2012-04-20", "2012-09-30", "2012-01-30", "2012-04-20"]})
+    ex = release_cluster_exclusions(f, {"r1"})
+    assert ex == {"r1": {"q_same_day"}}                    # q_later is beyond 120 days; q_prior is earlier; other firm excluded
+    assert release_cluster_exclusions(f, {"r1"}, window_days=180) == {"r1": {"q_same_day", "q_later"}}
