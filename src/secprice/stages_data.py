@@ -801,6 +801,12 @@ def s07(ctx):
     ev = ev.merge(u[["cik", "ticker", "ff12_industry"]], on="cik", how="left")
     price_cols = [c for c in ev.columns if c in ("close", "open", "ret", "raw_ret")]
     assert not price_cols, "event construction must not read price fields"
+    # point in time (D-071): every filing in an event is accepted no later than the event's acceptance time, so all of an
+    # event's content is public by its decision time
+    acc_t = pd.to_datetime(mm.set_index("accession")["acceptance_time"], utc=True)
+    late = [(e, a) for e, accs, t in zip(ev.event_id, ev.accessions, pd.to_datetime(ev.acceptance_time, utc=True))
+            for a in accs if a in acc_t.index and acc_t[a] > t]
+    assert not late, f"{len(late)} filings accepted after their event's acceptance time, e.g. {late[:3]}"
     px = C.read(ctx, "S03", "prices.parquet", columns=["ticker", "date"])
     last_px = pd.to_datetime(px[px.ticker != "SPY"].date).max()
     last_doc = pd.to_datetime(mm[mm.in_study].filing_date).max()

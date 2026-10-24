@@ -40,7 +40,7 @@ def build_events(manifest: pd.DataFrame, cal, cfg: dict, tax, release_info: pd.D
     per = m[m.form.isin(PERIODIC)]
     for r in per.itertuples(index=False):
         rows.append({"cik": r.cik, "accessions": [r.accession], "forms": [r.form], "acceptance_time": r.acceptance_time,
-                     "ts_quality": r.ts_quality, "ts_source": r.ts_source,
+                     "first_acceptance_time": r.acceptance_time, "ts_quality": r.ts_quality, "ts_source": r.ts_source,
                      "event_type": "periodic_10K" if r.form.startswith("10-K") else "periodic_10Q",
                      "categories": [], "items": [], "report_date": r.report_date, "filing_date": r.filing_date})
     ek = m[m.form.isin(EIGHTK)].sort_values(["cik", "acc_date_et", "acceptance_time", "accession"])
@@ -50,10 +50,13 @@ def build_events(manifest: pd.DataFrame, cal, cfg: dict, tax, release_info: pd.D
             its = list(r.items_list or [])
             items += its
             cats |= set(tax.categories(its, r.filing_date, list(r.item_titles or [])))
-        first = g.iloc[0]
+        first, last = g.iloc[0], g.iloc[-1]
         q = "A" if (g.ts_quality == "A").all() else ("B" if (g.ts_quality != "C").all() else "C")
+        # a same-day group is one event whose features use every filing in it, so its clock starts at the LAST acceptance:
+        # only then is all of its content public (decision log D-071; the first acceptance is kept for diagnostics)
         rows.append({"cik": cik, "accessions": g.accession.tolist(), "forms": g.form.tolist(),
-                     "acceptance_time": first.acceptance_time, "ts_quality": q, "ts_source": first.ts_source,
+                     "acceptance_time": last.acceptance_time, "first_acceptance_time": first.acceptance_time,
+                     "ts_quality": q, "ts_source": last.ts_source,
                      "event_type": "8K", "categories": sorted(cats), "items": sorted(set(items)),
                      "report_date": first.report_date, "filing_date": first.filing_date})
     ev = pd.DataFrame(rows)
@@ -179,7 +182,7 @@ def events_from_parquet(ev: pd.DataFrame) -> pd.DataFrame:
     for c in ("accessions", "forms", "categories", "items", "section_ids"):
         if c in out:
             out[c] = out[c].map(lambda v: json.loads(v) if isinstance(v, str) else (list(v) if v is not None else []))
-    for c in ("acceptance_time", "public_available_time", "feature_ready_time", "decision_time"):
+    for c in ("acceptance_time", "first_acceptance_time", "public_available_time", "feature_ready_time", "decision_time"):
         if c in out:
             out[c] = pd.to_datetime(out[c], utc=True).dt.tz_convert("America/New_York")
     return out

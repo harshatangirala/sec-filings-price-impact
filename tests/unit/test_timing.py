@@ -99,3 +99,27 @@ def test_ttrade_no_component_before_decision(cal):
         e = cal.first_open_at_or_after(tt.decision_time)
         first_price_time = cal.open_time(e)
         assert first_price_time >= tt.decision_time
+
+
+def test_same_day_8k_group_is_clocked_at_its_last_filing(cal):
+    """Point-in-time (D-071, found by the full run's availability assertion): a same-day 8-K group uses every filing's
+    content, so its clock must start at the last acceptance; the event id still comes from the earliest accession."""
+    from secprice import common as C
+    from secprice.config import load_config
+    from secprice.events.build import build_events, event_id
+    cfg = load_config("smoke")
+    tz = "America/New_York"
+    man = pd.DataFrame({"accession": ["0001-12-000001", "0001-12-000002"], "cik": [7, 7], "form": ["8-K", "8-K"],
+                        "filing_date": ["2012-02-29", "2012-02-29"],
+                        "acceptance_time": [pd.Timestamp("2012-02-29 11:00", tz=tz), pd.Timestamp("2012-02-29 16:50", tz=tz)],
+                        "ts_quality": ["A", "A"], "ts_source": ["sgml_header", "sgml_header"], "report_date": [None, None],
+                        "items_list": [["8.01"], ["2.02", "9.01"]], "item_titles": [[], []], "in_study": [True, True],
+                        "is_amendment": [False, False]})
+    tax = C.taxonomy(cfg)
+    ev = build_events(man, cal, cfg, tax, pd.DataFrame(), pd.DataFrame())
+    assert len(ev) == 1
+    e = ev.iloc[0]
+    assert pd.Timestamp(e.acceptance_time) == pd.Timestamp("2012-02-29 16:50", tz=tz)
+    assert pd.Timestamp(e.first_acceptance_time) == pd.Timestamp("2012-02-29 11:00", tz=tz)
+    assert pd.Timestamp(e.decision_time) >= pd.Timestamp("2012-02-29 16:50", tz=tz)
+    assert e.event_id == event_id(7, "0001-12-000001")
