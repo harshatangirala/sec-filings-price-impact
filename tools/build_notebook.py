@@ -249,7 +249,19 @@ All four were prepared and copied to `MyDrive/sec-price-study/inputs`. Missing o
 (the census by streaming 13 GB of HF shards; the LM dictionary from SRAF).
 """))
     C.append(code("""
+import zipfile
+def _unpack(zip_path, target, ready):
+    # one-off unpack of an uploaded zip (one big file uploads far faster than thousands of small ones)
+    if ready() or not zip_path.exists():
+        return
+    print("unpacking", zip_path.name, "->", target, "(first run only, a few minutes)")
+    target.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(zip_path) as zf:
+        zf.extractall(target)
+
 inp = DATA_ROOT / "inputs"
+_unpack(DATA_ROOT / "sec_inputs_for_colab.zip", inp, lambda: (inp / "ohlcv_1day").exists() and len(list((inp / "ohlcv_1day").glob("*.parquet"))) >= 900)
+_unpack(DATA_ROOT / (RUN_PROFILE + ".zip"), DATA_ROOT, lambda: len(list((DATA_ROOT / RUN_PROFILE).glob("S*/*/_SUCCESS"))) >= 15)
 chk = {"ohlcv_1day files": len(list((inp / "ohlcv_1day").glob("*.parquet"))) if (inp / "ohlcv_1day").exists() else 0,
        "yf_frozen.parquet": (inp / "yf_frozen.parquet").exists(),
        "LM dictionary": (inp / "lexicons" / "Loughran-McDonald_MasterDictionary_1993-2025.csv").exists(),
@@ -280,13 +292,13 @@ def _where_is_my_data():
 
 if not part1_done and chk["ohlcv_1day files"] == 0:
     if PART in ("gpu", "cpu2"):
-        raise RuntimeError("Part 1 results are not under DATA_ROOT/%s, and re-running Part 1 takes ~15 h. Copy the folder "
-                           "'%s' from your computer's Google Drive (sec-price-study/%s, ~4.2 GB) into MyDrive/%s/ and wait until "
-                           "Drive shows it as fully uploaded, then re-run.\\n%s" % (RUN_PROFILE, RUN_PROFILE, RUN_PROFILE, DRIVE_FOLDER, _where_is_my_data()))
+        raise RuntimeError("Part 1 results are not under DATA_ROOT/%s, and re-running Part 1 takes ~15 h. Upload "
+                           "'%s.zip' (3.8 GB, made by tools/make_colab_zips.py) to MyDrive/%s/ - it is unpacked automatically - or wait "
+                           "until Drive shows the '%s' folder as fully uploaded, then re-run.\\n%s" % (RUN_PROFILE, RUN_PROFILE, DRIVE_FOLDER, RUN_PROFILE, _where_is_my_data()))
     raise RuntimeError("The input files are not visible to Colab: expected MyDrive/%s/inputs/ohlcv_1day/*.parquet (979 files).\\n"
-                       "Fix: on your computer open Google Drive, check sec-price-study/inputs has finished uploading (no pending sync), "
+                       "Fix: upload sec_inputs_for_colab.zip to MyDrive/%s/ (it is unpacked automatically), or on your computer open Google Drive and check sec-price-study/inputs has finished uploading (no pending sync), "
                        "that you are signed in to the SAME Google account as Colab, and that DRIVE_FOLDER above matches the folder name.\\n%s"
-                       % (DRIVE_FOLDER, _where_is_my_data()))
+                       % (DRIVE_FOLDER, DRIVE_FOLDER, _where_is_my_data()))
 if not part1_done and PART in ("gpu", "cpu2"):
     raise RuntimeError("Part 1 is incomplete under DATA_ROOT/%s; run PART='cpu1' first (or copy the finished '%s' folder from Drive).\\n%s"
                        % (RUN_PROFILE, RUN_PROFILE, _where_is_my_data()))
