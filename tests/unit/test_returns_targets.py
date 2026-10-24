@@ -89,3 +89,23 @@ def test_overlap_flags_and_clean_cohort():
     out = _overlaps(ev, {"targets": {"horizons": [1, 5]}, "contam_window_sessions": 5})
     assert out.overlap_flag_h5.tolist() == [True, False, False, False]
     assert out.overlap_flag_h1.tolist() == [False, False, False, False]
+
+
+def test_robust_same_sign_treats_zero_p_as_significant_and_missing_as_unknown():
+    """D-073 (full run): `(p or 1) < 0.10` turned p = 0.0 into 1 and marked a t = -9.8 lag check as failed."""
+    from secprice.track_a.drift import robust_same_sign
+    main = {"estimate": -0.030, "p_value": 0.0}
+    assert robust_same_sign(main, {"estimate": -0.031, "p_value": 0.0}) is True
+    assert robust_same_sign(main, {"estimate": 0.010, "p_value": 0.0}) is False       # opposite sign
+    assert robust_same_sign(main, {"estimate": -0.010, "p_value": 0.4}) is False      # not significant
+    assert robust_same_sign(main, {}) is None and robust_same_sign(main, None) is None  # too few events: unknown
+
+
+def test_overlap_flags_ignore_own_cluster_members():
+    """D-073: a verified release and its own 10-Q are one information event (§5.2) and do not contaminate each other."""
+    from secprice.events.build import _overlaps
+    ev = pd.DataFrame({"cik": [1, 1, 1, 2, 2], "trackA_day0_idx": [100, 130, 300, 100, 120],
+                       "cluster_id": ["c1", "c1", None, None, None]})
+    cfg = {"targets": {"horizons": [60]}, "contam_window_sessions": 60}
+    out = _overlaps(ev.copy(), cfg)
+    assert out.overlap_flag_h60.tolist() == [False, False, False, True, False]

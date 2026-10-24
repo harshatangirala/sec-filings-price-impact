@@ -79,6 +79,16 @@ def subperiod_signs(df, qcol, car_col, n_sub=3) -> tuple[int, list]:
     return signs
 
 
+def robust_same_sign(main: dict | None, alt: dict | None, alpha: float = 0.10) -> bool | None:
+    """Robustness of a drift estimate (clean events, one-session lag): same sign and p < alpha. None when the alternative
+    could not be estimated (too few events) - unknown, not 'failed'. A p-value of exactly 0 counts as significant (the
+    earlier `p or 1` idiom treated 0.0 as missing; D-073)."""
+    if not main or not alt or alt.get("estimate") is None or main.get("estimate") is None:
+        return None
+    p = alt.get("p_value")
+    return bool(np.sign(alt["estimate"]) == np.sign(main["estimate"]) and p is not None and p < alpha)
+
+
 def verdict(res: dict | None, trivial: float, p_adj: float | None, signs: list, clean_ok: bool | None,
             cost_ok: bool | None, lag_ok: bool | None, min_n: int = 100) -> str:
     if res is None:

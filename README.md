@@ -34,7 +34,7 @@ depend on the machine, so any stage already on Drive is skipped.
 
 | Step | Runtime | Settings in the first code cell | Stages |
 |---|---|---|---|
-| 1. full Part 1 | CPU High-RAM | `RUN_PROFILE="full"`, `PART="cpu1"` | S00-S12, S20-S21 (~9 h EDGAR at 6 req/s, resumable; ~2.5 h S11) |
+| 1. full Part 1 | CPU High-RAM | `RUN_PROFILE="full"`, `PART="cpu1"` | S00-S12, S20-S21: **already run** (artifacts on Drive), so this step only verifies and skips; from scratch ~15 h EDGAR at 6 req/s (resumable) + ~4 h S06-S11 |
 | 2. full Part 2 | A100 | `PART="gpu"` | S13-S17: GPU preflight, embeddings, ChronoBERT vintages, L5/L7, G3, fine-tuning, RAG, distillation (~3-6 h) |
 | 3. full Part 3 | CPU | `PART="cpu2"` | S18 dev holdout + MCS/PBO + G4 freeze, S22 backtest, S24 report (S19 stays sealed) |
 | 4. lockbox | CPU/GPU | `OWNER_OVERRIDES["lockbox"]["unlock_locked_test"]=True` after reviewing S18 | S19, scored once; then S22 and S24 again |
@@ -68,6 +68,21 @@ optimum from 3 starts). L6 does not beat L2 metadata alone (0.396 vs 0.396); tra
 overfitting; adversarial AUC ≈ 1 reflects drift in filing vocabulary (covariate shift), not leakage (D-051). Track A: SUE
 post-earnings drift Q5-Q1 = -2.5% [-4.7%, -0.6%], p = 0.10 (weak/mixed; opposite sign to classic PEAD in this small sample); text
 beyond momentum not supported. Association is not causation; prediction is not profitability.
+
+## Full profile, Part 1 (local CPU, 23-24 Oct 2026)
+Run on the final code, real EDGAR data, 500 firms (S&P 500 members first, then non-members), Jan 2000 - Jul 2026; artifacts on
+Drive at `MyDrive/sec-price-study/full` (Colab skips these stages and starts at Part 2).
+
+| Stage | Result |
+|---|---|
+| S05 download + parse | 202,607 filings (149,992 8-K, 39,373 10-Q, 13,242 10-K); 201,728 parsed, 879 without a target section, 0 errors; 385,387 sections; HF 10-K QA median token Jaccard: Item 1 0.95, 1A 1.00, 7 0.83, 7A 0.96 |
+| S06 accounting | 975,196 XBRL facts; 47,967 earnings releases, 34,661 with usable EPS, 82.7% agreement with XBRL (n=26,075); SUE for 59,490 filings |
+| S07 events | 190,947 events (141,300 8-K, 37,135 10-Q, 12,512 10-K); 96% timestamp quality A (every year from 2003: 100%); usable cutoff 2026-07-31 |
+| S09 / S10 | 130 features; 0 availability and 0 SUE-rule violations; leakage audit passes; 4/4 planted leaks caught; 6 walk-forward blocks 2008-2019, development holdout 2020-2022, locked test 2023 - Jul 2026 (sealed) |
+| S11 baselines (walk-forward, T_trade h=1, n=89,376) | L6 (LightGBM, tuned) macro-F1 0.401 [0.396, 0.405]; L2 metadata 0.377 [0.371, 0.384]; L1 price 0.368; L4 text 0.376; L3 accounting 0.356; L6 without filing-change features 0.401 |
+
+The full run found and fixed seven defects that smaller runs could not show (decision log D-068, D-071, D-072), including two
+point-in-time leaks caught by the pipeline's own assertions.
 
 ## Early-era check (2000-2004, real filings)
 Six firms, 361 filings, 317 events, run on real EDGAR data before any full run (decision log D-052/D-053). It found and fixed two

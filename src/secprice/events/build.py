@@ -150,19 +150,28 @@ def _clusters(ev: pd.DataFrame, rel: pd.DataFrame) -> pd.DataFrame:
 
 
 def _overlaps(ev: pd.DataFrame, cfg: dict) -> pd.DataFrame:
-    """overlap_flag_h: another same-firm event's day 0 falls within (day0, day0 + h] (dates only)."""
+    """overlap_flag_h: another same-firm event's day 0 falls within [day0, day0 + h] (dates only). Members of the same
+    earnings cluster (a verified release and its own 10-Q/10-K) are one information event (§5.2) and do not flag each
+    other (D-073); any other same-firm event does."""
     hs = sorted(set(cfg["targets"]["horizons"]) | {int(cfg["contam_window_sessions"])})
     for h in hs:
         ev[f"overlap_flag_h{h}"] = False
+    has_cl = "cluster_id" in ev
     for cik, g in ev.groupby("cik"):
         d = g["trackA_day0_idx"].to_numpy()
+        cl = g["cluster_id"].to_numpy() if has_cl else np.array([None] * len(g), dtype=object)
         order = np.argsort(d, kind="stable")
-        ds = d[order]
+        ds, cs = d[order], cl[order]
+        n = len(ds)
         for h in hs:
-            nxt = np.searchsorted(ds, ds, side="right")       # first index with day0 > own day0
-            lim = np.searchsorted(ds, ds + h, side="right")   # first index with day0 > day0 + h
-            same_day_other = np.searchsorted(ds, ds, side="right") - np.searchsorted(ds, ds, side="left") > 1
-            flag = (lim > nxt) | same_day_other
+            lo = np.searchsorted(ds, ds, side="left")          # first event on the same day0
+            hi = np.searchsorted(ds, ds + h, side="right")     # first event with day0 > day0 + h
+            flag = np.zeros(n, bool)
+            for i in range(n):
+                for j in range(lo[i], hi[i]):
+                    if j != i and (cs[i] is None or pd.isna(cs[i]) or cs[j] != cs[i]):
+                        flag[i] = True
+                        break
             out = np.zeros(len(d), bool)
             out[order] = flag
             ev.loc[g.index, f"overlap_flag_h{h}"] = out

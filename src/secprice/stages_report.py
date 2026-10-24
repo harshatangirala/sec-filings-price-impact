@@ -187,8 +187,8 @@ def _topics(ctx, ev, cars, train_end, k=12):
        outputs=["hypothesis_tests.csv"], assertions=["FDR families", "verdict rubric"],
        card="SUE-conditioned post-earnings drift and other drift tests with pre-registered verdict rules.")
 def s21(ctx):
-    from .track_a.drift import (detect_dividend, momentum_benchmark, newey_west_t, prior_quarter_quintiles, spread_test,
-                                subperiod_signs, trivial_bps, verdict)
+    from .track_a.drift import (detect_dividend, momentum_benchmark, newey_west_t, prior_quarter_quintiles, robust_same_sign,
+                                spread_test, subperiod_signs, trivial_bps, verdict)
     from .track_a.event_study import window_cars
     cfg = ctx.cfg
     tb = cfg["trivial_effect_bps"]
@@ -216,12 +216,12 @@ def s21(ctx):
         res = spread_test(rel, "q_sue", car, "cik", "trackA_day0", nb, seed)
         signs = subperiod_signs(rel.dropna(subset=["q_sue"]), "q_sue", car) if res else None
         cres = spread_test(rel[~rel[clean_col]], "q_sue", car, "cik", "trackA_day0", nb, seed)
-        clean_ok = bool(cres and res and np.sign(cres["estimate"]) == np.sign(res["estimate"]) and (cres["p_value"] or 1) < 0.10)
+        clean_ok = robust_same_sign(res, cres)
         cost = 4 * max(cfg["backtest"]["costs_bps"]) / 1e4
         cost_ok = bool(res and abs(res["estimate"]) - cost > trivial_bps(60, tb) / 1e4)
         lag_col = "car4_3_61" if car.startswith("car4") and "car4_3_61" in rel else "car_3_61"
         lres = spread_test(rel, "q_sue", lag_col, "cik", "trackA_day0", nb, seed)
-        lag_ok = bool(lres and res and np.sign(lres["estimate"]) == np.sign(res["estimate"]) and (lres["p_value"] or 1) < 0.10)
+        lag_ok = robust_same_sign(res, lres)
         add("SUE-conditioned post-earnings drift (Q5-Q1, SUE_release)", f"verified releases; {car}; prior-quarter breakpoints",
             res, trivial_bps(60, tb), signs, clean_ok, cost_ok, lag_ok,
             f"one-session lag = {lag_col}; costs = 4 x {max(cfg['backtest']['costs_bps'])} bps round trip on the spread; "
