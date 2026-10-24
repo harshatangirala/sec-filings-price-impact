@@ -261,7 +261,7 @@ def _unpack(zip_path, target, ready):
 
 inp = DATA_ROOT / "inputs"
 _unpack(DATA_ROOT / "sec_inputs_for_colab.zip", inp, lambda: (inp / "ohlcv_1day").exists() and len(list((inp / "ohlcv_1day").glob("*.parquet"))) >= 900)
-_unpack(DATA_ROOT / (RUN_PROFILE + ".zip"), DATA_ROOT, lambda: len(list((DATA_ROOT / RUN_PROFILE).glob("S*/*/_SUCCESS"))) >= 15)
+_unpack(DATA_ROOT / (RUN_PROFILE + ".zip"), DATA_ROOT, lambda: len(list((DATA_ROOT / RUN_PROFILE).glob("S*/*/_SUCCESS"))) >= 15 and len(list((DATA_ROOT / RUN_PROFILE).glob("S05/*/sections/*.parquet"))) >= 450)
 chk = {"ohlcv_1day files": len(list((inp / "ohlcv_1day").glob("*.parquet"))) if (inp / "ohlcv_1day").exists() else 0,
        "yf_frozen.parquet": (inp / "yf_frozen.parquet").exists(),
        "LM dictionary": (inp / "lexicons" / "Loughran-McDonald_MasterDictionary_1993-2025.csv").exists(),
