@@ -559,6 +559,14 @@ def s05(ctx):
             "other_or_unmapped_share": other_share, "wall_s": round(time.time() - t0, 1)}
 
 
+def _one_text_per_section(df: pd.DataFrame, col: str) -> pd.Series:
+    """section_id -> the longest text (duplicates collapse to one string, missing text to '')."""
+    if df.empty:
+        return pd.Series(dtype=object)
+    d = df.assign(_n=df[col].fillna("").astype(str).str.len()).sort_values("_n", ascending=False)
+    return d.drop_duplicates("section_id").set_index("section_id")[col].fillna("").astype(str)
+
+
 def _hf_parser_qa(ctx, m: pd.DataFrame, sec_idx: pd.DataFrame) -> dict:
     """Optional QA of our 10-K section parser against the HF corpus sections (same CIK + filing date), streaming at
     most hf.qa_max_shards shards. Agreement is reported as length ratio and token-set Jaccard per section."""
@@ -587,8 +595,9 @@ def _hf_parser_qa(ctx, m: pd.DataFrame, sec_idx: pd.DataFrame) -> dict:
         if not p.exists():
             continue
         ours = pd.read_parquet(p, columns=["accession", "section_id", "text_raw"])
-        ours = ours[ours.accession == r.accession].set_index("section_id").text_raw
-        theirs = hf[(hf.cik == int(r.cik)) & (hf.filing_date == r.filing_date)].set_index("section_id").hf_text
+        ours = _one_text_per_section(ours[ours.accession == r.accession], "text_raw")
+        # the HF corpus can hold two filings for one firm and date (e.g. a 10-K and its amendment): keep the longest
+        theirs = _one_text_per_section(hf[(hf.cik == int(r.cik)) & (hf.filing_date == r.filing_date)], "hf_text")
         for sid in ("10K_1", "10K_1A", "10K_7", "10K_7A"):
             a, b = ours.get(sid, ""), theirs.get(sid, "")
             if not a and not b:

@@ -127,3 +127,13 @@ def test_s05_worker_client_honours_cache_cap(tmp_path):
            "cache_days": 30, "timeout_s": 10, "max_retries": 2, "backoff_base_s": 2.0, "blocked_403_limit": 20,
            "cache_max_bytes": 400000}
     assert _client(job).cache_max_bytes == 400000
+
+
+def test_hf_qa_collapses_duplicate_sections():
+    """Regression (full run): two HF rows for one firm-date made the parser-QA lookup return a Series."""
+    import pandas as pd
+    from secprice.stages_data import _one_text_per_section
+    d = pd.DataFrame({"section_id": ["10K_7", "10K_7", "10K_1"], "hf_text": ["short", "a much longer MD&A text", None]})
+    s = _one_text_per_section(d, "hf_text")
+    assert s["10K_7"] == "a much longer MD&A text" and s["10K_1"] == "" and s.index.is_unique
+    assert _one_text_per_section(d.iloc[:0], "hf_text").empty
