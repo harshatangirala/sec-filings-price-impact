@@ -462,12 +462,15 @@ def collect(ctx):
     facts["universe_text"] = (
         f"Universe: **{len(usel)} unique firms** (target {cfg['universe']['n_stocks']}) common to our OHLCV files and the HF 10-K corpus: "
         f"**{int(usel.ever_sp500.sum())} S&P 500 members** (at some point in {cfg['study']['start']} to {cfg['study']['end']}, "
-        f"fja05680/sp500 @ {cfg['universe']['sp500_commit'][:8]}) and **{int((~usel.ever_sp500.astype(bool)).sum())} non-members** "
-        "(seeded, sector-stratified fill); results are reported for each bucket and combined. "
-        "**Survivor-only:** every firm is a current listing, so firms that delisted, merged or were acquired before 2026 are absent "
+        f"fja05680/sp500 @ {cfg['universe']['sp500_commit'][:8]})"
+        + (f" and **{int((~usel.ever_sp500.astype(bool)).sum())} non-members** (seeded, sector-stratified fill); results are reported "
+           "for each bucket and combined. " if int((~usel.ever_sp500.astype(bool)).sum()) else
+           ", drawn seeded and sector-stratified from the eligible S&P members: an S&P-only study (no non-S&P comparison). ")
+        + "**Survivor-only:** every firm is a current listing, so firms that delisted, merged or were acquired before 2026 are absent "
         "(survivorship-biased; drift and backtest results are biased towards survivors)"
-        + (f"; our data covers about {spc['covered_by_eligible_universe']} of the {spc['sp500_tickers_in_window']} tickers that were "
-           f"S&P 500 members in the window ({spc['coverage_share']:.0%}, ticker-level, approximate). " if spc else ". ")
+        + (f"; the eligible data covers about {spc['covered_by_eligible_universe']} of the {spc['sp500_tickers_in_window']} tickers that were "
+           f"S&P 500 members in the window ({spc['coverage_share']:.0%}, ticker-level, approximate)"
+           + (f", of which this study uses {spc['selected_sp500']}. " if spc.get("selected_sp500") is not None else ". ") if spc else ". ")
         + f"Candidates: {len(u)}; eligible: {int(u.eligible.sum())}. "
         f"Exclusions: {u.exclusion_reason.value_counts().to_dict()}. Usable cutoff {uc['usable_cutoff']} "
         f"(last price {uc['last_price_date']}, last document {uc['last_document_date']}); final month partial: {uc['final_month_partial']}. "
