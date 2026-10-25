@@ -33,3 +33,20 @@ def test_invalid_speed_mode_rejected():
     from secprice.config import ConfigError
     with pytest.raises(ConfigError):
         load_config("full", {"speed": {"mode": "turbo"}})
+
+
+def test_benchmark_excludes_warmup_and_keeps_best_pass(monkeypatch):
+    """D-075 (found on a real A100 run): the first call carries one-off GPU start-up cost; the old benchmark timed it and
+    projected 19.3 GPU-hours from ~190 chunks/s."""
+    import time as _t
+    from secprice.models import embeddings as E
+    calls = []
+
+    def fake_encode(tok, model, dev, texts, max_len, batch, pooling, **kw):
+        calls.append(len(texts))
+        _t.sleep(0.6 if len(calls) == 1 else 0.02 * (len(texts) / 128))      # slow first call, steady afterwards
+
+    monkeypatch.setattr(E, "encode", fake_encode)
+    rate = E.benchmark(None, None, "cuda", n=512, batch=128)
+    assert calls == [256, 512, 512]                                             # warm-up (2 batches), then two timed passes
+    assert rate > 5000, rate                                                    # steady state: 512 / 0.08 s, not 512 / 0.68 s

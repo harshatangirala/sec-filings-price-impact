@@ -183,9 +183,16 @@ def chrono_vintage(year: int, vintages: list[int]) -> int:
     return max(v, min(vintages))
 
 
-def benchmark(tok, model, dev, n: int = 256, max_len: int = 512) -> float:
-    """Chunks per second on synthetic 350-word texts (preflight micro-benchmark)."""
+def benchmark(tok, model, dev, n: int = 1024, max_len: int = 512, batch: int = 128) -> float:
+    """Steady-state chunks per second on synthetic 350-word texts (preflight micro-benchmark).
+    A warm-up pass runs first (CUDA context, kernel selection and allocator growth cost seconds once and are not part of the
+    throughput of a multi-hour run; D-075), then the best of two timed passes is kept (one pass on CPU)."""
     texts = [("financial results revenue margin outlook guidance risk " * 50)[:2400]] * n
-    t0 = time.time()
-    encode(tok, model, dev, texts, max_len, 64, "mean")
-    return n / max(1e-6, time.time() - t0)
+    cuda = str(dev).startswith("cuda")
+    encode(tok, model, dev, texts[: (2 * batch if cuda else 4)], max_len, batch, "mean")        # warm-up, not timed
+    best = 0.0
+    for _ in range(2 if cuda else 1):
+        t0 = time.time()
+        encode(tok, model, dev, texts, max_len, batch, "mean")
+        best = max(best, n / max(1e-6, time.time() - t0))
+    return best

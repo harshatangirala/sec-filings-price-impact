@@ -89,6 +89,7 @@ OWNER_OVERRIDES = {
     "rag": {"run_extraction_without_gold": False},        # True = teacher/student extraction without gold-val (EXPLORATORY)
     "lockbox": {"unlock_locked_test": False,              # True only after reviewing the development-holdout results
                 "acknowledge_reuse": False},
+    # "budget": {"max_gpu_hours_b": 30},                  # only if S13 refuses with a projection above the budget and you accept it
     "speed": {"mode": SPEED},                              # depth of the GPU part (decision log D-074); logged in the report
     "full": {"owner_opt_in_full": True,                   # owner opted in to the full study (2026-10-23)
              "require_pilot_success": False},             # owner waived the pilot gate (D-058); the preflight still applies

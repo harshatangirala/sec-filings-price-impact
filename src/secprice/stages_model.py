@@ -398,7 +398,7 @@ def s13(ctx):
     try:
         b = rost["encoders"]["bge_base"]
         tok, mdl, d = load_encoder(b["model_id"], b["revision"], "base")
-        rate = benchmark(tok, mdl, d, 256 if dev == "cuda" else 32)
+        rate = benchmark(tok, mdl, d, 1024 if dev == "cuda" else 32, batch=int(cfg["models"]["embed_batch"]))
         unload(mdl)
     except Exception as e:
         ctx.warn(f"micro-benchmark failed: {e}")
@@ -420,7 +420,10 @@ def s13(ctx):
         if storage_gb > float(cfg["budget"]["max_storage_gb"]):
             raise RuntimeError(f"preflight: embedding storage {storage_gb:.1f} GB > budget")
         if gpu_h_b is not None and gpu_h_b > float(cfg["budget"]["max_gpu_hours_b"]):
-            raise RuntimeError(f"preflight: projected encoder GPU hours {gpu_h_b:.1f} > budget.max_gpu_hours_b")
+            raise RuntimeError(f"preflight: projected encoder GPU hours {gpu_h_b:.1f} > budget.max_gpu_hours_b "
+                               f"({cfg['budget']['max_gpu_hours_b']}) at a measured {rate:.0f} chunks/s on {dev} for {len(encs)} encoders. "
+                               "Options: use a faster GPU, SPEED='fast' (2 encoders), or raise the budget as an explicit owner decision "
+                               "with OWNER_OVERRIDES['budget'] = {'max_gpu_hours_b': <hours>}")
         if gpu_h_c is not None and gpu_h_c > float(cfg["budget"]["max_gpu_hours_c"]):
             raise RuntimeError(f"preflight: projected LLM GPU hours {gpu_h_c:.1f} > budget.max_gpu_hours_c")
     return rep
