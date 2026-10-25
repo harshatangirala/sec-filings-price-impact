@@ -50,7 +50,7 @@ def quarterly_eps(facts: pd.DataFrame) -> pd.DataFrame:
     e["start"] = pd.to_datetime(e["period_start"])
     e["end"] = pd.to_datetime(e["period_end"])
     e["days"] = (e["end"] - e["start"]).dt.days
-    e = e.sort_values("public_available_time")
+    e = e.sort_values(["public_available_time", "accession"], kind="stable")      # deterministic ties (D-077)
     first = lambda df, keys: df.drop_duplicates(keys, keep="first")  # noqa: E731
     q = first(e[(e.days >= 70) & (e.days <= 110)], ["cik", "kind", "end"])
     out = [pd.DataFrame({"cik": q.cik, "period_end": q.end, "kind": q.kind, "value": q.value,
@@ -67,7 +67,7 @@ def quarterly_eps(facts: pd.DataFrame) -> pd.DataFrame:
                                  "derivation": "fy_minus_9m", "form": j.form_fy}))
     r = pd.concat(out, ignore_index=True)
     r["public_available_time"] = pd.to_datetime(r["public_available_time"], utc=True).dt.tz_convert("America/New_York")
-    r = r.sort_values(["cik", "kind", "period_end", "public_available_time"])
+    r = r.sort_values(["cik", "kind", "period_end", "public_available_time", "source_accession"], kind="stable")
     r = r.drop_duplicates(["cik", "kind", "period_end"], keep="first")      # as first reported
     r["qkey"] = _qkey(r["period_end"])
     return r.reset_index(drop=True)
@@ -105,7 +105,7 @@ def history_before(eps_hist: pd.DataFrame, cik: int, decision_time, exclude_acce
     h = eps_hist[(eps_hist.cik == cik) & (eps_hist.public_available_time < decision_time)]
     if exclude_accessions:
         h = h[~h.source_accession.isin(exclude_accessions)]
-    h = h.sort_values("public_available_time").drop_duplicates("qkey", keep="first")
+    h = h.sort_values(["public_available_time", "source_accession"], kind="stable").drop_duplicates("qkey", keep="first")
     return h
 
 
@@ -115,7 +115,7 @@ def compute_sue_table(events: pd.DataFrame, xbrl_eps: pd.DataFrame, rel_eps: pd.
     xbrl_eps / rel_eps: cik, qkey, value, source_accession, public_available_time (diluted preferred).
     cluster_later: {accession: set(later same-cluster accessions)} -> excluded from history (rule 7)."""
     hist_all = pd.concat([xbrl_eps.assign(src="xbrl"), rel_eps.assign(src="release")], ignore_index=True)
-    hist_all = hist_all.sort_values("public_available_time")
+    hist_all = hist_all.sort_values(["public_available_time", "source_accession"], kind="stable")
     rows, sources = [], []
     for ev in events.itertuples(index=False):
         excl = (cluster_later or {}).get(ev.accession, set())
@@ -144,6 +144,19 @@ def compute_sue_table(events: pd.DataFrame, xbrl_eps: pd.DataFrame, rel_eps: pd.
     return pd.DataFrame(rows), src_df
 
 
+def newest_period_facts(sub: pd.DataFrame) -> pd.DataFrame:
+    """Facts of one tag ordered for a point-in-time lookup (D-077). A filing reports the current period AND its prior-year
+    comparative at the same public time, so ordering by public time alone left the choice between them to the sort order
+    (about half of all lookups returned last year's balance sheet, differently in different runs). Here: (1) within a filing
+    the newest period_end comes last; (2) a fact whose period is older than a period already public (a restated comparative in
+    a later filing) is dropped, so the lookup always returns the newest known period; ties are fully ordered (stable)."""
+    s = sub.copy()
+    s["_pe"] = pd.to_datetime(s["period_end"])
+    s = s.sort_values(["cik", "public_available_time", "_pe", "value"], kind="stable")
+    s = s[s["_pe"] >= s.groupby("cik")["_pe"].cummax()]
+    return s.sort_values(["public_available_time", "cik", "_pe", "value"], kind="stable").drop(columns="_pe")
+
+
 def pit_facts(events: pd.DataFrame, facts: pd.DataFrame, tags: list[str]) -> pd.DataFrame:
     """Latest value per tag with public time strictly before decision_time (merge_asof by cik)."""
     ev = events[["event_id", "cik", "decision_time"]].copy()
@@ -160,7 +173,7 @@ def pit_facts(events: pd.DataFrame, facts: pd.DataFrame, tags: list[str]) -> pd.
             sub = sub[sub.days.between(340, 380)]
         elif kind == "q":
             sub = sub[sub.days.between(70, 110)]
-        sub = sub.sort_values("public_available_time")[["cik", "public_available_time", "value", "period_end"]]
+        sub = newest_period_facts(sub)[["cik", "public_available_time", "value", "period_end"]]
         if sub.empty:
             out[f"{tag}_{kind}"] = np.nan
             continue

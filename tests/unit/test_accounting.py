@@ -160,3 +160,27 @@ def test_release_cluster_exclusions_cover_same_day_and_later_periodic_filings():
     ex = release_cluster_exclusions(f, {"r1"})
     assert ex == {"r1": {"q_same_day"}}                    # q_later is beyond 120 days; q_prior is earlier; other firm excluded
     assert release_cluster_exclusions(f, {"r1"}, window_days=180) == {"r1": {"q_same_day", "q_later"}}
+
+
+def test_pit_facts_prefers_newest_period_and_ignores_input_order():
+    """D-077 (found by comparing the 150-firm run with the 500-firm run): a filing reports the current period and the prior-year
+    comparative at the same public time; the lookup must return the current one whatever the row order, and a later restated
+    older period must not displace a newer one."""
+    from secprice.features.accounting import pit_facts
+    t = lambda s: pd.Timestamp(s, tz="America/New_York")  # noqa: E731
+    facts = pd.DataFrame({
+        "cik": [1] * 6, "tag": ["Assets"] * 6,
+        "value": [100.0, 80.0, 120.0, 100.0, 90.0, 70.0],
+        "period_start": [None] * 6,
+        "period_end": ["2011-12-31", "2010-12-31", "2012-12-31", "2011-12-31", "2010-12-31", "2009-12-31"],
+        "public_available_time": [t("2012-03-01"), t("2012-03-01"), t("2013-03-01"), t("2013-03-01"), t("2012-09-01"), t("2012-09-01")]})
+    ev = pd.DataFrame({"event_id": ["a", "b", "c"], "cik": [1, 1, 1],
+                       "decision_time": [t("2012-06-01"), t("2012-10-01"), t("2013-06-01")]})
+    expect = {"a": 100.0, "b": 100.0, "c": 120.0}     # b: the 2012-09 filing restates OLDER periods, so 2011-12-31 stays the newest
+    base = pit_facts(ev, facts, [("Assets", "inst")]).set_index("event_id")["Assets_inst"].to_dict()
+    assert base == expect, base
+    rng = np.random.default_rng(0)
+    for _ in range(25):
+        shuf = facts.sample(frac=1.0, random_state=int(rng.integers(1 << 30))).reset_index(drop=True)
+        got = pit_facts(ev.sample(frac=1.0, random_state=int(rng.integers(1 << 30))), shuf, [("Assets", "inst")])
+        assert got.set_index("event_id")["Assets_inst"].to_dict() == expect

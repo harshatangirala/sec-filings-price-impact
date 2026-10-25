@@ -62,7 +62,7 @@ Jul 2026**. On that panel it runs three separate tracks:
 stages whose `_SUCCESS` marker matches; the EDGAR download (S05) checkpoints per firm.
 
 1. **smoke** (default, hard rule 4): 5 firms (4 S&P 500 + 1 non-member), 2021–2023, ~20–30 min on CPU. Verifies the chain on real data.
-2. **full**: 500 firms (S&P 500 members first, then non-members), 2000–2026, reported as **S&P 500 / non-S&P 500 / combined**.
+2. **full**: `N_STOCKS` firms (S&P 500 members first, then non-members), 2000–2026, reported as **S&P 500 / non-S&P 500 / combined**. `N_STOCKS = 150` is the S&P-only mini study (about a third of the work); `500` is the full study.
    Gate **G2** = your opt-in + the preflight budget check, which runs before the download (the owner waived the pilot, D-058).
    Expect **~10–14 h** for the EDGAR download/parse on a CPU runtime (fair-access limit 6 requests/s; S05 stops cleanly after
    `s05_max_wall_hours` and resumes on re-run), then **~3–6 h of A100** for embeddings, tuning and fine-tuning. Run **Part 1 on a
@@ -73,14 +73,15 @@ stages whose `_SUCCESS` marker matches; the EDGAR download (S05) checkpoints per
 later than decision time; the report contains computed values only; association ≠ causation; prediction ≠ profitability;
 results are *validation-selected*, never a global optimum; the locked test is scored **once**, and only when you unseal it.
 
-Repository build: `{commit()}` · Artifacts: `MyDrive/sec-price-study/<profile>/…` · Report: `…/<profile>/reports/results_report.html`
+Repository build: `{commit()}` · Artifacts: `MyDrive/<DRIVE_FOLDER>/<profile>/…` · Report: `…/<profile>/reports/results_report.html`
 """))
     C.append(md("## 0. Owner settings"))
     C.append(code("""
 RUN_PROFILE = "smoke"      # "smoke" -> "full" ("pilot" optional)   (hard rule 4: smoke is the default)
 PART = "all"               # "cpu1" (S00-S12, S20-S21) | "gpu" (S13-S17) | "cpu2" (S18-S24) | "all"
 SPEED = "fast"             # "fast": 2 encoders, no CatBoost, fewer trials, no fine-tuning (~12 h on Colab) | "full": spec core roster (~20+ h)
-DRIVE_FOLDER = "sec-price-study"
+N_STOCKS = 150               # 150 = the S&P 500 mini study (sector-stratified, seeded); 500 = the full study (folder sec-price-study)
+DRIVE_FOLDER = "sec-price-study-mini" if N_STOCKS < 500 else "sec-price-study"
 
 # Study window: configs/default.yaml sets Jan 2000 - Jul 2026 for pilot/full (owner); smoke uses 2021-2023.
 OWNER_OVERRIDES = {
@@ -97,6 +98,8 @@ OWNER_OVERRIDES = {
     # run the same cell again and finished firms are skipped. 0 = no limit.
     "sec": {"s05_max_wall_hours": 8},
 }
+if RUN_PROFILE == "full":      # smoke keeps its own five firms; S&P 500 members are drawn first, so 150 gives 150 S&P stocks (D-076)
+    OWNER_OVERRIDES["universe"] = {"n_stocks": N_STOCKS}
 """))
     C.append(md("""
 ## 1. Environment
