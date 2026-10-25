@@ -69,7 +69,27 @@ overfitting; adversarial AUC ≈ 1 reflects drift in filing vocabulary (covariat
 post-earnings drift Q5-Q1 = -2.5% [-4.7%, -0.6%], p = 0.10 (weak/mixed; opposite sign to classic PEAD in this small sample); text
 beyond momentum not supported. Association is not causation; prediction is not profitability.
 
-## Full profile, Part 1 (local CPU, 23-24 Oct 2026)
+## Mini study: 150 S&P 500 stocks (26 Oct 2026) - the version to run first
+`N_STOCKS = 150` in the notebook's first cell (folder `sec-price-study-mini`). Same pipeline and filings as the 500-firm run for
+those firms (decision log D-076): 150 S&P members drawn seeded and sector-stratified, 60,261 events, S&P-only (no non-S&P bucket).
+The CPU part is already run and packed as `colab_upload_mini/full.zip` (1.3 GB); Colab only runs the GPU part (about a third of the
+work: roughly 5-8 h in fast mode, 7-11 h in full mode, unmeasured).
+
+| CPU-part result (walk-forward, T_trade h=1, n = 28,533) | |
+|---|---|
+| L6 all CPU features | macro-F1 0.390 [0.383, 0.397] (best head: elastic net 0.392); shuffled-label null 0.251 (max 0.273) |
+| L2 metadata / L1 price / L4 text / L3 accounting | 0.379 / 0.362 / 0.374 / 0.347 (same ranking and level as the 500-firm run) |
+| SUE-conditioned drift Q5-Q1 | -2.6% [-3.5%, -1.7%], n=3,825: a reversal, survivor-only caveat applies |
+| Checks | events, timestamps and targets identical to the 500-firm run for the same firms (60,261 events; 1.3M target rows); 0 availability violations; 4/4 planted leaks caught; accounting features match a brute-force oracle in 1,500 of 1,500 sampled events |
+
+## Superseded numbers (D-077)
+The 500-firm and pilot results below were computed before a point-in-time accounting bug was found (total assets, leverage, ROA,
+revenue, latest EPS, book-to-market and market cap used last year's value in about half of all events). Results that use those
+features (L3, L6, bucket scores, size controls) are superseded until stages S09-S24 are re-run (about 4.5 h locally); events,
+timestamps, targets, Track A abnormal returns, SUE and release-EPS drift, and the L1/L2/L4 baselines are unaffected. The 150-firm
+mini study above was run on the corrected code.
+
+## Full profile, Part 1 (local CPU, 23-24 Oct 2026; accounting-dependent rows superseded, see D-077)
 Run on the final code, real EDGAR data, 500 firms (S&P 500 members first, then non-members), Jan 2000 - Jul 2026; artifacts on
 Drive at `MyDrive/sec-price-study/full` (Colab skips these stages and starts at Part 2).
 

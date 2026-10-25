@@ -33,9 +33,7 @@ models, rag, gold, evaluation, track_a, backtest, viz, report, extensions, testi
 fixtures) | `docs/decision_log.md` | `tools/` (input preparation, notebook builder).
 
 ## Current milestone
-M0-M13 implemented; 99 tests (unit, offline integration, opt-in live online smoke); notebook runs end to end on smoke on a
-clean data root. **Full profile Part 1 (S00-S12, S20, S21, S24) ran on all 500 firms, 2000-2026, real data**; artifacts on
-Drive (`MyDrive/sec-price-study/full`), seen as done by the notebook's own settings. Owner decisions: no pilot gate (D-058),
-S&P / non-S&P / combined reporting (D-056), survivor-only wording (D-057). Next: owner runs Part 2 (A100, `PART="gpu"`) and
-Part 3 on Colab, annotates gold (Track C), then unlocks the lockbox once. Decisions D-001..D-073; audit with closure table
-in docs/audit_2026-10-23.md.
+M0-M13 implemented; 104 tests; notebook runs end to end on smoke. **Mini study (150 S&P stocks, D-076): CPU part run on corrected
+code and packed (`colab_upload_mini/full.zip`); next = Colab GPU part, then final CPU part, gold labels, lockbox.** The 500-firm CPU
+results predate the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h). Owner decisions: no pilot gate (D-058), S&P / non-S&P /
+combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-077; audit in docs/audit_2026-10-23.md.
