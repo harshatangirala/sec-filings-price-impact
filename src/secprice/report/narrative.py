@@ -37,6 +37,13 @@ def _success(ctx, sid) -> dict:
         return {}
 
 
+def _d(d) -> str:
+    """Readable text for a small dict (no Python repr in the report)."""
+    if not isinstance(d, dict) or not d:
+        return str(d)
+    return ", ".join(f"{k} {v:,}" if isinstance(v, (int, np.integer)) and not isinstance(v, bool) else f"{k} {v}" for k, v in d.items())
+
+
 def _pct(x, nd=1) -> str:
     return "n/a" if x is None or (isinstance(x, float) and not np.isfinite(x)) else f"{100 * x:.{nd}f}%"
 
@@ -734,10 +741,10 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
         tq = ev.ts_quality.value_counts().to_dict()
         lab = tg[(tg.target_def == cfg["targets"]["primary"]["target_def"]) & (tg.horizon == cfg["targets"]["primary"]["horizon"]) & (tg.eligible.fillna(False))] if tg is not None else None
         sh = lab.label3.value_counts(normalize=True).sort_index().to_dict() if lab is not None and len(lab) else {}
-        return (f"**Events.** {n_ev:,} events: {ev.event_type.value_counts().to_dict()}. Same-firm, same-day 8-Ks are merged into one multi-label event whose clock is the "
+        return (f"**Events.** {n_ev:,} events ({_d(ev.event_type.value_counts().to_dict())}). Same-firm, same-day 8-Ks are merged into one multi-label event whose clock is the "
                    "LAST acceptance of the group (found as a look-ahead leak in the full-scale run, decision D-071). **Four timestamps** per event: acceptance, assumed public "
                    f"time (+{cfg['timing']['public_lag_minutes']} min), feature-ready time and decision time (+{cfg['timing']['decision_latency_minutes']} min). Timestamp quality "
-                   f"{tq} (A = exact from the SGML header, B = date only, C = uncertain). Session buckets {sb}.\n\n"
+                   f"{_d(tq)} (A = exact from the SGML header, B = date only, C = uncertain). Session buckets: {_d(sb)} (PRE = before the open, INTRA = during the session, POST = after the close).\n\n"
                    f"**Targets.** T_trade (primary): entry at the open of the first session whose open is at or after the decision time, exit at the close of session "
                    "entry + h - 1 (an executable open-to-close return); abnormal return = stock return minus beta x SPY return on the identical interval (no close-to-close "
                    "factor return is ever subtracted from an open-to-close return, so Carhart abnormal returns are null for T_trade). Beta comes from a market model estimated on sessions "
@@ -778,7 +785,7 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
             "Fine-tuning of the encoders is allowed only if gate G3 passes; here it did not, so no encoder was fine-tuned.\n\n**Tuned hyperparameters**\n\n"
             + md_table(head_params_table(ctx), 30) +
             "\n\nThe elastic net's convex problem has a certified global optimum; tree models are validation-selected, never claimed to be global optima. "
-        f"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed: {cfg['tuning']['trials']} trials per study. Optuna's TPE sampler draws "
+        f"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed: {_d(cfg['tuning']['trials'])} trials per study. Optuna's TPE sampler draws "
         "its first 10 candidates at random, so CatBoost and elastic-net studies (fewer than 10 trials) are small random searches that see the SAME random candidates in every rung; this is why several rungs "
         "share identical settings in the table, and why 'tuned' is often equal to 'default' (see 'Tuning: default vs tuned'). Tuning gains are small by design and should not be read as a search for the best possible model.")
 
@@ -820,7 +827,7 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
         f"({int(pv.groupby('field').size().max()) if pv is not None and len(pv) else 'n/a'} returned a valid structured response) "
             f"({rg['s16'].get('seconds_per_filing', 'n/a')} s per filing, {rg['s16'].get('generation_seconds', 0) / 3600:.1f} h). Gold-test filings were never sent to the model. "
             f"**What could not run:** there are no human gold labels (status: {rg['gold'].get('rater_status', 'n/a')}; imported: {rg['gold'].get('labels_imported')}), so the retrieval tournament "
-            f"(BM25 vs hybrid vs hybrid+rerank), extraction F1, faithfulness and numeric-fidelity evaluation (F32-F36), gate G3b ({g3b}), the teacher/student distillation (S17) and "
+            f"(BM25 vs hybrid vs hybrid+rerank), extraction F1, faithfulness and numeric-fidelity evaluation (F32-F36), gate G3b (passed: {g3b.get('passed')}; reason: {g3b.get('reason')}), the teacher/student distillation (S17) and "
             "feature set L8 were not produced, and H3 and H6 are untested. The model outputs below are therefore **not evidence of extraction quality**; they only show what the pipeline produces."
             + ("\n\n**How often each field was extracted as present** (descriptive; unvalidated)\n\n" + md_table(prev_tab, 14) if prev_tab is not None else "") + ex_txt)
 

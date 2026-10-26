@@ -645,7 +645,8 @@ def collect(ctx):
     cv = _opt(ctx, "S23", "content_validity.csv", "csv")
     g3b = _opt(ctx, "S16", "g3b.json", "json")
     facts["trackc_text"] = (f"Gold set: {gs.get('rater_status', 'n/a')}; labels imported: {gs.get('labels_imported')}. "
-                            f"G3b: {g3b}. Price outcomes never validate semantic labels.")
+                            f"G3b: passed {(g3b or {}).get('passed')}"
+                            + (f" ({g3b['reason']})" if g3b and g3b.get("reason") else "") + ". Price outcomes never validate semantic labels.")
     facts["trackc"] = cv
     fd = _csv(ctx.dep("S11") / "fit_diagnosis.csv")
     facts["fit_diag"] = fd[["rung", "head", "mean_val", "mean_train", "std", "verdict"]]
@@ -678,7 +679,7 @@ def collect(ctx):
     from .report.narrative import add_narrative
     add_narrative(ctx, F, facts, _opt, ev, usel, tg, rl)
     # executive bullets (computed values only)
-    eb = [f"{len(usel)} firms, {len(ev):,} events ({ev.event_type.value_counts().to_dict()}), {cfg['study']['start']} to {uc['usable_cutoff']}."]
+    eb = [f"{len(usel)} firms, {len(ev):,} events ({', '.join(f'{k} {v:,}' for k, v in ev.event_type.value_counts().items())}), {cfg['study']['start']} to {uc['usable_cutoff']}."]
     if len(lad):
         com = lad[lad.cohort.str.startswith("common")]
         strict = com[com.leaderboard == "strict"].sort_values("mean_fold_score", ascending=False).head(1) if "leaderboard" in com else com.head(0)
