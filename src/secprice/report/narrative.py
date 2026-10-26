@@ -12,6 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from ..config import gpu_trials
 from .build import fmt, md_table
 
 BLOCK_LABEL = {"wf": "walk-forward 2008-2019", "dev": "development 2020-2022", "locked": "locked 2023-2026"}
@@ -785,9 +786,11 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
             "Fine-tuning of the encoders is allowed only if gate G3 passes; here it did not, so no encoder was fine-tuned.\n\n**Tuned hyperparameters**\n\n"
             + md_table(head_params_table(ctx), 30) +
             "\n\nThe elastic net's convex problem has a certified global optimum; tree models are validation-selected, never claimed to be global optima. "
-        f"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed: {_d(cfg['tuning']['trials'])} trials per study. Optuna's TPE sampler draws "
-        "its first 10 candidates at random, so CatBoost and elastic-net studies (fewer than 10 trials) are small random searches that see the SAME random candidates in every rung; this is why several rungs "
-        "share identical settings in the table, and why 'tuned' is often equal to 'default' (see 'Tuning: default vs tuned'). Tuning gains are small by design and should not be read as a search for the best possible model.")
+        ff"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed. Baseline stage (S11): {_d(cfg['tuning']['trials'])} trials per study; "
+        f"embedding stage (S15): {_d(gpu_trials(cfg))} trials per study{' (fast mode)' if fast else ''}. Optuna's TPE sampler draws its first 10 candidates at random, so every study with fewer than 10 trials "
+        "(CatBoost and elastic-net in S11, everything in S15 under fast mode) is a small random search that sees the SAME random candidates in every rung and encoder. That is why several rungs "
+        "share identical settings in the table (for example the two L7/LightGBM rows) and why 'tuned' is often equal to 'default' (see 'Tuning: default vs tuned'). Tuning gains are small by design "
+        "and should not be read as a search for the best possible model.")
 
     N["a7"] = _safe(ctx, "a7", _a7)
 
