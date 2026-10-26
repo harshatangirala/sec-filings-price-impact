@@ -786,7 +786,7 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
             "Fine-tuning of the encoders is allowed only if gate G3 passes; here it did not, so no encoder was fine-tuned.\n\n**Tuned hyperparameters**\n\n"
             + md_table(head_params_table(ctx), 30) +
             "\n\nThe elastic net's convex problem has a certified global optimum; tree models are validation-selected, never claimed to be global optima. "
-        ff"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed. Baseline stage (S11): {_d(cfg['tuning']['trials'])} trials per study; "
+            f"**Search budget.** Each Optuna study first tries the default setting, then draws candidates with a fixed seed. Baseline stage (S11): {_d(cfg['tuning']['trials'])} trials per study; "
         f"embedding stage (S15): {_d(gpu_trials(cfg))} trials per study{' (fast mode)' if fast else ''}. Optuna's TPE sampler draws its first 10 candidates at random, so every study with fewer than 10 trials "
         "(CatBoost and elastic-net in S11, everything in S15 under fast mode) is a small random search that sees the SAME random candidates in every rung and encoder. That is why several rungs "
         "share identical settings in the table (for example the two L7/LightGBM rows) and why 'tuned' is often equal to 'default' (see 'Tuning: default vs tuned'). Tuning gains are small by design "
