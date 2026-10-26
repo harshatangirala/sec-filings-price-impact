@@ -33,7 +33,11 @@ models, rag, gold, evaluation, track_a, backtest, viz, report, extensions, testi
 fixtures) | `docs/decision_log.md` | `tools/` (input preparation, notebook builder).
 
 ## Current milestone
-**2026-10-26: the 150-stock mini study is COMPLETE (all 25 stages, locked test scored once and now spent); report v2 built (D-078).** M0-M13 implemented; 104 tests; notebook runs end to end on smoke. **Mini study (150 S&P stocks, D-076): CPU part run on corrected
-code and packed (`colab_upload_mini/full.zip`); next = Colab GPU part, then final CPU part, gold labels, lockbox.** The 500-firm CPU
-results predate the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h). Owner decisions: no pilot gate (D-058), S&P / non-S&P /
-combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-077; audit in docs/audit_2026-10-23.md.
+**2026-10-26: the 150-stock S&P mini study is COMPLETE** (D-076): all 25 stages ran (CPU part locally, GPU part on Colab), the locked test
+was scored once and is spent (re-runs can only treat it as development data), and report v2 was built from the finished stages (D-078;
+rebuild only S24 with `force=["S24"]`, it never re-runs a model). 110 tests; the notebook runs end to end on smoke. Results: text adds nothing
+(L7 - L6 = -0.001 [-0.012, +0.009] on the locked test); the models predict whether a stock moves, not which way. Not done: Track C (no gold
+labels), stress-fold scores, a deterministic LightGBM and a strict-model tie-break (listed in report section 11). The 500-firm results predate
+the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h) and that study is the planned major project. Owner decisions: no pilot gate (D-058),
+S&P / non-S&P / combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-078; audit in
+docs/audit_2026-10-23.md.
