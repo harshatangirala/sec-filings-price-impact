@@ -366,7 +366,7 @@ def build_pdf(md_text: str, figures: list[dict], path: Path) -> str | None:
     def add_fig(fg):
         used.add(fg["id"])
         if fg.get("path") and Path(fg["path"]).exists() and fg["status"] == "ok":
-            story.append(Image(fg["path"], width=min(width, 22 * cm), height=11.5 * cm, kind="proportional"))
+            story.append(Image(fg["path"], width=width, height=14.5 * cm, kind="proportional"))
             story.append(Paragraph(f"<b>{fg['id']}</b> {html.escape(fg['title'])}. {html.escape(fg['caption'])}", ss["BodyText"]))
             story.append(Spacer(1, 8))
         else:

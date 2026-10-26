@@ -462,18 +462,15 @@ def draw_context_figures(ctx, F, rc: dict, facts):
             vals = [sk[(sk.blk == b) & (sk.model == m)].macro_f1.mean() for b in order]
             ax.bar(np.arange(3) + k * w - 0.4 + w / 2, vals, w, label=m, color=colors[m])
         ch = _chance(sk)
-        ax.axhline(ch, color="k", ls="--", lw=1)
-        ax.text(2.45, ch + 0.003, f"real chance level (shuffled own predictions) {ch:.3f}", ha="right", fontsize=8)
+        ax.axhline(ch, color="k", ls="--", lw=1.2, label=f"real chance level (shuffled own predictions) {ch:.3f}")
         if l0 is not None:
-            ax.axhline(l0, color="#6b7280", ls=":", lw=1)
-            ax.text(2.45, l0 + 0.003, f"majority-class baseline {l0:.3f}", ha="right", fontsize=8, color="#6b7280")
+            ax.axhline(l0, color="#6b7280", ls=":", lw=1.2, label=f"majority-class baseline {l0:.3f}")
         if perm is not None:
-            ax.axhline(perm, color="#9ca3af", ls="-.", lw=1)
-            ax.text(2.45, perm + 0.003, f"permutation null {perm:.3f}", ha="right", fontsize=8, color="#6b7280")
+            ax.axhline(perm, color="#9ca3af", ls="-.", lw=1.2, label=f"permutation null {perm:.3f}")
         ax.set_xticks(range(3), [BLOCK_LABEL[b] for b in order])
         ax.set_ylabel("macro-F1")
-        ax.set_ylim(0.15, max(0.45, sk.macro_f1.max() + 0.03))
-        ax.legend(title="model")
+        ax.set_ylim(0.15, max(0.5, sk.macro_f1.max() + 0.09))
+        ax.legend(fontsize=8, ncol=2, loc="upper center")
         F.save(fig, i, t)
     F.safe("R01", "Macro-F1 against its real chance level", r01)
 
@@ -508,13 +505,13 @@ def draw_context_figures(ctx, F, rc: dict, facts):
                                 label=BLOCK_LABEL[b] if BLOCK_LABEL[b] not in seen else None)
                     seen.add(BLOCK_LABEL[b])
                     ticks.append(y)
-                    labs.append(f"{r.comparison}  ({b})")
+                    labs.append(f"{r.comparison}  ({BLOCK_LABEL[b].split(' ')[0]})")
                     y -= 1
             y -= 0.6
         ax.axvline(0, color="k", lw=1)
         ax.set_yticks(ticks, labs, fontsize=8)
         ax.set_xlabel("paired lift in macro-F1 (95% month-block bootstrap CI)")
-        ax.legend(fontsize=7, loc="lower right")
+        ax.legend(fontsize=7, loc="upper right")
         F.save(fig, i, t)
     F.safe("R03", "Paired lifts by period", r03)
 
@@ -557,10 +554,17 @@ def draw_arch_figs(ctx, F, facts, usel, rl):
     pf = _success(ctx, "S13")
     ftab = features_table(ctx)
     nf = dict(zip(ftab.family, ftab.features)) if len(ftab) else {}
+    uni = _read_pq(ctx, "S02", "universe.parquet", ["eligible", "selected"])
+    n_elig = f" (of {int(uni.eligible.sum())} eligible)" if uni is not None else ""
+    pcv = ctx_read_csv(ctx, "S03", "price_coverage.csv")
+    px_span = f"{str(pcv['first'].min())[:4]}-{str(pcv['last'].max())[:4]}" if pcv is not None else ""
+    xf = _read_pq(ctx, "S06", "xbrl_facts.parquet", ["tag"])
+    er = _read_pq(ctx, "S06", "eps_release.parquet", ["is_results_release"])
+    xb = (f"{len(xf):,} XBRL facts; " if xf is not None else "") + (f"{int(er.is_results_release.sum()):,} parsed releases" if er is not None else "")
     c = {"src_edgar": f"{tot:,} filings (10-K/10-Q/8-K)", "src_hf": "10-K overlap + parser QA", "src_px": "daily bars, local + Yahoo",
          "src_fac": "Fama-French/Carhart, 12-industry map", "src_sp": "fja05680 membership list", "src_lm": "Loughran-McDonald",
-         "universe": f"{len(usel)} S&P 500 firms (of 743 eligible)", "manifest": f"{tot:,} filings listed", "prices": f"{len(usel)} firms, 1998-2026",
-         "xbrl": "XBRL facts + parsed release EPS", "download": f"{tot:,} filings", "sections": f"{pf.get('sections', 0):,} sections kept",
+         "universe": f"{len(usel)} S&P 500 firms{n_elig}", "manifest": f"{tot:,} filings listed", "prices": f"{len(usel)} firms, {px_span}",
+         "xbrl": xb, "download": f"{tot:,} filings", "sections": f"{pf.get('sections', 0):,} sections kept",
          "mask": "regex on every section", "chunks": f"~{pf.get('est_chunks', 0):,} chunks",
          "events": f"{len(ev):,} events" if ev is not None else "", "targets": "horizons 1, 2, 5, 20, 60",
          "overlap": "clean = no same-firm event within 60 sessions",
@@ -697,7 +701,10 @@ def compose(ctx, facts, usel, ev, tg, rc, rg, stages) -> dict:
                    "Colab disconnect costs nothing. Stages run in three parts: Part 1 on CPU (data, events, features, baselines, event study), Part 2 on GPU (embeddings, "
                    "text models, RAG), Part 3 on CPU (holdout, locked test, backtest, report). Safety checks are assertions inside stages: availability of every feature "
                    "before decision time, SUE and EAR registry rules, a single-use locked test, and four deliberately planted leaks that the audit must catch.\n\n"
-                   + md_table(stages.assign(hours=stages.hours.map(lambda h: "n/a" if pd.isna(h) else f"{h:.2f}")), 30))
+                   + md_table(stages.assign(hours=stages.hours.map(lambda h: "n/a" if pd.isna(h) else f"{h:.2f}")), 30)
+                + "\n\n**Reading the hours.** Hours are the wall time of the run that produced each result. In this 150-firm study S05 reused the filings already downloaded and parsed for "
+                  "these firms in the earlier 500-firm run (copied, not fetched again; decision D-076), so its time here is a copy, not the cost of downloading and parsing the filings. "
+                  "Part 1 ran on a 12-core PC; S13-S19 and S22-S24 ran on Colab.")
 
     N["a2"] = _safe(ctx, "a2", _a2)
 

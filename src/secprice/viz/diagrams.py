@@ -21,6 +21,14 @@ def _arrow(ax, x0, y0, x1, y1, color="#6b7280", ls="-", rad=0.0):
                                  connectionstyle=f"arc3,rad={rad}"))
 
 
+def _poly(ax, pts, color="#6b7280", ls="-"):
+    """Elbow connector through the listed points with an arrowhead on the last segment."""
+    for (x0, y0), (x1, y1) in zip(pts[:-2], pts[1:-1]):
+        ax.plot([x0, x1], [y0, y1], color=color, lw=1.0, ls=ls)
+    (x0, y0), (x1, y1) = pts[-2], pts[-1]
+    _arrow(ax, x0, y0, x1, y1, color=color, ls=ls)
+
+
 def _canvas(F, w=11.5, h=6.2):
     fig, ax = F.plt.subplots(figsize=(w, h))
     ax.set_xlim(0, 100)
@@ -66,7 +74,7 @@ def data_flow(F, fid, title, c: dict):
     cols = [("1 SOURCES", 1), ("2 ACQUIRE (S02-S06)", 20.5), ("3 CLEAN + SECTION (S05)", 40), ("4 EVENTS + CLOCKS (S07-S08)", 59.5),
             ("5 FEATURES (S09)", 79)]
     for t, x in cols:
-        ax.text(x, 97, t, fontsize=8.5, fontweight="bold")
+        ax.text(x, 99.5, t, fontsize=8.5, fontweight="bold")
     W, H = 18, 14
     src = [("SEC EDGAR\n" + c["src_edgar"], 82), ("Hugging Face SEC corpus\n" + c["src_hf"], 66), ("Daily prices (OHLCV)\n" + c["src_px"], 50),
            ("Factors + industry\n" + c["src_fac"], 34), ("S&P 500 history\n" + c["src_sp"], 18), ("Tone dictionary\n" + c["src_lm"], 3)]
@@ -79,11 +87,11 @@ def data_flow(F, fid, title, c: dict):
     prep = [("Download + HTML -> text\n" + c["download"], 82), ("Item sections (10-K 1/1A/7/7A,\n10-Q MD&A/RF/MR, 8-K items+EX-99)\n" + c["sections"], 64),
             ("Mask firm names + tickers\n(firm-memorisation control)\n" + c["mask"], 46), ("Drop numeric lines, cap length,\nchunk 350 words / 50 overlap\n" + c["chunks"], 28)]
     for t, y in prep:
-        _box(ax, 40, y, W, H + 1, t, COLORS["CPU"], fs=6.2)
+        _box(ax, 40, y - 1.5, W, H, t, COLORS["CPU"], fs=6.2)
     ev = [("Events: 10-K, 10-Q, same-day 8-K groups\n" + c["events"], 82), ("Clocks: acceptance -> public (+5 min)\n-> decision (+30 min)", 66),
           ("Targets: T_trade (primary), T_info\n3 classes at +/- k*sigma*sqrt(h)\n" + c["targets"], 46), ("Overlap flags + clean cohort\n" + c["overlap"], 30)]
     for t, y in ev:
-        _box(ax, 59.5, y, W, H + 1, t, COLORS["CPU"], fs=6.4)
+        _box(ax, 59.5, y - 1.5, W, H, t, COLORS["CPU"], fs=6.4)
     ft = [(c["ft_a"], 82), (c["ft_b"], 66),
           ("Chunk embeddings (GPU):\nChronoBERT + BGE", 50), ("Fold-fitted TF-IDF + SVD,\nPCA, imputers, scalers", 34),
           ("Availability rule: every feature's\nlatest input <= decision time", 18)]
@@ -108,11 +116,11 @@ def ladder(F, fid, title, rungs: list[dict]):
         fc = COLORS["off"] if off else (COLORS["strict"] if r["lb"] == "strict" else COLORS["retro"])
         _box(ax, 1, y, 9, h - 2, r["rung"], fc, fs=9, bold=True, ls="--" if off else "-")
         _box(ax, 11.5, y, 58, h - 2, r["adds"], "white", fs=7, ls="--" if off else "-", wrap=88)
-        sc = "not run (needs gold labels)" if off else (f"walk-forward macro-F1 {r['wf']:.3f}" if r.get("wf") is not None else "")
+        sc = "not run (needs gold labels)" if off else (f"mean fold macro-F1 {r['wf']:.3f} (best head)" if r.get("wf") is not None else "")
         _box(ax, 71, y, 28, h - 2, sc + (f"\n{r['lb']} leaderboard" if not off else ""), fc, fs=7)
         if k:
             _arrow(ax, 5.5, y + h - 1.6, 5.5, y + h - 2.2 + 0.3)
-    ax.text(1, 1, "green = strict point-in-time leaderboard (documented cutoff before every evaluated event); red = retrospective only (cutoff unknown); grey = not run.",
+    ax.text(1, 1, "Scores = walk-forward macro-F1 averaged over the validation folds, best head per rung. Green = strict point-in-time leaderboard (documented cutoff before every evaluated event); red = retrospective only (cutoff unknown); grey = not run.",
             fontsize=7, color="#4b5563")
     F.save(fig, fid, title)
 
@@ -124,12 +132,12 @@ def rag(F, fid, title, c: dict):
     # row 1: retrieval
     _box(ax, 1, 70, 14, 18, "Filing sections\n(masked text)\n" + c["sections"], COLORS["data"], fs=6.6)
     _box(ax, 19, 70, 14, 18, "Chunks\n350 words,\n50 overlap\n" + c["chunks"], COLORS["CPU"], fs=6.6)
-    _box(ax, 38, 79, 15, 10, "BM25\n(k1 1.5, b 0.75)", COLORS["CPU"], fs=6.6)
-    _box(ax, 38, 66, 15, 10, "Dense BGE-base\n(cosine)", COLORS["GPU"], fs=6.6)
+    _box(ax, 38, 80, 15, 9, "BM25\n(k1 1.5, b 0.75)", COLORS["CPU"], fs=6.6)
+    _box(ax, 38, 68, 15, 9, "Dense BGE-base\n(cosine)", COLORS["GPU"], fs=6.6)
     _box(ax, 58, 70, 12, 18, "Reciprocal rank fusion\n(k=60)\n-> top 30", COLORS["CPU"], fs=6.4)
     _box(ax, 74, 70, 12, 18, "BGE reranker\n(cross-encoder)\n-> top 8", COLORS["GPU"], fs=6.4)
     _box(ax, 89, 70, 10, 18, "8 passages\nwith chunk ids", COLORS["data"], fs=6.4)
-    for x0, x1, y in ((15.2, 18.8, 79), (33.2, 37.8, 84), (33.2, 37.8, 71), (53.2, 57.8, 79), (70.2, 73.8, 79), (86.2, 88.8, 79)):
+    for x0, x1, y in ((15.2, 18.8, 79), (33.2, 37.8, 84.5), (33.2, 37.8, 72.5), (53.2, 57.8, 79), (70.2, 73.8, 79), (86.2, 88.8, 79)):
         _arrow(ax, x0, y, x1, y)
     # row 2: generation + guardrails
     _box(ax, 1, 40, 17, 20, "Question bank v1\n12 fields: guidance, results tone,\nimpairment, restructuring, liquidity,\nfinancing, M&A, dividend, buyback,\nlitigation, management, risk factors", COLORS["data"], fs=6.0)
@@ -140,7 +148,7 @@ def rag(F, fid, title, c: dict):
     _box(ax, 89, 40, 10, 20, "Pre-filled\nannotation\ntemplates\n" + c["templates"], COLORS["ok"], fs=6.2)
     for x0, x1, y in ((18.2, 21.8, 50), (40.2, 43.8, 50), (72.2, 75.8, 50), (87.2, 88.8, 50)):
         _arrow(ax, x0, y, x1, y)
-    _arrow(ax, 94, 69.5, 31, 60.5, rad=-0.25)
+    _poly(ax, [(94, 69.5), (94, 65.4), (31, 65.4), (31, 60.6)])
     # row 3: downstream, not run
     off = dict(fc=COLORS["off"], ec="#9ca3af", ls="--")
     _box(ax, 1, 8, 20, 18, "HUMAN GOLD LABELS\n(gold-dev / gold-val / gold-test)\nannotators fix the pre-filled\ntemplates", off["fc"], off["ec"], fs=6.2, ls=off["ls"])
@@ -149,7 +157,7 @@ def rag(F, fid, title, c: dict):
     _box(ax, 76, 8, 23, 18, "L8 = L7 + extracted-event features;\nTrack C: content validity on gold-test\n(never validated against prices)", off["fc"], off["ec"], fs=6.2, ls=off["ls"])
     for x0, x1 in ((21.2, 25.8), (46.2, 50.8), (71.2, 75.8)):
         _arrow(ax, x0, 17, x1, 17, color="#9ca3af", ls="--")
-    _arrow(ax, 94, 39.5, 12, 26.5, color="#9ca3af", ls="--", rad=0.2)
-    ax.text(1, 31, "Historical-evidence path (SPEC.md section 8): the firm's PRIOR filings with public time < decision time only; never the current or a later filing "
+    _poly(ax, [(94, 39.5), (94, 31), (11, 31), (11, 26.6)], color="#9ca3af", ls="--")
+    ax.text(1, 3, "Historical-evidence path (SPEC.md section 8): the firm's PRIOR filings with public time < decision time only; never the current or a later filing "
                    "(self-test + planted-leak test).", fontsize=6.6, color="#374151")
     F.save(fig, fid, title)
