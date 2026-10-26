@@ -399,13 +399,14 @@ def s23(ctx):
        outputs=["reports/results_summary.md", "reports/results_report.html", "reports/results_report.pdf", "figures/"],
        assertions=["computed values only"], card="All figures and the full extracted report, built only from artifacts.")
 def s24(ctx):
-    from .report.build import build_html, build_markdown, build_pdf
+    from .report.build import build_html, build_markdown, build_pdf, resolve_slots_md
     from .viz.figures import Figs
     facts, figs = collect(ctx)
     md = build_markdown(facts)
     rep = ctx.storage.reports
-    (rep / "results_summary.md").write_text(md, encoding="utf-8")
-    (ctx.out / "results_summary.md").write_text(md, encoding="utf-8")
+    md_file = resolve_slots_md(md, figs)
+    (rep / "results_summary.md").write_text(md_file, encoding="utf-8")
+    (ctx.out / "results_summary.md").write_text(md_file, encoding="utf-8")
     html = build_html(md, figs)
     (rep / "results_report.html").write_text(html, encoding="utf-8")
     err = build_pdf(md, figs, rep / "results_report.pdf")
@@ -515,7 +516,10 @@ def collect(ctx):
                             f"(clean events = no same-firm event within {cfg['contam_window_sessions']} sessions).")
     facts["event_counts"] = ev.groupby(["event_type", "session_bucket"]).size().unstack(fill_value=0).reset_index()
     # ---------------- leakage / provenance
-    facts["leakage_audit"] = _csv(ctx.dep("S10") / "leakage_audit.csv")
+    from .report.narrative import relabel_stress_audit
+    _rl0 = pd.concat([x for x in (_opt(ctx, "S11", "results_long.parquet"), _opt(ctx, "S15", "results_long.parquet")) if x is not None],
+                     ignore_index=True)
+    facts["leakage_audit"] = relabel_stress_audit(_csv(ctx.dep("S10") / "leakage_audit.csv"), _rl0)
     facts["ledger"] = _csv(ctx.dep("S10") / "model_provenance_ledger.csv")[["key", "model_id", "revision", "license", "stated_cutoff"]]
     sanity = []
     perm = _opt(ctx, "S11", "permutation.csv", "csv")
@@ -671,18 +675,32 @@ def collect(ctx):
     man_run = json.loads((ctx.storage.manifests / "run_manifest.json").read_text()) if (ctx.storage.manifests / "run_manifest.json").exists() else {}
     facts["resources"] = pd.DataFrame([{"stage": k, "wall_s": v.get("wall_s"), "status": v.get("status")} for k, v in man_run.get("stages", {}).items()])
     facts["decision_log"] = "docs/decision_log.md"
+    from .report.narrative import add_narrative
+    add_narrative(ctx, F, facts, _opt, ev, usel, tg, rl)
     # executive bullets (computed values only)
     eb = [f"{len(usel)} firms, {len(ev):,} events ({ev.event_type.value_counts().to_dict()}), {cfg['study']['start']} to {uc['usable_cutoff']}."]
     if len(lad):
-        best = lad[lad.cohort.str.startswith("common")].sort_values("mean_fold_score", ascending=False).head(1)
-        if len(best):
-            b = best.iloc[0]
-            eb.append(f"Best walk-forward model: {b.rung}/{b.model_id}{'/' + str(b.revision) if b.revision != 'n/a' else ''} "
-                      f"mean macro-F1 {b.mean_fold_score:.3f} (pooled {b.value:.3f}, CI {b.ci_low if b.ci_low is None else round(b.ci_low, 3)} to "
+        com = lad[lad.cohort.str.startswith("common")]
+        strict = com[com.leaderboard == "strict"].sort_values("mean_fold_score", ascending=False).head(1) if "leaderboard" in com else com.head(0)
+        if len(strict):
+            b = strict.iloc[0]
+            eb.append(f"Best strict-leaderboard model on the walk-forward folds: {b.rung}/{b.model_id} mean macro-F1 {b.mean_fold_score:.3f} "
+                      f"(pooled {b.value:.3f}, CI {b.ci_low if b.ci_low is None else round(b.ci_low, 3)} to "
                       f"{b.ci_high if b.ci_high is None else round(b.ci_high, 3)}).")
+        fz = _opt(ctx, "S18", "frozen_architecture.json", "json")
+        if fz and fz.get("primary_model"):
+            pm = fz["primary_model"]
+            same = strict.iloc[0].rung == pm.get("rung") if len(strict) else False
+            eb.append(f"Model frozen for the locked test (pre-registered rule: highest walk-forward macro-F1): {pm['name']}"
+                      f"{'/' + pm['enc'] if pm.get('enc') else ''}, walk-forward {pm['wf_score']:.3f}"
+                      + ("." if same else f"; it is on the retrospective leaderboard and its margin over the best strict model is smaller than the "
+                                          "cross-run re-scoring noise (section 5a), so the two are statistically tied."))
         l0 = lad[lad.rung == "L0"]
         if len(l0):
-            eb.append(f"Majority-class baseline macro-F1: {l0.value.iloc[0]:.3f}.")
+            eb.append(f"Majority-class baseline macro-F1: {l0.value.iloc[0]:.3f}; the real chance level for balanced predictions is about 0.33 "
+                      "(shuffled predictions, section 5a), so scores must be read against 0.33.")
+    for kf in facts.get("key_findings") or []:
+        eb.append(kf)
     if g3:
         eb.append(f"G3 (text lift >= {cfg['gates']['text_lift']} with CI excluding 0): {'passed' if g3.get('passed') else 'not passed'}.")
     sc = facts.get("sp_scores_wf")
@@ -690,7 +708,7 @@ def collect(ctx):
         l6 = sc[sc.rung == "L6"].set_index("sp_bucket")
         comp = facts.get("sp_composition")
         nfirms = comp.set_index("sp_bucket").firms.to_dict() if comp is not None and len(comp) else {}
-        if len(l6):
+        if len(l6) and "NonSP500" in l6.index:
             eb.append("S&P 500 vs non-S&P 500 (combined L6 model, walk-forward macro-F1): " + "; ".join(
                 f"{bb} {l6.loc[bb, 'macro_f1']:.3f} [{l6.loc[bb, 'ci_low']:.3f}, {l6.loc[bb, 'ci_high']:.3f}]"
                 + (f" ({int(nfirms[bb])} firms)" if bb in nfirms else "") for bb in ("SP500", "NonSP500", "Combined") if bb in l6.index) + ".")
