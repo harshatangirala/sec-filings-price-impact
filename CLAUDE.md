@@ -33,7 +33,7 @@ models, rag, gold, evaluation, track_a, backtest, viz, report, extensions, testi
 fixtures) | `docs/decision_log.md` | `tools/` (input preparation, notebook builder).
 
 ## Current milestone
-M0-M13 implemented; 104 tests; notebook runs end to end on smoke. **Mini study (150 S&P stocks, D-076): CPU part run on corrected
+**2026-10-26: the 150-stock mini study is COMPLETE (all 25 stages, locked test scored once and now spent); report v2 built (D-078).** M0-M13 implemented; 104 tests; notebook runs end to end on smoke. **Mini study (150 S&P stocks, D-076): CPU part run on corrected
 code and packed (`colab_upload_mini/full.zip`); next = Colab GPU part, then final CPU part, gold labels, lockbox.** The 500-firm CPU
 results predate the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h). Owner decisions: no pilot gate (D-058), S&P / non-S&P /
 combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-077; audit in docs/audit_2026-10-23.md.

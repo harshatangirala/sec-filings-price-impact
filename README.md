@@ -69,7 +69,15 @@ overfitting; adversarial AUC ≈ 1 reflects drift in filing vocabulary (covariat
 post-earnings drift Q5-Q1 = -2.5% [-4.7%, -0.6%], p = 0.10 (weak/mixed; opposite sign to classic PEAD in this small sample); text
 beyond momentum not supported. Association is not causation; prediction is not profitability.
 
-## Mini study: 150 S&P 500 stocks (26 Oct 2026) - the version to run first
+## Mini study: complete run and report (26 Oct 2026)
+The 150-stock study is finished end to end (CPU part locally, GPU part on Colab, locked test scored once). Headline results: locked-test
+macro-F1 0.384 for the best structured model against a real chance level of about 0.33; text adds nothing (L7 - L6 = -0.001 [-0.012, +0.009]);
+the models know WHETHER a stock moves (AUC 0.635) but not WHICH WAY (AUC 0.494 [0.475, 0.509]); SUE drift -2.6% (a reversal, survivor-only
+caveat). The full report (architecture, data, pre-processing, models, RAG, evaluation design, 48 figures, known issues) is
+`reports/results_report.html` / `.pdf` / `results_summary.md` (decision D-078). Rebuild only the report from finished stages with S24
+(`force=["S24"]`; it never re-runs a model or the locked test).
+
+## Mini study: 150 S&P 500 stocks (26 Oct 2026) - how it was run
 `N_STOCKS = 150` in the notebook's first cell (folder `sec-price-study-mini`). Same pipeline and filings as the 500-firm run for
 those firms (decision log D-076): 150 S&P members drawn seeded and sector-stratified, 60,261 events, S&P-only (no non-S&P bucket).
 The CPU part is already run and packed as `colab_upload_mini/full.zip` (1.3 GB); Colab only runs the GPU part (about a third of the
