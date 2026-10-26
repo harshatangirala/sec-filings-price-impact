@@ -917,8 +917,12 @@ def selection_text(ctx, facts, rc) -> str:
     txt = (f"**Which model is 'best'?** The pre-registered rule freezes the model with the highest walk-forward mean macro-F1. That is **{pm.get('name')}** "
            f"({pm.get('head')}{'/' + pm.get('enc') if pm.get('enc') else ''}, {lb} leaderboard) with {sp:.4f}" if sp is not None else
            f"**Which model is 'best'?** The frozen primary model is {pm.get('name')}.")
+    same = facts.get("_s15_l6")
     if sp is not None and s6 is not None:
-        txt += (f", against {s6:.4f} for the best strict model L6, a margin of {sp - s6:+.4f}. ")
+        txt += (f", against {s6:.4f} for the best strict model L6 as scored in S11, a margin of {sp - s6:+.4f}. ")
+        if same is not None:
+            txt += (f"**Scored inside the same stage (S15) the order reverses:** the same L6 model scores {same:.4f} there and L7 {sp:.4f} ({sp - same:+.4f}); "
+                    "the frozen choice came from comparing scores produced in two different runs. ")
         if rep is not None and len(rep):
             mx = float((rep.macro_f1_a - rep.macro_f1_b).abs().max())
             txt += (f"Re-scoring the same L6 model in two stages (same events and folds, different machines) changed its pooled macro-F1 by up to {mx:.4f} and its predicted class "
@@ -1090,6 +1094,9 @@ def relabel_stress_audit(leak: pd.DataFrame | None, rl: pd.DataFrame) -> pd.Data
 
 def add_narrative(ctx, F, facts, opt, ev, usel, tg, rl) -> None:
     facts["_rl"], facts["_ev"] = rl, ev
+    x = rl[(rl.metric == "macro_f1") & (rl.block == "walk_forward_pooled") & (rl.event_set == "all")
+           & rl.run_id.astype(str).str.startswith("common_emb|L6|") & (rl.tuned == "tuned")]
+    facts["_s15_l6"] = float(x.mean_fold_score.max()) if len(x) and x.mean_fold_score.notna().any() else None
     perm = opt(ctx, "S11", "permutation.csv", "csv")
     facts["_perm_null"] = float(perm[perm.kind == "permuted"].macro_f1.mean()) if perm is not None and len(perm) else None
     empty_stage = pd.DataFrame(columns=["stage", "name", "part", "needs", "main outputs", "hours", "result"])

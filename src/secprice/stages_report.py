@@ -691,10 +691,12 @@ def collect(ctx):
         if fz and fz.get("primary_model"):
             pm = fz["primary_model"]
             same = strict.iloc[0].rung == pm.get("rung") if len(strict) else False
+            gap = pm["wf_score"] - strict.iloc[0].mean_fold_score if len(strict) else None
             eb.append(f"Model frozen for the locked test (pre-registered rule: highest walk-forward macro-F1): {pm['name']}"
                       f"{'/' + pm['enc'] if pm.get('enc') else ''}, walk-forward {pm['wf_score']:.3f}"
-                      + ("." if same else f"; it is on the retrospective leaderboard and its margin over the best strict model is smaller than the "
-                                          "cross-run re-scoring noise (section 5a), so the two are statistically tied."))
+                      + ("." if same else (f" ({gap:+.4f} versus the best strict model when both are scored in the same stage)" if gap is not None else "")
+                         + "; it is on the retrospective leaderboard, and the choice compared scores from two different runs whose re-scoring noise "
+                           "(section 5a) is larger than the gap, so the two models are statistically tied."))
         l0 = lad[lad.rung == "L0"]
         if len(l0):
             eb.append(f"Majority-class baseline macro-F1: {l0.value.iloc[0]:.3f}; the real chance level for balanced predictions is about 0.33 "
