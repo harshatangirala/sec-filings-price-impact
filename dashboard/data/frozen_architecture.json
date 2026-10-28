@@ -1,0 +1,77 @@
+{
+ "primary_model": {
+  "name": "L7",
+  "rung": "L7",
+  "head": "lightgbm",
+  "enc": "bge_base",
+  "params": {
+   "learning_rate": 0.06930861795531851,
+   "num_leaves": 13,
+   "min_child_samples": 74,
+   "subsample": 0.7459113162861031,
+   "colsample_bytree": 0.49640833265292406,
+   "reg_alpha": 1.107538009240819,
+   "reg_lambda": 7.224650481979384,
+   "max_depth": -1
+  },
+  "wf_score": 0.3897691684861367
+ },
+ "finalists": [
+  {
+   "name": "L6",
+   "rung": "L6",
+   "head": "enet",
+   "enc": null,
+   "params": {
+    "C": 0.006372306021510243,
+    "l1_ratio": 0.4408111352250861
+   },
+   "wf_score": 0.38877047691376526
+  },
+  {
+   "name": "L6_nochange",
+   "rung": "L6_nochange",
+   "head": "enet",
+   "enc": null,
+   "params": {
+    "C": 0.006372306021510243,
+    "l1_ratio": 0.4408111352250861
+   },
+   "wf_score": null
+  },
+  {
+   "name": "L1",
+   "rung": "L1",
+   "head": "enet",
+   "enc": null,
+   "params": {
+    "C": 0.006372306021510243,
+    "l1_ratio": 0.4408111352250861
+   },
+   "wf_score": null
+  },
+  {
+   "name": "L7",
+   "rung": "L7",
+   "head": "lightgbm",
+   "enc": "bge_base",
+   "params": {
+    "learning_rate": 0.06930861795531851,
+    "num_leaves": 13,
+    "min_child_samples": 74,
+    "subsample": 0.7459113162861031,
+    "colsample_bytree": 0.49640833265292406,
+    "reg_alpha": 1.107538009240819,
+    "reg_lambda": 7.224650481979384,
+    "max_depth": -1
+   },
+   "wf_score": 0.3897691684861367
+  }
+ ],
+ "selection_rule": "walk-forward mean macro-F1 (validation-selected)",
+ "prereg_hash": "f7cbd70abc4a87412b3eae2eb2b85c910a3086470a3d7137a0049c4a5de1200f",
+ "config_hash": "fd0552fd493ae7a2",
+ "common_cohort_n": 53167,
+ "frozen_at": "2026-10-25T23:57:20.177430+00:00",
+ "g4_hash": "d2f47ca5c609602f8f9d5bc4059bde7908ac984a05eac5aa4b8903319f63bffb"
+}

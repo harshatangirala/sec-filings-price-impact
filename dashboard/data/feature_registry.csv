@@ -1,0 +1,129 @@
+name,family,source,availability_rule,max_availability_col,leaderboard
+px_ret_1,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_ret_5,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_ret_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_ret_60,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_ret_250,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_rev_1m,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_mom_12_2,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_vol_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_vol_60,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_logdv_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_volratio_5_60,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_amihud_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_dist_52w_high,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_beta,price,prices (S03),closes at or before decision_time,_avail_price,strict
+px_idio_vol,price,prices (S03),closes at or before decision_time,_avail_price,strict
+mkt_ret_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+mkt_ret_60,price,prices (S03),closes at or before decision_time,_avail_price,strict
+mkt_vol_20,price,prices (S03),closes at or before decision_time,_avail_price,strict
+mkt_dd_252,price,prices (S03),closes at or before decision_time,_avail_price,strict
+meta_type_periodic_10K,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_type_periodic_10Q,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_type_8K,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_OTHER_OR_UNMAPPED,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_abs,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_acquisition_disposition,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_auditor_change,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_bankruptcy,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_benefit_plan_blackout,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_bylaws_fiscal_year,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_control_change,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_cybersecurity,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_delisting,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_director_nomination,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_earnings,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_ethics_code,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_exhibits,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_financial_obligation,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_impairment,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_management_change,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_material_agreement,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_mine_safety,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_non_reliance_restatement,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_other_events,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_reg_fd,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_restructuring_exit,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_security_rights,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_shareholder_vote,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_shell_status,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_cat_unregistered_sales,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_n_items,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_n_accessions,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10K_1,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10K_1A,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10K_7,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10K_7A,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10Q_MDA,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10Q_MR,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_10Q_RF,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_8K_ITEMS,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_has_8K_EX99,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_BusEq,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Chems,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Durbl,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Enrgy,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Hlth,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Manuf,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Money,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_NoDur,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Other,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Shops,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Telcm,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_ff12_Utils,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_year,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_month,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_dow,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_bucket_PRE,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_bucket_INTRA,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_bucket_POST,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_bucket_NONTRADING,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_tsq_A,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_tsq_B,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_tsq_C,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_earn_earnings_announcement_verified,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_earn_earnings_date_ambiguous,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_earn_periodic_filing_only,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_filing_lag_days,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+meta_days_since_prev_same,metadata,manifest/events,own filing metadata (acceptance <= decision),_avail_metadata,strict
+acc_log_assets,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_leverage,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_roa,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_log_revenue,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_eps_q_latest,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_log_mcap,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+acc_book_to_market,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+sue_event,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+sue_n_diffs,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+sue_last,accounting,S06,XBRL/release values with public_time < decision_time; SUE never from a later same-cluster accession,_avail_accounting,strict
+ear_last,ear,S08/S20,"EAR of a later, different cluster whose window closed before decision_time",_avail_ear,strict
+lm_negative,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_positive,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_uncertainty,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_litigious,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_strong_modal,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_weak_modal,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_constraining,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_net_tone,lexical,S05 sections,own filing text,_avail_lexical,strict
+lm_n_words,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_negative,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_positive,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_uncertainty,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_litigious,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_strong_modal,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_weak_modal,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_constraining,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_net_tone,lexical,S05 sections,own filing text,_avail_lexical,strict
+main_lm_n_words,lexical,S05 sections,own filing text,_avail_lexical,strict
+novelty_share,novelty,S05 sections,prior same-firm documents with public_time < decision_time,_avail_novelty,strict
+chg_cosine,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_jaccard_sent,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_log_len,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_lm_negative,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_lm_positive,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_lm_uncertainty,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_lm_litigious,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+chg_lm_net_tone,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+boilerplate_share,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+rf_new_share,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict
+rf_removed_share,change,S05 sections,prior same-firm documents with public_time < decision_time,_avail_change,strict

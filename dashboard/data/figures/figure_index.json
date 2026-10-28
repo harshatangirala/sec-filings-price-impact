@@ -1,0 +1,373 @@
+[
+  {
+    "id": "A01",
+    "title": "Pipeline architecture: 25 stages in three parts",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\A01.png",
+    "caption": "System architecture: the 25 stages in three parts (CPU data and baselines, GPU embeddings and RAG, CPU holdout/locked test/report) with the wall time of the run that produced each result. Orange dashed = ran but produced no result because gold labels are missing.",
+    "status": "ok"
+  },
+  {
+    "id": "A02",
+    "title": "Data and pre-processing flow",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\A02.png",
+    "caption": "Data and pre-processing flow from sources to features; counts are read from the run.",
+    "status": "ok"
+  },
+  {
+    "id": "A03",
+    "title": "Ablation ladder L0-L8",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\A03.png",
+    "caption": "The ablation ladder L0-L8: what each rung adds, its walk-forward macro-F1, and whether it is on the strict (green) or retrospective (red) leaderboard.",
+    "status": "ok"
+  },
+  {
+    "id": "A04",
+    "title": "RAG and extraction system",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\A04.png",
+    "caption": "The retrieval-augmented extraction system: retrieval (BM25 + dense + fusion + rerank), constrained generation, guardrails, cache and annotation templates; dashed grey stages need human gold labels and were not run.",
+    "status": "ok"
+  },
+  {
+    "id": "R01",
+    "title": "Macro-F1 against its real chance level",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R01.png",
+    "caption": "Macro-F1 of L1, L6 and L7 in each period against the real chance level (shuffled own predictions), the majority-class baseline and the permutation null.",
+    "status": "ok"
+  },
+  {
+    "id": "R02",
+    "title": "Move versus direction skill",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R02.png",
+    "caption": "Two AUCs per model and period: does the stock move (move vs sideways) and which way (up vs down among moved events). 0.5 = no information; bars are month-block bootstrap 95% CIs.",
+    "status": "ok"
+  },
+  {
+    "id": "R03",
+    "title": "Paired lifts by period",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R03.png",
+    "caption": "Paired macro-F1 lifts on identical events in each period (text over structured, change features, structured over price-only) with 95% month-block bootstrap CIs.",
+    "status": "ok"
+  },
+  {
+    "id": "R04",
+    "title": "Compute time by stage",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R04.png",
+    "caption": "Wall-clock hours per stage. Part 1 ran on a 12-core PC, Parts 2 and 3 on Colab.",
+    "status": "ok"
+  },
+  {
+    "id": "R05",
+    "title": "Universe by Fama-French 12 industry",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R05.png",
+    "caption": "Universe: number of firms per Fama-French 12 industry.",
+    "status": "ok"
+  },
+  {
+    "id": "R06",
+    "title": "Qwen pre-fill: how often each field was extracted",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\R06.png",
+    "caption": "Share of pre-filled filings in which Qwen extracted each field as present. Unvalidated model output (no gold labels), shown only to describe what the pipeline produces.",
+    "status": "ok"
+  },
+  {
+    "id": "F01",
+    "title": "Coverage heatmap (parsed share)",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F01.png",
+    "caption": "Coverage heatmap: share of observed filings that parsed into at least one section, by year x form. Pale cells = parser or download gaps.",
+    "status": "ok"
+  },
+  {
+    "id": "F02",
+    "title": "Audit reason codes over time",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F02.png",
+    "caption": "Audit reason codes by year (periodic-filing expectations only; 8-Ks have no expectation).",
+    "status": "ok"
+  },
+  {
+    "id": "F03",
+    "title": "8-K category availability by year",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F03.png",
+    "caption": "8-K category availability by year under taxonomy v1 (legacy items before 2004-08-23).",
+    "status": "ok"
+  },
+  {
+    "id": "F04",
+    "title": "Universe: unique firms vs firms per year",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F04.png",
+    "caption": "Universe: unique firms (constant) vs firms with prices and firms in the S&P 500 each year. Survivor-only universe (current listings; survivorship-biased).",
+    "status": "ok"
+  },
+  {
+    "id": "F05",
+    "title": "Timestamp quality and session buckets by year",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F05.png",
+    "caption": "Timestamp quality (A exact / B date-only / C uncertain) and session buckets by year.",
+    "status": "ok"
+  },
+  {
+    "id": "F06",
+    "title": "Pre-publication window and lag sensitivity",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F06.png",
+    "caption": "Pre-publication window (last close -> acceptance) and the share of events whose clock changes under public-lag sensitivity.",
+    "status": "ok"
+  },
+  {
+    "id": "F07",
+    "title": "Event-clock diagram",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F07.png",
+    "caption": "Event-clock diagram: acceptance, assumed public time, decision time; T_info base/exit; T_trade entry/exit.",
+    "status": "ok"
+  },
+  {
+    "id": "F08",
+    "title": "Earnings types over time",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F08.png",
+    "caption": "Earnings event types over time (verified releases, periodic-only, ambiguous).",
+    "status": "ok"
+  },
+  {
+    "id": "F09",
+    "title": "Overlap counts and clean share",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F09.png",
+    "caption": "Same-firm overlap counts by horizon and the clean-event share.",
+    "status": "ok"
+  },
+  {
+    "id": "F10",
+    "title": "Target distributions and class balance",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F10.png",
+    "caption": "Target distributions (abnormal returns) and 3-class balance by target definition.",
+    "status": "ok"
+  },
+  {
+    "id": "F11",
+    "title": "CAR paths by event type (all vs clean)",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F11.png",
+    "caption": "Average cumulative abnormal return path (market model) around day 0 by event type, all events vs clean events.",
+    "status": "ok"
+  },
+  {
+    "id": "F12",
+    "title": "CAR[0,+1] by session bucket",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F12.png",
+    "caption": "CAR[0,+1] by session bucket (INTRA day 0 is a mixed pre/post interval).",
+    "status": "ok"
+  },
+  {
+    "id": "F13",
+    "title": "Pre-trend diagnostics",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F13.png",
+    "caption": "Pre-trend diagnostics: CAR[-20,-2] and CAR[-5,-1] by event type (interpreted, not forced to zero).",
+    "status": "ok"
+  },
+  {
+    "id": "F14",
+    "title": "Abnormal volume and volatility response",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F14.png",
+    "caption": "Abnormal log volume and volatility response on days [0,+1] by event type.",
+    "status": "ok"
+  },
+  {
+    "id": "F15",
+    "title": "Correlation heatmap",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F15.png",
+    "caption": "Spearman correlations between text features and event-window CARs (association only).",
+    "status": "ok"
+  },
+  {
+    "id": "F16",
+    "title": "SUE-drift quintile CAR[+2,+60]",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F16.png",
+    "caption": "SUE-conditioned post-earnings drift: CAR[+2,+60] by SUE_release quintile (prior-quarter breakpoints).",
+    "status": "ok"
+  },
+  {
+    "id": "F17",
+    "title": "Split timeline",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F17.png",
+    "caption": "Split timeline: walk-forward validation blocks, purge/embargo gap, development holdout, locked test; per-fold strict/retrospective labels.",
+    "status": "ok"
+  },
+  {
+    "id": "F18",
+    "title": "Ladder lift with CIs",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F18.png",
+    "caption": "Ablation ladder: walk-forward macro-F1 by rung with month-block bootstrap CIs (common and maximum-available cohorts).",
+    "status": "ok"
+  },
+  {
+    "id": "F19",
+    "title": "Vintage vs static (H4)",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F19.png",
+    "caption": "H4: point-in-time ChronoBERT vintages vs static encoders on identical rows and heads.",
+    "status": "ok"
+  },
+  {
+    "id": "F20",
+    "title": "Loss curves",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F20.png",
+    "caption": "Loss curves: train vs inner-validation loss per boosting round (GBDT) and per step/epoch (fine-tuning).",
+    "status": "ok"
+  },
+  {
+    "id": "F21",
+    "title": "Validation curves",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F21.png",
+    "caption": "Validation curves: walk-forward objective vs each tuned hyperparameter (Optuna trials).",
+    "status": "ok"
+  },
+  {
+    "id": "F22",
+    "title": "Learning curves",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F22.png",
+    "caption": "Learning curves: validation macro-F1 vs training-set fraction (most recent rows kept).",
+    "status": "ok"
+  },
+  {
+    "id": "F23",
+    "title": "Before / after tuning",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F23.png",
+    "caption": "Before vs after tuning: default vs tuned walk-forward macro-F1 per rung and head.",
+    "status": "ok"
+  },
+  {
+    "id": "F24",
+    "title": "Confusion matrices",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F24.png",
+    "caption": "Confusion matrices (row-normalised) for the selected models.",
+    "status": "ok"
+  },
+  {
+    "id": "F25",
+    "title": "ROC / PR curves",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F25.png",
+    "caption": "One-vs-rest ROC and precision-recall curves for the selected primary model.",
+    "status": "ok"
+  },
+  {
+    "id": "F26",
+    "title": "Calibration",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F26.png",
+    "caption": "Calibration: reliability curves and expected calibration error.",
+    "status": "ok"
+  },
+  {
+    "id": "F27",
+    "title": "Coverage-accuracy curve",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F27.png",
+    "caption": "Coverage-accuracy curve: accuracy and macro-F1 when only the most confident predictions are kept.",
+    "status": "ok"
+  },
+  {
+    "id": "F31",
+    "title": "Performance by slice",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F31.png",
+    "caption": "Primary-model macro-F1 by form, category, bucket, timestamp quality, size, sector and year.",
+    "status": "ok"
+  },
+  {
+    "id": "F28",
+    "title": "Rolling IC",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F28.png",
+    "caption": "Rolling monthly rank IC of the abnormal-return regression head.",
+    "status": "ok"
+  },
+  {
+    "id": "F29",
+    "title": "T_info vs T_trade",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F29.png",
+    "caption": "T_info vs T_trade: the same rung scored on the information-response and the tradable target.",
+    "status": "ok"
+  },
+  {
+    "id": "F30",
+    "title": "Backtest",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F30.png",
+    "caption": "Backtest: cumulative long-only (vs interval-matched SPY) and hypothetical long-short returns, by cost level and with a one-session lag.",
+    "status": "ok"
+  },
+  {
+    "id": "F32",
+    "title": "Retrieval metrics by setup",
+    "path": null,
+    "caption": "Retrieval metrics by setup on gold-val qrels (BM25, hybrid, hybrid + rerank).",
+    "status": "not produced: not evaluable without gold-val qrels"
+  },
+  {
+    "id": "F33",
+    "title": "Extraction F1 / faithfulness (gold-test)",
+    "path": null,
+    "caption": "Extraction field F1 and faithfulness on gold-test.",
+    "status": "not produced: gold-test not evaluated"
+  },
+  {
+    "id": "F34",
+    "title": "Numeric fidelity",
+    "path": null,
+    "caption": "Numeric fidelity: exact and tolerance matches against source/XBRL.",
+    "status": "not produced: needs gold labels (Track C)"
+  },
+  {
+    "id": "F35",
+    "title": "Judge vs human",
+    "path": null,
+    "caption": "Faithfulness judge vs human ratings (kappa).",
+    "status": "not produced: needs gold labels (Track C)"
+  },
+  {
+    "id": "F36",
+    "title": "Student vs teacher vs human",
+    "path": null,
+    "caption": "Student vs teacher vs human agreement.",
+    "status": "not produced: needs gold labels (Track C)"
+  },
+  {
+    "id": "F37",
+    "title": "Permutation null",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F37.png",
+    "caption": "Permutation null: distribution of macro-F1 under within-block class-stratified label permutation vs the observed value.",
+    "status": "ok"
+  },
+  {
+    "id": "F38",
+    "title": "Random-split demo",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F38.png",
+    "caption": "Random-split demo (pedagogical only): random split vs walk-forward macro-F1.",
+    "status": "ok"
+  },
+  {
+    "id": "F39",
+    "title": "Adversarial-validation ROC",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F39.png",
+    "caption": "Adversarial validation ROC per fold (an AUC near 0.5 does not prove a split is unbiased).",
+    "status": "ok"
+  },
+  {
+    "id": "F40",
+    "title": "MCS / PBO diagnostics",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\F40.png",
+    "caption": "Selection diagnostics: Model Confidence Set membership and PBO (diagnostics only).",
+    "status": "ok"
+  },
+  {
+    "id": "FX1",
+    "title": "Optimisation diagnostics",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\FX1.png",
+    "caption": "Supplementary - optimisation diagnostics: Optuna best-so-far objective per trial and the elastic-net convexity certificate (equal objective from several random starts = global optimum of that convex problem; tree and transformer optima are validation-selected, not global).",
+    "status": "ok"
+  },
+  {
+    "id": "FX2",
+    "title": "Macro-F1 by index bucket",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\FX2.png",
+    "caption": "Supplementary - S&P 500 vs non-S&P 500 vs combined: walk-forward macro-F1 of the combined L0/L2/L6 models scored on each bucket, with month-block bootstrap CIs (overlapping CIs do not show a difference).",
+    "status": "ok"
+  },
+  {
+    "id": "FX3",
+    "title": "CAR paths by index bucket",
+    "path": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full\\reports\\figures\\FX3.png",
+    "caption": "Supplementary - average cumulative abnormal return path (market model) by index bucket, all event types (association only; survivor-only universe).",
+    "status": "ok"
+  }
+]

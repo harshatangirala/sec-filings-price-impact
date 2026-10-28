@@ -1,0 +1,586 @@
+{
+ "question_bank": {
+  "version": "question_bank_v1",
+  "fields": {
+   "guidance": {
+    "question": "Does the filing initiate, raise, lower, withdraw or reaffirm forward-looking guidance?",
+    "directions": [
+     "initiated",
+     "raised",
+     "lowered",
+     "withdrawn",
+     "reaffirmed"
+    ],
+    "path": "current"
+   },
+   "results_tone": {
+    "question": "Does the filing describe results as better (beat) or worse (miss) than the prior year or expectations?",
+    "directions": [
+     "beat",
+     "miss",
+     "mixed"
+    ],
+    "path": "current"
+   },
+   "impairment": {
+    "question": "Does the filing report an impairment or write-down? Give the amount if stated.",
+    "directions": [
+     "recorded",
+     "reversed"
+    ],
+    "path": "current"
+   },
+   "restructuring": {
+    "question": "Does the filing announce restructuring, layoffs or exit/disposal activities?",
+    "directions": [
+     "announced",
+     "expanded",
+     "completed"
+    ],
+    "path": "current"
+   },
+   "liquidity_stress": {
+    "question": "Does the filing disclose liquidity stress or going-concern doubt?",
+    "directions": [
+     "going_concern",
+     "liquidity_stress"
+    ],
+    "path": "current"
+   },
+   "financing_covenant": {
+    "question": "Does the filing disclose new financing, a covenant issue, waiver or default?",
+    "directions": [
+     "new_financing",
+     "covenant_breach",
+     "waiver",
+     "default"
+    ],
+    "path": "current"
+   },
+   "mna": {
+    "question": "Does the filing announce a merger, acquisition or disposition?",
+    "directions": [
+     "acquisition",
+     "disposition",
+     "merger"
+    ],
+    "path": "current"
+   },
+   "dividend": {
+    "question": "Does the filing announce a dividend change? Give the type and amount if stated.",
+    "directions": [
+     "initiated",
+     "increased",
+     "decreased",
+     "suspended",
+     "special",
+     "maintained"
+    ],
+    "path": "current"
+   },
+   "buyback": {
+    "question": "Does the filing announce a share repurchase authorization or change?",
+    "directions": [
+     "authorized",
+     "increased",
+     "suspended"
+    ],
+    "path": "current"
+   },
+   "litigation_regulatory": {
+    "question": "Does the filing disclose new litigation or regulatory action against the company?",
+    "directions": [
+     "new",
+     "settled",
+     "adverse_ruling"
+    ],
+    "path": "current"
+   },
+   "management_change": {
+    "question": "Does the filing announce a change of CEO, CFO or board chair?",
+    "directions": [
+     "departure",
+     "appointment"
+    ],
+    "path": "current"
+   },
+   "risk_factor_change": {
+    "question": "Compared with the firm's prior filings, are risk factors new or removed?",
+    "directions": [
+     "new",
+     "removed"
+    ],
+    "path": "historical"
+   }
+  },
+  "certainty_levels": [
+   "low",
+   "medium",
+   "high"
+  ]
+ },
+ "rag_config": {
+  "top_k": 8,
+  "bm25_k1": 1.5,
+  "bm25_b": 0.75,
+  "rrf_k": 60,
+  "rerank_top_n": 30,
+  "max_prompt_passages": 8,
+  "max_new_tokens": 1800,
+  "run_extraction_without_gold": false,
+  "prefill_dev_val": true
+ },
+ "distill_config": {
+  "teacher_filings": 3000,
+  "student_model": "modernbert_base",
+  "epochs": 3,
+  "lr": 3e-05,
+  "batch": 16
+ },
+ "gates": {
+  "text_lift": 0.01,
+  "detector_min_precision": 0.8,
+  "extraction_min_f1": 0.7,
+  "faithfulness_min": 0.9,
+  "owner_override_g3_finetune": false
+ },
+ "s16": {
+  "stage": "S16",
+  "stage_hash": "bdda2fd8e132a080",
+  "finished": "2026-10-25T23:44:17Z",
+  "config_hash": "1f682d816adfaa83",
+  "outputs": {
+   "g3b.json": 84,
+   "llm_cache.jsonl": 345472,
+   "prefilled_templates/ANNOTATION_GUIDE.md": 2695,
+   "prefilled_templates/gold_filings_template.xlsx": 227350,
+   "prefilled_templates/gold_gold_dev_filings_template.csv": 212681,
+   "prefilled_templates/gold_gold_test_filings_template.csv": 209790,
+   "prefilled_templates/gold_gold_val_filings_template.csv": 428624,
+   "rag_frozen.json": 92,
+   "rag_tournament.csv": 90
+  },
+  "wall_s": 7126.3,
+  "gpu_active_s": 7126.299999952316,
+  "warnings": [],
+  "g3b": {
+   "passed": false,
+   "reason": "no gold-val labels",
+   "generator": "qwen2.5-7b"
+  },
+  "prefilled_events": 149,
+  "generation_seconds": 7026.4,
+  "seconds_per_filing": 47.16
+ },
+ "g3b": {
+  "passed": false,
+  "reason": "no gold-val labels",
+  "generator": "qwen2.5-7b"
+ },
+ "rag_frozen": {
+  "setup": "hybrid_rerank",
+  "generator": "qwen2.5-7b",
+  "top_k": 8,
+  "frozen": false
+ },
+ "tournament": [
+  {
+   "setup": "all",
+   "status": "not evaluable: no gold-val labels imported (annotate and re-run S12/S16)"
+  }
+ ],
+ "student": {
+  "ran": false,
+  "reason": "G3b not passed (no gold-val evidence); set rag.run_extraction_without_gold: true to run as exploratory"
+ },
+ "gold_status": {
+  "templates": {
+   "gold_dev_filings": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\gold_gold_dev_filings_template.csv",
+   "gold_test_filings": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\gold_gold_test_filings_template.csv",
+   "gold_val_filings": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\gold_gold_val_filings_template.csv",
+   "xlsx": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\gold_filings_template.xlsx",
+   "passages": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\gold_passages_template.csv",
+   "guide": "C:\\Users\\harsh\\Downloads\\sec_inputs_staging_mini\\full\\S12\\7762ce8902a00800\\templates\\ANNOTATION_GUIDE.md"
+  },
+  "labels_imported": false,
+  "second_rater": false,
+  "rater_status": "single-rater, provisional"
+ },
+ "examples": [
+  {
+   "guidance": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "For the second quarter ending October 1, 2010, revenue is expected to be in the range of $6.8 billion to $7.2 billion and adjusted EPS is expected to be in the range of $0.19 to $0.21 per share. GAAP earnings per share are expected to be lower than the guidance provided herein by approximately $0.04 per diluted share for quarterly intangible amortization, stock-based compensation expense and non-cash interest expense",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:1"
+     }
+    ],
+    "direction": "initiated",
+    "magnitude": 0,
+    "certainty": "high",
+    "unit": "$M"
+   },
+   "results_tone": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "Net sales rose 14% year-over-year and 11% sequentially Adjusted EPS increased 138% year-over-year and 19% sequentially",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:0"
+     }
+    ],
+    "direction": "beat",
+    "certainty": "high",
+    "unit": "%",
+    "magnitude": 0
+   },
+   "impairment": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "During the three-month period ended July 3, 2009, the Company impair",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:9"
+     }
+    ],
+    "direction": "recorded",
+    "certainty": "medium",
+    "unit": "$M",
+    "magnitude": 0
+   },
+   "restructuring": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "The Company\u2019s restructuring activities, which include employee severance, costs related to owned and leased facilities and equipment that are no longer in use and are to be disposed of, and other costs associated with the exit of certain contractual arrangements due to facility closures, are intended to improve its operational efficiencies by reducing excess workforce and capacity",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:9"
+     }
+    ],
+    "direction": "announced",
+    "certainty": "high",
+    "unit": "$M",
+    "magnitude": 0
+   },
+   "liquidity_stress": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "financing_covenant": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "mna": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "dividend": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "buyback": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "During the quarter we repurchased $135 million of stock on our $200 million authorization",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:1"
+     }
+    ],
+    "direction": "authorized",
+    "certainty": "high",
+    "unit": "$M",
+    "magnitude": 135
+   },
+   "litigation_regulatory": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "management_change": {
+    "present": false,
+    "certainty": "low",
+    "unit": "",
+    "magnitude": 0,
+    "evidence": [],
+    "direction": null
+   },
+   "risk_factor_change": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "Add \u2022 the effects that the current macroeconomic environment could have on our business and demand for our products as well as on our liquidity and our ability to access credit markets; and \u2022 the effects that current credit and market conditions could have on the liquidity and financial condition of customers or suppliers, including any impact on their ability to meet contractual obligations to us on terms and conditions previously negotiated",
+      "chunk_id": "5d276cfb64685f1f:8K_EX99:3"
+     }
+    ],
+    "direction": "new",
+    "certainty": "high",
+    "unit": "",
+    "magnitude": 0
+   }
+  },
+  {
+   "guidance": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "We remain optimistic about having a successful 2007",
+      "chunk_id": "92c97cc70e78005a:8K_EX99:1"
+     }
+    ],
+    "direction": "reaffirmed",
+    "magnitude": null,
+    "certainty": "high",
+    "unit": null
+   },
+   "results_tone": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "Net income rose 10.1% to a record $18.8 million or $0.28 per diluted share for the third quarter 2007, compared to $17.0 million or $0.25 per diluted share for the same period in 2006",
+      "chunk_id": "92c97cc70e78005a:8K_EX99:0"
+     }
+    ],
+    "direction": "beat",
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   },
+   "impairment": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "restructuring": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "liquidity_stress": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "financing_covenant": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "mna": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "We have established four international franchises this year and expect to continue to develop our worldwide presence",
+      "chunk_id": "92c97cc70e78005a:8K_EX99:1"
+     }
+    ],
+    "direction": "acquisition",
+    "certainty": "medium",
+    "unit": null,
+    "magnitude": null
+   },
+   "dividend": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "The Company declared a regular quarterly cash dividend of $0.075 per share payable December 10, 2007 to stockholders of record at the close of business November 12, 2007",
+      "chunk_id": "92c97cc70e78005a:8K_EX99:0"
+     }
+    ],
+    "direction": "initiated",
+    "certainty": "high",
+    "unit": "$",
+    "magnitude": 0.075
+   },
+   "buyback": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "litigation_regulatory": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "management_change": {
+    "present": false,
+    "evidence": [],
+    "direction": null,
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "risk_factor_change": {
+    "present": true,
+    "evidence": [
+     {
+      "quote": "The actual results of the Company could differ materially from those indicated by the forward-looking statements because of various risks and uncertainties, including without limitation, general economic conditions; market risk; changes in industry practices or technologies; the degree of success of the Company\u2019s pest and termite process reforms and pest control selling and treatment methods; the Company\u2019s ability to identify and integrate potential acquisitions; climate and weather trends; competitive factors and pricing practices; expected benefits of the commercial re-engineering project may not be realized; potential increases in labor costs; uncertainties of litigation; and changes in various government laws and regulations, including environmental regulations. All of the foregoing risks and uncertainties are beyond the ability of the Company to control, and in many cases the Company cannot predict the risks a",
+      "chunk_id": "92c97cc70e78005a:8K_EX99:1"
+     }
+    ],
+    "direction": "new",
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   }
+  },
+  {
+   "guidance": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "results_tone": {
+    "present": true,
+    "direction": "beat",
+    "evidence": [
+     {
+      "quote": "Consolidated net income increased by $12.8 million or 14% in the three months ended March 31, 2016, due to increased operating income in our Workforce Solutions and Global Consumer Solutions businesses",
+      "chunk_id": "2d4fe2aebbf06d95:10Q_MDA:6"
+     }
+    ],
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   },
+   "impairment": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "restructuring": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "liquidity_stress": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "financing_covenant": {
+    "present": true,
+    "direction": "waiver",
+    "evidence": [
+     {
+      "quote": "As permitted under the terms of the Credit Facilities, made the election to increase the covenant to 4.0 to 1.0, effective for four consecutive quarters, beginning with the first quarter of 2016 and continuing through the fourth quarter of 2016",
+      "chunk_id": "2d4fe2aebbf06d95:10Q_MDA:14"
+     }
+    ],
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   },
+   "mna": {
+    "present": true,
+    "direction": "acquisition",
+    "evidence": [
+     {
+      "quote": "Following the acquisition of Veda, we have created an Asia Pacific reporting unit which consists mainly of our Australia and New Zealand operations",
+      "chunk_id": "2d4fe2aebbf06d95:10Q_MDA:1"
+     }
+    ],
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   },
+   "dividend": {
+    "present": true,
+    "direction": "increased",
+    "evidence": [
+     {
+      "quote": "We increased our quarterly dividend from $0.29 per share to $0.33 per share as announced in the first quarter of 2016",
+      "chunk_id": "2d4fe2aebbf06d95:10Q_MDA:15"
+     }
+    ],
+    "certainty": "high",
+    "unit": "per share",
+    "magnitude": 0.04
+   },
+   "buyback": {
+    "present": true,
+    "direction": "suspended",
+    "evidence": [
+     {
+      "quote": "During the first three months of 2016, we did not repurchase any shares of our stock",
+      "chunk_id": "2d4fe2aebbf06d95:10Q_MDA:15"
+     }
+    ],
+    "certainty": "high",
+    "unit": null,
+    "magnitude": null
+   },
+   "litigation_regulatory": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "management_change": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   },
+   "risk_factor_change": {
+    "present": false,
+    "direction": null,
+    "evidence": [],
+    "certainty": "low",
+    "unit": null,
+    "magnitude": null
+   }
+  }
+ ],
+ "valid_responses": 141
+}

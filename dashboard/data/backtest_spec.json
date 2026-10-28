@@ -1,0 +1,25 @@
+{
+ "signal_model": {
+  "name": "L7",
+  "rung": "L7",
+  "head": "lightgbm",
+  "enc": "bge_base",
+  "params": {
+   "learning_rate": 0.06930861795531851,
+   "num_leaves": 13,
+   "min_child_samples": 74,
+   "subsample": 0.7459113162861031,
+   "colsample_bytree": 0.49640833265292406,
+   "reg_alpha": 1.107538009240819,
+   "reg_lambda": 7.224650481979384,
+   "max_depth": -1
+  },
+  "wf_score": 0.3897691684861367
+ },
+ "thresholds": {
+  "short_le": -0.015894602005426365,
+  "long_ge": 0.045921868221317434
+ },
+ "threshold_source": "walk-forward OOF signals (training period)",
+ "horizon": 5
+}

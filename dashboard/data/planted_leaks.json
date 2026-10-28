@@ -1,0 +1,22 @@
+[
+ {
+  "leak": "future_return_feature",
+  "caught": true,
+  "n_flagged": 60261
+ },
+ {
+  "leak": "same_event_EAR",
+  "caught": true,
+  "n_flagged": 27094
+ },
+ {
+  "leak": "later_cluster_SUE",
+  "caught": true,
+  "n_flagged": 1
+ },
+ {
+  "leak": "future_document_retrieval",
+  "caught": true,
+  "n_flagged": 1
+ }
+]

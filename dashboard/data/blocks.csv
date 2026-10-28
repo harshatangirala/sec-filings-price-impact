@@ -1,0 +1,9 @@
+block,kind,start,end_exclusive,events
+wf0,walk_forward_val,2008-01-01,2010-01-01,5026
+wf1,walk_forward_val,2010-01-01,2012-01-01,4951
+wf2,walk_forward_val,2012-01-01,2014-01-01,4874
+wf3,walk_forward_val,2014-01-01,2016-01-01,4978
+wf4,walk_forward_val,2016-01-01,2018-01-01,4937
+wf5,walk_forward_val,2018-01-01,2020-01-01,4807
+dev,development_holdout,2020-01-01,2023-01-01,7455
+locked,locked_test,2023-01-01,2026-08-01,8213

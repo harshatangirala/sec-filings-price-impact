@@ -1,0 +1,151 @@
+ticker,cik,sec_name,ff12_industry,sic_desc,ever_sp500,price_start,price_end,n_bars,hf_10k_count,n_periodic_in_window
+ADBE,796343,ADOBE INC.,BusEq,Services-Prepackaged Software,True,2001-01-02,2026-10-09,6481,27,107
+ADI,6281,ANALOG DEVICES INC,BusEq,Semiconductors & Related Devices,True,2001-01-02,2026-10-09,6481,26,107
+ADSK,769397,"Autodesk, Inc.",BusEq,Services-Prepackaged Software,True,2001-01-02,2026-10-09,6481,23,106
+AMAT,6951,APPLIED MATERIALS INC /DE,BusEq,Semiconductors & Related Devices,True,2001-01-02,2026-10-09,6481,24,107
+ANET,1596532,"Arista Networks, Inc.",BusEq,Computer Communications Equipment,True,2014-06-06,2026-10-09,3105,7,48
+CDNS,813672,CADENCE DESIGN SYSTEMS INC,BusEq,Services-Prepackaged Software,True,2005-10-31,2026-10-09,5268,19,107
+CIEN,936395,CIENA CORP,BusEq,Telephone & Telegraph Apparatus,True,2001-01-02,2026-10-09,6481,24,106
+CRWD,1535527,"CrowdStrike Holdings, Inc.",BusEq,Services-Prepackaged Software,True,2019-06-12,2026-10-09,1843,1,29
+ENPH,1463101,"Enphase Energy, Inc.",BusEq,Semiconductors & Related Devices,True,2012-03-30,2026-10-09,3653,9,58
+FDS,1013237,FACTSET RESEARCH SYSTEMS INC,BusEq,"Services-Computer Programming, Data Processing, Etc.",True,2001-01-02,2026-10-09,6481,25,107
+FLEX,866374,FLEX LTD.,BusEq,Printed Circuit Boards,True,2001-01-02,2026-10-09,6481,23,107
+HPQ,47217,HP INC,BusEq,Computer & office Equipment,True,2002-05-06,2026-10-09,6148,27,107
+ILMN,1110803,"ILLUMINA, INC.",BusEq,Laboratory Analytical Instruments,True,2001-01-02,2026-10-09,6481,13,105
+INTU,896878,INTUIT INC.,BusEq,Services-Prepackaged Software,True,2001-01-02,2026-10-09,6481,22,106
+MCHP,827054,MICROCHIP TECHNOLOGY INC,BusEq,Semiconductors & Related Devices,True,2001-01-02,2026-10-09,6481,22,106
+META,1326801,"Meta Platforms, Inc.",BusEq,"Services-Computer Programming, Data Processing, Etc.",True,2012-05-18,2026-10-09,3619,9,57
+MSFT,789019,MICROSOFT CORP,BusEq,Services-Prepackaged Software,True,2001-01-02,2026-10-09,6481,27,107
+MTD,1037646,METTLER TOLEDO INTERNATIONAL INC/,BusEq,Laboratory Analytical Instruments,True,2001-01-02,2026-10-09,6481,22,107
+MU,723125,MICRON TECHNOLOGY INC,BusEq,Semiconductors & Related Devices,True,2001-01-02,2026-10-09,6481,25,107
+NOC,1133421,NORTHROP GRUMMAN CORP /DE/,BusEq,"Search, Detection, Navigation, Guidance, Aeronautical Sys",True,2001-01-02,2026-10-09,6481,19,102
+ORCL,1341439,ORACLE CORP,BusEq,Services-Prepackaged Software,True,2001-01-02,2026-10-09,6481,15,82
+SWKS,4127,"SKYWORKS SOLUTIONS, INC.",BusEq,Semiconductors & Related Devices,True,2002-06-26,2026-10-09,6112,20,107
+TMO,97745,THERMO FISHER SCIENTIFIC INC.,BusEq,"Measuring & Controlling Devices, NEC",True,2001-01-02,2026-10-09,6481,24,107
+TRMB,864749,TRIMBLE INC.,BusEq,"Measuring & Controlling Devices, NEC",True,2001-01-02,2026-10-09,6481,14,106
+VRSN,1014473,VERISIGN INC/CA,BusEq,Services-Computer Programming Services,True,2001-01-02,2026-10-09,6481,21,107
+XYZ,1512673,"Block, Inc.",BusEq,Services-Prepackaged Software,True,2015-11-19,2026-10-09,2737,6,42
+APD,2969,"Air Products & Chemicals, Inc.",Chems,Industrial Inorganic Chemicals,True,2001-01-02,2026-10-09,6481,20,107
+ECL,31462,ECOLAB INC.,Chems,"Soap, Detergents, Cleang Preparations, Perfumes, Cosmetics",True,2001-01-02,2026-10-09,6481,19,106
+EL,1001250,ESTEE LAUDER COMPANIES INC,Chems,"Perfumes, Cosmetics & Other Toilet Preparations",True,2001-01-02,2026-10-09,6481,23,106
+EMN,915389,EASTMAN CHEMICAL CO,Chems,"Plastic Materials, Synth Resins & Nonvulcan Elastomers",True,2001-01-02,2026-10-09,6481,19,107
+PPG,79879,PPG INDUSTRIES INC,Chems,"Paints, Varnishes, Lacquers, Enamels & Allied Prods",True,2001-01-02,2026-10-09,6481,25,107
+AYI,1144215,ACUITY INC. (DE),Durbl,Electric Lighting & Wiring Equipment,True,2001-12-03,2026-10-09,6253,19,99
+TSLA,1318605,"Tesla, Inc.",Durbl,Motor Vehicles & Passenger Car Bodies,True,2010-06-29,2026-10-09,4096,11,65
+WHR,106640,WHIRLPOOL CORP /DE/,Durbl,Household Appliances,True,2001-01-02,2026-10-09,6481,20,106
+CNX,1070412,CNX Resources Corp,Enrgy,Crude Petroleum & Natural Gas,True,2001-01-02,2026-10-09,6481,19,107
+EQT,33213,EQT Corp,Enrgy,Crude Petroleum & Natural Gas,True,2001-01-02,2026-10-09,6481,27,107
+MUR,717423,MURPHY OIL CORP,Enrgy,Crude Petroleum & Natural Gas,True,2001-01-02,2026-10-09,6481,26,106
+RRC,315852,RANGE RESOURCES CORP,Enrgy,Crude Petroleum & Natural Gas,True,2001-01-02,2026-10-09,6481,21,107
+SLB,87347,SLB LIMITED/NV,Enrgy,"Oil & Gas Field Services, NEC",True,2001-01-02,2026-10-09,6481,20,107
+ALGN,1097149,ALIGN TECHNOLOGY INC,Hlth,"Orthopedic, Prosthetic & Surgical Appliances & Supplies",True,2001-01-26,2026-10-09,6464,20,102
+AMGN,318154,AMGEN INC,Hlth,"Biological Products, (No Diagnostic Substances)",True,2001-01-02,2026-10-09,6481,26,106
+BAX,10456,BAXTER INTERNATIONAL INC,Hlth,Surgical & Medical Instruments & Apparatus,True,2001-01-02,2026-10-09,6481,27,107
+BIIB,875045,BIOGEN INC.,Hlth,"Biological Products, (No Diagnostic Substances)",True,2003-11-13,2026-10-09,5762,22,107
+COO,711404,"COOPER COMPANIES, INC.",Hlth,Ophthalmic Goods,True,2001-01-02,2026-10-09,6481,23,107
+DXCM,1093557,DEXCOM INC,Hlth,Surgical & Medical Instruments & Apparatus,True,2005-04-14,2026-10-09,5407,16,86
+GILD,882095,"GILEAD SCIENCES, INC.",Hlth,"Biological Products, (No Diagnostic Substances)",True,2001-01-02,2026-10-09,6481,21,106
+ISRG,1035267,INTUITIVE SURGICAL INC,Hlth,"Orthopedic, Prosthetic & Surgical Appliances & Supplies",True,2001-01-02,2026-10-09,6481,20,105
+JNJ,200406,JOHNSON & JOHNSON,Hlth,Pharmaceutical Preparations,True,2001-01-02,2026-10-09,6481,15,107
+LH,920148,LABCORP HOLDINGS INC.,Hlth,Services-Medical Laboratories,True,2001-01-02,2026-10-09,6481,18,106
+LLY,59478,ELI LILLY & Co,Hlth,Pharmaceutical Preparations,True,2001-01-02,2026-10-09,6481,25,106
+PFE,78003,PFIZER INC,Hlth,Pharmaceutical Preparations,True,2001-01-02,2026-10-09,6481,26,106
+REGN,872589,"REGENERON PHARMACEUTICALS, INC.",Hlth,Pharmaceutical Preparations,True,2001-01-02,2026-10-09,6481,25,107
+STE,1757898,STERIS plc,Hlth,"Orthopedic, Prosthetic & Surgical Appliances & Supplies",True,2001-01-02,2026-10-09,6481,2,29
+ATI,1018963,ATI INC,Manuf,Steel Pipe & Tubes,True,2001-01-02,2026-10-09,6481,19,106
+CAT,18230,CATERPILLAR INC,Manuf,Construction Machinery & Equip,True,2001-01-02,2026-10-09,6481,21,106
+DECK,910521,DECKERS OUTDOOR CORP,Manuf,Rubber & Plastics Footwear,True,2001-01-02,2026-10-09,6481,23,106
+GD,40533,GENERAL DYNAMICS CORP,Manuf,Ship & Boat Building & Repairing,True,2001-01-02,2026-10-09,6481,26,107
+GE,40545,GENERAL ELECTRIC CO,Manuf,Electronic & Other Electrical Equipment (No Computer Equip),True,2001-01-02,2026-10-09,6481,17,107
+GLW,24741,CORNING INC /NY,Manuf,Drawing & Insulating of  Nonferrous Wire,True,2001-01-02,2026-10-09,6481,24,107
+IEX,832101,IDEX CORP /DE/,Manuf,Pumps & Pumping Equipment,True,2001-01-02,2026-10-09,6481,20,107
+ITT,216228,ITT INC.,Manuf,Pumps & Pumping Equipment,True,2001-01-02,2026-10-09,6481,18,106
+KMB,55785,KIMBERLY CLARK CORP,Manuf,Converted Paper & Paperboard Prods (No Contaners/Boxes),True,2001-01-02,2026-10-09,6481,28,106
+LII,1069202,LENNOX INTERNATIONAL INC,Manuf,Air-Cond & Warm Air Heatg Equip & Comm & Indl Refrig Equip,True,2001-01-02,2026-10-09,6481,20,107
+MAS,62996,MASCO CORP /DE/,Manuf,"Heating Equip, Except Elec & Warm Air; & Plumbing Fixtures",True,2001-01-02,2026-10-09,6481,24,107
+NDSN,72331,NORDSON CORP,Manuf,"General Industrial Machinery & Equipment, NEC",True,2001-01-02,2026-10-09,6481,22,107
+NKE,320187,"NIKE, Inc.",Manuf,Rubber & Plastics Footwear,True,2001-01-02,2026-10-09,6481,24,107
+NOV,1021860,NOV Inc.,Manuf,Oil & Gas Field Machinery & Equipment,True,2005-03-14,2026-10-09,5429,24,107
+PH,76334,Parker-Hannifin Corp,Manuf,Miscellaneous Fabricated Metal Products,True,2001-01-02,2026-10-09,6481,23,106
+PKG,75677,PACKAGING CORP OF AMERICA,Manuf,Paperboard Containers & Boxes,True,2001-01-02,2026-10-09,6481,20,106
+SNA,91440,Snap-on Inc,Manuf,"Cutlery, Handtools & General Hardware",True,2001-01-02,2026-10-09,6481,14,107
+TEX,97216,TEREX CORP,Manuf,"Industrial Trucks, Tractors, Trailors & Stackers",True,2001-01-02,2026-10-09,6481,26,107
+TKR,98362,TIMKEN CO,Manuf,Ball & Roller Bearings,True,2001-01-02,2026-10-09,6481,28,106
+AMT,1053507,AMERICAN TOWER CORP /MA/,Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,24,107
+AXP,4962,AMERICAN EXPRESS CO,Money,Finance Services,True,2001-01-02,2026-10-09,6481,25,107
+CPT,906345,CAMDEN PROPERTY TRUST,Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,25,107
+EQIX,1101239,EQUINIX INC,Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,20,105
+ESS,920522,"ESSEX PROPERTY TRUST, INC.",Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,20,107
+EXR,1289490,Extra Space Storage Inc.,Money,Real Estate Investment Trusts,True,2004-08-12,2026-10-09,5576,17,89
+GNW,1276520,GENWORTH FINANCIAL INC,Money,Life Insurance,True,2004-05-25,2026-10-09,5630,17,88
+ICE,1571949,"Intercontinental Exchange, Inc.",Money,"Security & Commodity Brokers, Dealers, Exchanges & Services",True,2005-11-16,2026-10-09,5256,8,53
+LNC,59558,LINCOLN NATIONAL CORP,Money,Life Insurance,True,2001-01-02,2026-10-09,6481,27,107
+MAC,912242,MACERICH CO,Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,25,106
+MBI,814585,MBIA INC,Money,Surety Insurance,True,2001-01-02,2026-10-09,6481,27,106
+MKTX,1278021,MARKETAXESS HOLDINGS INC,Money,"Security Brokers, Dealers & Flotation Companies",True,2004-11-05,2026-10-09,5516,17,86
+MOH,1179929,"MOLINA HEALTHCARE, INC.",Money,Hospital & Medical Service Plans,True,2003-07-02,2026-10-09,5856,16,93
+MTG,876437,MGIC INVESTMENT CORP,Money,Surety Insurance,True,2001-01-02,2026-10-09,6481,22,107
+PGR,80661,PROGRESSIVE CORP/OH/,Money,"Fire, Marine & Casualty Insurance",True,2001-01-02,2026-10-09,6481,26,106
+UDR,74208,"UDR, Inc.",Money,Real Estate Investment Trusts,True,2001-01-02,2026-10-09,6481,27,107
+UNH,731766,UNITEDHEALTH GROUP INC,Money,Hospital & Medical Service Plans,True,2001-01-02,2026-10-09,6481,24,106
+CAG,23217,CONAGRA BRANDS INC.,NoDur,Food and Kindred Products,True,2001-01-02,2026-10-09,6481,25,107
+DLX,27996,DELUXE CORP,NoDur,"Blankbooks, Looseleaf Binders & Bookbindg & Relatd Work",True,2001-01-02,2026-10-09,6481,23,106
+GIS,40704,GENERAL MILLS INC,NoDur,Grain Mill Products,True,2001-01-02,2026-10-09,6481,23,107
+HRL,48465,HORMEL FOODS CORP /DE/,NoDur,Meat Packing Plants,True,2001-01-02,2026-10-09,6481,25,107
+HSY,47111,HERSHEY CO,NoDur,Sugar & Confectionery Products,True,2001-01-02,2026-10-09,6481,25,107
+KO,21344,COCA COLA CO,NoDur,Beverages,True,2001-01-02,2026-10-09,6481,25,107
+MAT,63276,MATTEL INC /DE/,NoDur,Dolls & Stuffed Toys,True,2001-01-02,2026-10-09,6481,27,106
+TSN,100493,"TYSON FOODS, INC.",NoDur,Poultry Slaughtering and Processing,True,2001-01-02,2026-10-09,6481,23,106
+VFC,103379,V F CORP,NoDur,"Men's & Boys' Furnishgs, Work Clothg, & Allied Garments",True,2001-01-02,2026-10-09,6481,15,106
+CCL,815097,Carnival Corp Ltd.,Other,Water Transportation,True,2001-01-02,2026-10-09,6481,27,107
+CLF,764065,CLEVELAND-CLIFFS INC.,Other,Metal Mining,True,2001-01-02,2026-10-09,6481,21,107
+CRL,1100682,"CHARLES RIVER LABORATORIES INTERNATIONAL, INC.",Other,Services-Commercial Physical & Biological Research,True,2001-01-02,2026-10-09,6481,21,106
+EBAY,1065088,EBAY INC,Other,"Services-Business Services, NEC",True,2001-01-02,2026-10-09,6481,22,106
+EFX,33185,EQUIFAX INC,Other,"Services-Consumer Credit Reporting, Collection Agencies",True,2001-01-02,2026-10-09,6481,22,107
+FDX,1048911,FEDEX CORP,Other,Air Courier Services,True,2001-01-02,2026-10-09,6481,21,107
+FIS,1136893,"Fidelity National Information Services, Inc.",Other,"Services-Business Services, NEC",True,2006-02-01,2026-10-09,5205,19,100
+LEN,920760,LENNAR CORP /NEW/,Other,General Bldg Contractors - Residential Bldgs,True,2001-01-02,2026-10-09,6481,22,107
+LYV,1335258,"Live Nation Entertainment, Inc.",Other,Services-Amusement & Recreation Services,True,2005-12-22,2026-10-09,5231,16,83
+MGM,789570,MGM Resorts International,Other,Hotels & Motels,True,2005-05-13,2026-10-09,5386,23,107
+NEM,1164727,NEWMONT Corp /DE/,Other,Gold and Silver Ores,True,2001-01-02,2026-10-09,6481,20,99
+ODFL,878927,"OLD DOMINION FREIGHT LINE, INC.",Other,Trucking (No Local),True,2001-01-02,2026-10-09,6481,24,106
+OMC,29989,OMNICOM GROUP INC.,Other,Services-Advertising Agencies,True,2001-01-02,2026-10-09,6481,24,107
+PAYX,723531,PAYCHEX INC,Other,"Services-Engineering, Accounting, Research, Management",True,2001-01-02,2026-10-09,6481,26,106
+PENN,921738,"PENN Entertainment, Inc.",Other,Hotels & Motels,True,2001-01-02,2026-10-09,6481,25,106
+PHM,822416,PULTEGROUP INC/MI/,Other,Operative Builders,True,2001-01-02,2026-10-09,6481,24,107
+RCL,884887,ROYAL CARIBBEAN CRUISES LTD,Other,Water Transportation,True,2001-01-02,2026-10-09,6481,17,87
+ROL,84839,ROLLINS INC,Other,Services-To Dwellings & Other Buildings,True,2001-01-02,2026-10-09,6481,23,107
+RSG,1060391,"REPUBLIC SERVICES, INC.",Other,Refuse Systems,True,2001-01-02,2026-10-09,6481,21,106
+UBER,1543151,"Uber Technologies, Inc",Other,"Services-Business Services, NEC",True,2019-05-10,2026-10-09,1865,2,29
+UNP,100885,UNION PACIFIC CORP,Other,"Railroads, Line-Haul Operating",True,2001-01-02,2026-10-09,6481,25,107
+UPS,1090727,UNITED PARCEL SERVICE INC,Other,Trucking & Courier Services (No Air),True,2001-01-02,2026-10-09,6481,21,106
+V,1403161,VISA INC.,Other,"Services-Business Services, NEC",True,2008-03-19,2026-10-09,4670,13,76
+VMC,1396009,Vulcan Materials CO,Other,Mining & Quarrying of  Nonmetallic Minerals (No Fuels),True,2001-01-02,2026-10-09,6481,14,75
+WYNN,1174922,WYNN RESORTS LTD,Other,Hotels & Motels,True,2002-10-25,2026-10-09,6027,19,95
+AAP,1158449,ADVANCE AUTO PARTS INC,Shops,Retail-Auto & Home Supply Stores,True,2001-11-29,2026-10-09,6255,13,98
+AMZN,1018724,AMAZON COM INC,Shops,Retail-Catalog & Mail-Order Houses,True,2001-01-02,2026-10-09,6481,21,107
+ANF,1018840,ABERCROMBIE & FITCH CO /DE/,Shops,Retail-Family Clothing Stores,True,2001-01-02,2026-10-09,6481,22,106
+ASH,1674862,ASHLAND INC.,Shops,Wholesale-Chemicals & Allied Products,True,2001-01-02,2026-10-09,6481,5,40
+CASY,726958,CASEYS GENERAL STORES INC,Shops,Retail-Auto Dealers & Gasoline Stations,True,2001-01-02,2026-10-09,6481,22,106
+COST,909832,COSTCO WHOLESALE CORP /NEW,Shops,Retail-Variety Stores,True,2001-01-02,2026-10-09,6481,22,106
+DRI,940944,DARDEN RESTAURANTS INC,Shops,Retail-Eating  Places,True,2001-01-02,2026-10-09,6481,22,107
+FAST,815556,FASTENAL CO,Shops,"Retail-Building Materials, Hardware, Garden Supply",True,2001-01-02,2026-10-09,6481,23,107
+GME,1326380,GameStop Corp.,Shops,Retail-Computer & Computer Software Stores,True,2002-02-13,2026-10-09,6204,15,83
+GPC,40987,GENUINE PARTS CO,Shops,Wholesale-Motor Vehicle Supplies & New Parts,True,2001-01-02,2026-10-09,6481,26,107
+HD,354950,"HOME DEPOT, INC.",Shops,Retail-Lumber & Other Building Materials Dealers,True,2001-01-02,2026-10-09,6481,25,106
+HSIC,1000228,HENRY SCHEIN INC,Shops,"Wholesale-Medical, Dental & Hospital Equipment & Supplies",True,2001-01-02,2026-10-09,6481,22,106
+MCD,63908,MCDONALDS CORP,Shops,Retail-Eating  Places,True,2001-01-02,2026-10-09,6481,24,106
+SBUX,829224,STARBUCKS CORP,Shops,Retail-Eating & Drinking Places,True,2001-01-02,2026-10-09,6481,24,107
+SYY,96021,SYSCO CORP,Shops,Wholesale-Groceries & Related Products,True,2001-01-02,2026-10-09,6481,27,106
+TGT,27419,TARGET CORP,Shops,Retail-Variety Stores,True,2001-01-02,2026-10-09,6481,25,106
+TJX,109198,TJX COMPANIES INC /DE/,Shops,Retail-Family Clothing Stores,True,2001-01-02,2026-10-09,6481,21,106
+TSCO,916365,TRACTOR SUPPLY CO /DE/,Shops,"Retail-Building Materials, Hardware, Garden Supply",True,2001-01-02,2026-10-09,6481,17,106
+URBN,912615,URBAN OUTFITTERS INC,Shops,Retail-Family Clothing Stores,True,2001-01-02,2026-10-09,6481,23,106
+VZ,732712,VERIZON COMMUNICATIONS INC,Telcm,Telephone Communications (No Radiotelephone),True,2001-01-02,2026-10-09,6481,23,107
+AEE,1002910,AMEREN CORP,Utils,Electric & Other Services Combined,True,2001-01-02,2026-10-09,6481,21,106
+EIX,827052,EDISON INTERNATIONAL,Utils,Electric Services,True,2001-01-02,2026-10-09,6481,26,107
+ETR,65984,ENTERGY CORP /DE/,Utils,Electric Services,True,2001-01-02,2026-10-09,6481,26,107
+EXC,1109357,EXELON CORP,Utils,Electric & Other Services Combined,True,2001-01-02,2026-10-09,6481,21,104
+FE,1031296,FIRSTENERGY CORP,Utils,Electric Services,True,2001-01-02,2026-10-09,6481,23,107
+OKE,1039684,ONEOK INC /NEW/,Utils,Natural Gas Transmisison & Distribution,True,2001-01-02,2026-10-09,6481,18,107
+WMB,107263,"WILLIAMS COMPANIES, INC.",Utils,Natural Gas Transmission,True,2001-01-02,2026-10-09,6481,23,106

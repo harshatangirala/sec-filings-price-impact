@@ -1,0 +1,503 @@
+categories,events
+"[""earnings"", ""exhibits""]",10040
+"[""exhibits"", ""other_events""]",5683
+"[""exhibits"", ""reg_fd""]",3540
+"[""management_change""]",2817
+"[""exhibits"", ""management_change""]",2459
+"[""other_events""]",2389
+"[""reg_fd""]",2375
+"[""earnings"", ""exhibits"", ""reg_fd""]",1545
+"[""shareholder_vote""]",1336
+"[""exhibits"", ""material_agreement""]",1257
+"[""exhibits"", ""financial_obligation"", ""material_agreement""]",1112
+"[""earnings"", ""exhibits"", ""other_events""]",974
+"[""material_agreement""]",563
+"[""exhibits"", ""management_change"", ""reg_fd""]",546
+"[""bylaws_fiscal_year"", ""exhibits""]",505
+"[""exhibits"", ""material_agreement"", ""other_events""]",490
+"[""earnings""]",463
+"[""exhibits"", ""other_events"", ""reg_fd""]",439
+"[""exhibits"", ""management_change"", ""other_events""]",312
+"[""exhibits"", ""management_change"", ""shareholder_vote""]",285
+"[""earnings"", ""exhibits"", ""management_change""]",241
+"[""exhibits"", ""material_agreement"", ""reg_fd""]",238
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events""]",230
+"[""acquisition_disposition"", ""exhibits""]",199
+"[""earnings"", ""reg_fd""]",198
+"[""financial_obligation"", ""material_agreement""]",196
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change""]",195
+"[""exhibits""]",177
+"[""exhibits"", ""shareholder_vote""]",153
+"[""management_change"", ""shareholder_vote""]",145
+"[""earnings"", ""exhibits"", ""other_events"", ""reg_fd""]",127
+"[""exhibits"", ""management_change"", ""material_agreement""]",126
+"[""bylaws_fiscal_year"", ""exhibits"", ""shareholder_vote""]",101
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd""]",97
+"[""management_change"", ""other_events""]",96
+"[""exhibits"", ""other_events"", ""shareholder_vote""]",94
+"[""other_events"", ""reg_fd""]",89
+"[""exhibits"", ""financial_obligation""]",88
+"[""earnings"", ""exhibits"", ""material_agreement""]",76
+"[""auditor_change"", ""exhibits""]",75
+"[""restructuring_exit""]",74
+"[""exhibits"", ""financial_obligation"", ""other_events""]",74
+"[""financial_obligation""]",74
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events""]",70
+"[""earnings"", ""exhibits"", ""management_change"", ""reg_fd""]",65
+"[""earnings"", ""exhibits"", ""restructuring_exit""]",56
+"[""acquisition_disposition"", ""exhibits"", ""other_events""]",53
+"[""unregistered_sales""]",53
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""shareholder_vote""]",51
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",50
+"[""earnings"", ""other_events""]",50
+"[""acquisition_disposition"", ""exhibits"", ""reg_fd""]",49
+"[""exhibits"", ""reg_fd"", ""shareholder_vote""]",49
+"[""earnings"", ""exhibits"", ""management_change"", ""other_events""]",47
+"[""benefit_plan_blackout"", ""exhibits""]",47
+"[""bylaws_fiscal_year""]",45
+"[""mine_safety""]",45
+"[""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd""]",44
+"[""management_change"", ""material_agreement""]",42
+"[""exhibits"", ""management_change"", ""other_events"", ""shareholder_vote""]",40
+"[""acquisition_disposition""]",39
+"[""material_agreement"", ""other_events""]",38
+"[""other_events"", ""shareholder_vote""]",37
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement""]",36
+"[""earnings"", ""exhibits"", ""material_agreement"", ""other_events""]",36
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events""]",35
+"[""earnings"", ""exhibits"", ""shareholder_vote""]",35
+"[""control_change""]",30
+"[""earnings"", ""exhibits"", ""material_agreement"", ""reg_fd""]",30
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""unregistered_sales""]",30
+"[""exhibits"", ""material_agreement"", ""security_rights""]",29
+"[""exhibits"", ""management_change"", ""other_events"", ""reg_fd""]",28
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement""]",27
+"[""exhibits"", ""restructuring_exit""]",25
+"[""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",25
+"[""management_change"", ""reg_fd""]",24
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement""]",23
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits""]",22
+"[""exhibits"", ""other_events"", ""unregistered_sales""]",21
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events""]",21
+"[""impairment""]",21
+"[""exhibits"", ""material_agreement"", ""unregistered_sales""]",20
+"[""benefit_plan_blackout""]",20
+"[""exhibits"", ""management_change"", ""reg_fd"", ""shareholder_vote""]",18
+"[""auditor_change""]",18
+"[""earnings"", ""exhibits"", ""impairment""]",18
+"[""delisting""]",18
+"[""bylaws_fiscal_year"", ""exhibits"", ""reg_fd""]",18
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",17
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""material_agreement""]",17
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change""]",17
+"[""exhibits"", ""reg_fd"", ""restructuring_exit""]",17
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""reg_fd""]",16
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement""]",15
+"[""earnings"", ""exhibits"", ""impairment"", ""restructuring_exit""]",15
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""other_events""]",15
+"[""impairment"", ""restructuring_exit""]",14
+"[""ethics_code"", ""exhibits""]",14
+"[""exhibits"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",14
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""reg_fd""]",14
+"[""financial_obligation"", ""material_agreement"", ""other_events""]",13
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events""]",13
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation""]",13
+"[""bylaws_fiscal_year"", ""exhibits"", ""security_rights""]",13
+"[""earnings"", ""exhibits"", ""non_reliance_restatement""]",13
+"[""delisting"", ""exhibits""]",13
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events"", ""security_rights""]",13
+"[""exhibits"", ""impairment"", ""reg_fd""]",12
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",11
+"[""earnings"", ""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd""]",11
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd""]",11
+"[""earnings"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd""]",11
+"[""material_agreement"", ""reg_fd""]",11
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""other_events"", ""security_rights""]",10
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""other_events""]",10
+"[""exhibits"", ""material_agreement"", ""other_events"", ""security_rights""]",10
+"[""exhibits"", ""other_events"", ""security_rights""]",10
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events"", ""shareholder_vote""]",10
+"[""bylaws_fiscal_year"", ""shareholder_vote""]",10
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""security_rights""]",10
+"[""earnings"", ""exhibits"", ""management_change"", ""shareholder_vote""]",10
+"[""earnings"", ""exhibits"", ""management_change"", ""material_agreement""]",10
+"[""financial_obligation"", ""other_events""]",10
+"[""bylaws_fiscal_year"", ""management_change""]",10
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd""]",9
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""reg_fd""]",9
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""reg_fd""]",9
+"[""earnings"", ""exhibits"", ""other_events"", ""restructuring_exit""]",9
+"[""reg_fd"", ""shareholder_vote""]",9
+"[""exhibits"", ""impairment""]",9
+"[""exhibits"", ""financial_obligation"", ""reg_fd""]",9
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""material_agreement""]",8
+"[""acquisition_disposition"", ""earnings"", ""exhibits""]",8
+"[""earnings"", ""exhibits"", ""other_events"", ""shareholder_vote""]",7
+"[""earnings"", ""management_change""]",7
+"[""non_reliance_restatement""]",7
+"[""control_change"", ""exhibits""]",7
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events""]",7
+"[""exhibits"", ""impairment"", ""restructuring_exit""]",7
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events""]",7
+"[""acquisition_disposition"", ""exhibits"", ""other_events"", ""reg_fd""]",7
+"[""exhibits"", ""other_events"", ""restructuring_exit""]",7
+"[""exhibits"", ""reg_fd"", ""unregistered_sales""]",7
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""security_rights""]",7
+"[""earnings"", ""other_events"", ""reg_fd""]",6
+"[""earnings"", ""exhibits"", ""reg_fd"", ""restructuring_exit""]",6
+"[""other_events"", ""restructuring_exit""]",6
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events""]",6
+"[""exhibits"", ""security_rights""]",6
+"[""exhibits"", ""material_agreement"", ""other_events"", ""shareholder_vote""]",6
+"[""exhibits"", ""impairment"", ""other_events"", ""reg_fd""]",6
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events"", ""shareholder_vote""]",6
+"[""exhibits"", ""material_agreement"", ""shareholder_vote""]",6
+"[""acquisition_disposition"", ""exhibits"", ""management_change""]",6
+"[""material_agreement"", ""unregistered_sales""]",6
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""other_events""]",5
+"[""benefit_plan_blackout"", ""exhibits"", ""other_events""]",5
+"[""exhibits"", ""management_change"", ""restructuring_exit""]",5
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement""]",5
+"[""delisting"", ""exhibits"", ""reg_fd""]",5
+"[""reg_fd"", ""restructuring_exit""]",5
+"[""security_rights""]",5
+"[""impairment"", ""other_events""]",5
+"[""exhibits"", ""non_reliance_restatement""]",5
+"[""impairment"", ""reg_fd""]",5
+"[""acquisition_disposition"", ""material_agreement""]",5
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""other_events""]",5
+"[""management_change"", ""other_events"", ""shareholder_vote""]",5
+"[""earnings"", ""exhibits"", ""financial_obligation""]",5
+"[""other_events"", ""unregistered_sales""]",5
+"[""earnings"", ""exhibits"", ""impairment"", ""other_events""]",5
+"[""exhibits"", ""unregistered_sales""]",5
+"[""financial_obligation"", ""material_agreement"", ""reg_fd""]",5
+"[""bylaws_fiscal_year"", ""management_change"", ""shareholder_vote""]",5
+"[""bylaws_fiscal_year"", ""exhibits"", ""security_rights"", ""shareholder_vote""]",5
+"[""delisting"", ""exhibits"", ""management_change""]",5
+"[""bylaws_fiscal_year"", ""other_events""]",5
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""security_rights""]",4
+"[""earnings"", ""reg_fd"", ""restructuring_exit""]",4
+"[""financial_obligation"", ""management_change"", ""material_agreement""]",4
+"[""earnings"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",4
+"[""earnings"", ""restructuring_exit""]",4
+"[""financial_obligation"", ""material_agreement"", ""unregistered_sales""]",4
+"[""earnings"", ""exhibits"", ""non_reliance_restatement"", ""reg_fd""]",4
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""unregistered_sales""]",4
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""reg_fd"", ""shareholder_vote""]",4
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""other_events""]",4
+"[""acquisition_disposition"", ""financial_obligation""]",4
+"[""exhibits"", ""management_change"", ""material_agreement"", ""unregistered_sales""]",4
+"[""exhibits"", ""impairment"", ""other_events"", ""restructuring_exit""]",4
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""reg_fd""]",4
+"[""exhibits"", ""impairment"", ""reg_fd"", ""restructuring_exit""]",4
+"[""ethics_code"", ""exhibits"", ""material_agreement""]",4
+"[""bylaws_fiscal_year"", ""exhibits"", ""reg_fd"", ""shareholder_vote""]",4
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""shareholder_vote""]",4
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""shareholder_vote""]",3
+"[""earnings"", ""exhibits"", ""non_reliance_restatement"", ""other_events""]",3
+"[""earnings"", ""exhibits"", ""other_events"", ""reg_fd"", ""restructuring_exit""]",3
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",3
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",3
+"[""acquisition_disposition"", ""reg_fd""]",3
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",3
+"[""exhibits"", ""other_events"", ""reg_fd"", ""restructuring_exit""]",3
+"[""exhibits"", ""other_events"", ""reg_fd"", ""shareholder_vote""]",3
+"[""acquisition_disposition"", ""exhibits"", ""reg_fd"", ""unregistered_sales""]",3
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""reg_fd""]",3
+"[""exhibits"", ""material_agreement"", ""restructuring_exit""]",3
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change"", ""reg_fd""]",3
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change"", ""other_events""]",3
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",3
+"[""exhibits"", ""impairment"", ""material_agreement""]",3
+"[""management_change"", ""material_agreement"", ""other_events""]",3
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement""]",3
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events""]",3
+"[""material_agreement"", ""security_rights""]",3
+"[""financial_obligation"", ""unregistered_sales""]",3
+"[""exhibits"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",3
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",3
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",3
+"[""cybersecurity""]",3
+"[""ethics_code""]",3
+"[""bylaws_fiscal_year"", ""exhibits"", ""unregistered_sales""]",3
+"[""exhibits"", ""financial_obligation"", ""other_events"", ""unregistered_sales""]",3
+"[""exhibits"", ""financial_obligation"", ""other_events"", ""reg_fd""]",3
+"[""exhibits"", ""financial_obligation"", ""management_change""]",3
+"[""earnings"", ""non_reliance_restatement""]",3
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",3
+"[""earnings"", ""non_reliance_restatement"", ""reg_fd""]",3
+"[""earnings"", ""exhibits"", ""impairment"", ""reg_fd""]",3
+"[""earnings"", ""exhibits"", ""reg_fd"", ""shareholder_vote""]",3
+"[""earnings"", ""exhibits"", ""management_change"", ""reg_fd"", ""shareholder_vote""]",3
+"[""financial_obligation"", ""reg_fd""]",3
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""security_rights"", ""shareholder_vote""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""reg_fd"", ""security_rights""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd""]",2
+"[""exhibits"", ""impairment"", ""management_change"", ""material_agreement"", ""restructuring_exit""]",2
+"[""exhibits"", ""impairment"", ""other_events""]",2
+"[""exhibits"", ""impairment"", ""material_agreement"", ""reg_fd""]",2
+"[""exhibits"", ""impairment"", ""management_change"", ""restructuring_exit""]",2
+"[""bylaws_fiscal_year"", ""ethics_code"", ""exhibits""]",2
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",2
+"[""benefit_plan_blackout"", ""exhibits"", ""material_agreement""]",2
+"[""exhibits"", ""management_change"", ""other_events"", ""reg_fd"", ""shareholder_vote""]",2
+"[""exhibits"", ""management_change"", ""material_agreement"", ""shareholder_vote""]",2
+"[""exhibits"", ""management_change"", ""non_reliance_restatement"", ""other_events""]",2
+"[""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",2
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights""]",2
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change"", ""shareholder_vote""]",2
+"[""auditor_change"", ""earnings"", ""exhibits"", ""reg_fd""]",2
+"[""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",2
+"[""exhibits"", ""management_change"", ""other_events"", ""unregistered_sales""]",2
+"[""benefit_plan_blackout"", ""earnings"", ""exhibits""]",2
+"[""exhibits"", ""management_change"", ""unregistered_sales""]",2
+"[""impairment"", ""management_change""]",2
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement""]",2
+"[""security_rights"", ""shareholder_vote""]",2
+"[""management_change"", ""reg_fd"", ""shareholder_vote""]",2
+"[""material_agreement"", ""other_events"", ""unregistered_sales""]",2
+"[""material_agreement"", ""restructuring_exit""]",2
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",2
+"[""exhibits"", ""non_reliance_restatement"", ""other_events""]",2
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""unregistered_sales""]",2
+"[""exhibits"", ""material_agreement"", ""security_rights"", ""unregistered_sales""]",2
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",2
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",2
+"[""ethics_code"", ""exhibits"", ""shareholder_vote""]",2
+"[""ethics_code"", ""exhibits"", ""other_events""]",2
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""reg_fd""]",2
+"[""exhibits"", ""financial_obligation"", ""impairment"", ""material_agreement""]",2
+"[""delisting"", ""management_change""]",2
+"[""delisting"", ""earnings"", ""exhibits""]",2
+"[""bylaws_fiscal_year"", ""management_change"", ""other_events""]",2
+"[""bylaws_fiscal_year"", ""management_change"", ""material_agreement""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""reg_fd""]",2
+"[""exhibits"", ""security_rights"", ""unregistered_sales""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""security_rights"", ""unregistered_sales""]",2
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""shareholder_vote""]",2
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""shareholder_vote""]",2
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events"", ""reg_fd"", ""security_rights""]",2
+"[""exhibits"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",2
+"[""earnings"", ""exhibits"", ""management_change"", ""reg_fd"", ""restructuring_exit""]",2
+"[""earnings"", ""impairment"", ""other_events""]",2
+"[""earnings"", ""impairment""]",2
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""reg_fd""]",2
+"[""earnings"", ""material_agreement""]",2
+"[""earnings"", ""exhibits"", ""impairment"", ""management_change""]",2
+"[""earnings"", ""exhibits"", ""impairment"", ""management_change"", ""other_events""]",2
+"[""director_nomination""]",2
+"[""earnings"", ""exhibits"", ""management_change"", ""restructuring_exit""]",2
+"[""earnings"", ""exhibits"", ""management_change"", ""non_reliance_restatement""]",2
+"[""financial_obligation"", ""management_change"", ""other_events""]",2
+"[""acquisition_disposition"", ""earnings"", ""exhibits"", ""other_events""]",2
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""reg_fd""]",2
+"[""earnings"", ""exhibits"", ""material_agreement"", ""unregistered_sales""]",2
+"[""earnings"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",2
+"[""acquisition_disposition"", ""bankruptcy"", ""exhibits""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""control_change"", ""delisting"", ""exhibits"", ""material_agreement"", ""reg_fd"", ""security_rights"", ""unregistered_sales""]",1
+"[""other_events"", ""security_rights""]",1
+"[""reg_fd"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""security_rights"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""shareholder_vote""]",1
+"[""management_change"", ""restructuring_exit"", ""shareholder_vote""]",1
+"[""management_change"", ""restructuring_exit""]",1
+"[""material_agreement"", ""other_events"", ""restructuring_exit""]",1
+"[""material_agreement"", ""shareholder_vote"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""auditor_change"", ""bylaws_fiscal_year"", ""exhibits"", ""other_events""]",1
+"[""earnings"", ""exhibits"", ""material_agreement"", ""non_reliance_restatement"", ""other_events""]",1
+"[""earnings"", ""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""earnings"", ""exhibits"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""earnings"", ""exhibits"", ""mine_safety""]",1
+"[""earnings"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events""]",1
+"[""earnings"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",1
+"[""earnings"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd"", ""shareholder_vote""]",1
+"[""earnings"", ""exhibits"", ""management_change"", ""other_events"", ""shareholder_vote""]",1
+"[""earnings"", ""exhibits"", ""unregistered_sales""]",1
+"[""earnings"", ""financial_obligation"", ""material_agreement""]",1
+"[""earnings"", ""impairment"", ""material_agreement"", ""other_events"", ""restructuring_exit""]",1
+"[""earnings"", ""impairment"", ""material_agreement"", ""restructuring_exit""]",1
+"[""earnings"", ""management_change"", ""other_events""]",1
+"[""earnings"", ""management_change"", ""reg_fd""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""restructuring_exit""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""other_events"", ""reg_fd""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""other_events""]",1
+"[""earnings"", ""exhibits"", ""impairment"", ""management_change"", ""reg_fd"", ""restructuring_exit""]",1
+"[""earnings"", ""exhibits"", ""impairment"", ""management_change"", ""restructuring_exit""]",1
+"[""earnings"", ""exhibits"", ""impairment"", ""material_agreement"", ""restructuring_exit""]",1
+"[""earnings"", ""exhibits"", ""impairment"", ""other_events"", ""reg_fd"", ""restructuring_exit""]",1
+"[""earnings"", ""material_agreement"", ""restructuring_exit""]",1
+"[""earnings"", ""other_events"", ""restructuring_exit""]",1
+"[""earnings"", ""reg_fd"", ""shareholder_vote""]",1
+"[""ethics_code"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd""]",1
+"[""ethics_code"", ""exhibits"", ""management_change"", ""other_events""]",1
+"[""ethics_code"", ""exhibits"", ""management_change""]",1
+"[""delisting"", ""material_agreement"", ""reg_fd""]",1
+"[""delisting"", ""reg_fd""]",1
+"[""director_nomination"", ""exhibits"", ""other_events""]",1
+"[""director_nomination"", ""other_events""]",1
+"[""earnings"", ""ethics_code"", ""exhibits"", ""management_change"", ""other_events""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""impairment"", ""material_agreement"", ""reg_fd"", ""restructuring_exit""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""reg_fd""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""management_change"", ""reg_fd""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""reg_fd""]",1
+"[""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""restructuring_exit""]",1
+"[""ethics_code"", ""material_agreement""]",1
+"[""ethics_code"", ""shareholder_vote""]",1
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""exhibits"", ""financial_obligation"", ""management_change"", ""reg_fd""]",1
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""control_change"", ""exhibits"", ""other_events""]",1
+"[""cybersecurity"", ""exhibits"", ""reg_fd""]",1
+"[""delisting"", ""earnings"", ""exhibits"", ""management_change"", ""reg_fd""]",1
+"[""delisting"", ""earnings"", ""exhibits"", ""management_change""]",1
+"[""delisting"", ""earnings"", ""exhibits"", ""other_events""]",1
+"[""delisting"", ""exhibits"", ""management_change"", ""reg_fd""]",1
+"[""delisting"", ""exhibits"", ""material_agreement""]",1
+"[""delisting"", ""exhibits"", ""shareholder_vote""]",1
+"[""bylaws_fiscal_year"", ""material_agreement"", ""other_events""]",1
+"[""bylaws_fiscal_year"", ""material_agreement"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""material_agreement"", ""shareholder_vote""]",1
+"[""bylaws_fiscal_year"", ""security_rights""]",1
+"[""control_change"", ""earnings"", ""exhibits""]",1
+"[""control_change"", ""exhibits"", ""management_change""]",1
+"[""control_change"", ""exhibits"", ""material_agreement"", ""other_events""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""other_events"", ""security_rights"", ""unregistered_sales""]",1
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""security_rights""]",1
+"[""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",1
+"[""exhibits"", ""financial_obligation"", ""reg_fd"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""reg_fd"", ""security_rights"", ""shareholder_vote""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""shareholder_vote"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""other_events"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""other_events"", ""security_rights"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""reg_fd"", ""security_rights"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""security_rights"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""reg_fd"", ""security_rights"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""security_rights"", ""unregistered_sales""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd"", ""shareholder_vote""]",1
+"[""exhibits"", ""impairment"", ""management_change"", ""reg_fd"", ""restructuring_exit""]",1
+"[""exhibits"", ""impairment"", ""management_change""]",1
+"[""exhibits"", ""impairment"", ""material_agreement"", ""restructuring_exit""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""material_agreement"", ""other_events"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""material_agreement"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""material_agreement"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""material_agreement""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""other_events"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""other_events"", ""shareholder_vote""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""restructuring_exit""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""material_agreement""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change""]",1
+"[""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""security_rights""]",1
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights"", ""unregistered_sales""]",1
+"[""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""exhibits"", ""management_change"", ""other_events"", ""restructuring_exit""]",1
+"[""exhibits"", ""management_change"", ""other_events"", ""security_rights""]",1
+"[""benefit_plan_blackout"", ""exhibits"", ""other_events"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""control_change"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",1
+"[""bylaws_fiscal_year"", ""delisting"", ""exhibits"", ""management_change""]",1
+"[""bylaws_fiscal_year"", ""delisting"", ""exhibits"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""delisting"", ""exhibits""]",1
+"[""bylaws_fiscal_year"", ""director_nomination"", ""exhibits"", ""management_change"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""ethics_code"", ""exhibits"", ""reg_fd""]",1
+"[""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""exhibits"", ""management_change"", ""reg_fd"", ""restructuring_exit""]",1
+"[""exhibits"", ""management_change"", ""security_rights"", ""shareholder_vote""]",1
+"[""exhibits"", ""management_change"", ""security_rights""]",1
+"[""exhibits"", ""material_agreement"", ""mine_safety""]",1
+"[""auditor_change"", ""earnings"", ""exhibits"", ""management_change""]",1
+"[""auditor_change"", ""earnings"", ""exhibits""]",1
+"[""auditor_change"", ""ethics_code"", ""exhibits"", ""management_change""]",1
+"[""auditor_change"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",1
+"[""auditor_change"", ""exhibits"", ""material_agreement""]",1
+"[""auditor_change"", ""exhibits"", ""other_events""]",1
+"[""auditor_change"", ""material_agreement""]",1
+"[""bankruptcy"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",1
+"[""benefit_plan_blackout"", ""earnings"", ""exhibits"", ""material_agreement""]",1
+"[""benefit_plan_blackout"", ""exhibits"", ""management_change"", ""material_agreement""]",1
+"[""benefit_plan_blackout"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd""]",1
+"[""benefit_plan_blackout"", ""exhibits"", ""management_change""]",1
+"[""exhibits"", ""mine_safety""]",1
+"[""acquisition_disposition"", ""exhibits"", ""shareholder_vote""]",1
+"[""acquisition_disposition"", ""exhibits"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""financial_obligation"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""management_change"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""material_agreement"", ""security_rights"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""other_events"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""other_events""]",1
+"[""auditor_change"", ""bylaws_fiscal_year"", ""exhibits"", ""other_events""]",1
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""reg_fd"", ""security_rights""]",1
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""reg_fd"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""material_agreement"", ""shareholder_vote""]",1
+"[""acquisition_disposition"", ""exhibits"", ""other_events"", ""reg_fd"", ""shareholder_vote""]",1
+"[""acquisition_disposition"", ""exhibits"", ""other_events"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""reg_fd"", ""security_rights""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""impairment"", ""material_agreement"", ""reg_fd"", ""restructuring_exit""]",1
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""material_agreement"", ""restructuring_exit""]",1
+"[""acquisition_disposition"", ""exhibits"", ""management_change"", ""other_events"", ""reg_fd""]",1
+"[""exhibits"", ""other_events"", ""security_rights"", ""shareholder_vote""]",1
+"[""exhibits"", ""other_events"", ""security_rights"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""earnings"", ""exhibits"", ""management_change"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""earnings"", ""exhibits"", ""material_agreement"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""earnings"", ""exhibits"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd"", ""security_rights""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights"", ""shareholder_vote""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""reg_fd"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""restructuring_exit""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""management_change"", ""other_events""]",1
+"[""acquisition_disposition"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""other_events"", ""reg_fd""]",1
+"[""financial_obligation"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""financial_obligation"", ""material_agreement"", ""shareholder_vote""]",1
+"[""financial_obligation"", ""other_events"", ""unregistered_sales""]",1
+"[""financial_obligation"", ""shareholder_vote""]",1
+"[""impairment"", ""management_change"", ""material_agreement"", ""restructuring_exit""]",1
+"[""impairment"", ""material_agreement"", ""restructuring_exit""]",1
+"[""impairment"", ""material_agreement""]",1
+"[""impairment"", ""other_events"", ""restructuring_exit""]",1
+"[""impairment"", ""shareholder_vote""]",1
+"[""management_change"", ""material_agreement"", ""shareholder_vote""]",1
+"[""management_change"", ""mine_safety""]",1
+"[""management_change"", ""other_events"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""control_change"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""other_events"", ""reg_fd"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""material_agreement"", ""other_events"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""other_events"", ""security_rights""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""management_change""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""other_events""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""reg_fd"", ""security_rights"", ""unregistered_sales""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits""]",1
+"[""acquisition_disposition"", ""earnings"", ""exhibits"", ""financial_obligation"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""control_change"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""security_rights""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""delisting"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""security_rights""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""earnings"", ""exhibits"", ""management_change""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""ethics_code"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""ethics_code"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events"", ""security_rights""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""other_events""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""material_agreement""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""reg_fd""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change"", ""shareholder_vote""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""management_change""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""exhibits"", ""financial_obligation"", ""material_agreement"", ""reg_fd"", ""security_rights"", ""shareholder_vote""]",1
+"[""OTHER_OR_UNMAPPED""]",1
+"[""acquisition_disposition"", ""bylaws_fiscal_year"", ""control_change"", ""exhibits"", ""management_change"", ""material_agreement"", ""security_rights""]",1

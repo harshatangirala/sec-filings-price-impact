@@ -1,0 +1,28 @@
+{
+ "stage": "S14",
+ "stage_hash": "fa757a4389a73fc6",
+ "finished": "2026-10-25T20:56:23Z",
+ "config_hash": "1f682d816adfaa83",
+ "outputs": {
+  "embeddings/bge_base/extra.parquet": 1629105,
+  "embeddings/bge_base/index.parquet": 1117274,
+  "embeddings/bge_base/vectors.npy": 184412288,
+  "embeddings/chrono_bert/extra.parquet": 1569070,
+  "embeddings/chrono_bert/index.parquet": 1117274,
+  "embeddings/chrono_bert/vectors.npy": 184412288
+ },
+ "wall_s": 5946.4,
+ "gpu_active_s": 5946.399999856949,
+ "warnings": [],
+ "chunk_store": "/content/hot/s14_chunks_fa757a4389a73fc6",
+ "chrono_bert": {
+  "events": 60030,
+  "dim": 1536,
+  "seconds": 3377.2
+ },
+ "bge_base": {
+  "events": 60030,
+  "dim": 1536,
+  "seconds": 2310.0
+ }
+}

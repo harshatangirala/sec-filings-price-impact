@@ -1,0 +1,43 @@
+{
+ "device": "cuda",
+ "firms": 150,
+ "events": 60261,
+ "sections": 121398,
+ "est_chunks": 900694,
+ "est_tokens": 474394039,
+ "embedding_storage_gb": 0.41,
+ "model_sizes_gb": {
+  "sec_bert": 0.44,
+  "finbert_tone": 0.44,
+  "chrono_bert": 0.6,
+  "bge_base": 0.88,
+  "bge_reranker": 2.22,
+  "qwen": 15.23,
+  "modernbert_base": 1.2
+ },
+ "llm_prompts": 250,
+ "disk_free_gb": {
+  "data_root": 47.3,
+  "hot_root": 203.7
+ },
+ "bench_chunks_per_s": 529.0808577211285,
+ "projected_gpu_hours_encoders": 0.9457638624667501,
+ "projected_gpu_hours_llm": 1.3888888888888888,
+ "teacher_extraction_runs": false,
+ "budget": {
+  "max_storage_gb": 60,
+  "max_gpu_hours_b": 10,
+  "max_gpu_hours_c": 8,
+  "max_error_rate": 0.05,
+  "llm_teacher_filings": 3000,
+  "llm_gold_filings": 250,
+  "preflight_chunks_per_filing": {
+   "10-K": 62,
+   "10-Q": 26,
+   "8-K": 10
+  },
+  "preflight_bytes_per_filing": 20000,
+  "preflight_assumed_chunks_per_s": 400,
+  "preflight_llm_s_per_prompt": 20
+ }
+}

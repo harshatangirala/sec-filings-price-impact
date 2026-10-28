@@ -1,0 +1,13 @@
+event_type,session_bucket,events
+8K,INTRA,9035
+8K,NONTRADING,160
+8K,POST,24443
+8K,PRE,11555
+periodic_10K,INTRA,1205
+periodic_10K,NONTRADING,34
+periodic_10K,POST,2224
+periodic_10K,PRE,334
+periodic_10Q,INTRA,4133
+periodic_10Q,NONTRADING,78
+periodic_10Q,POST,6022
+periodic_10Q,PRE,1038

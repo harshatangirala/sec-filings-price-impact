@@ -1,0 +1,13 @@
+topic,top_words,n,car_m1_1,car_2_60,fit_on
+0,"income, net, gaap, share, diluted, assets, cash, million",6929,0.0029744310392857,-0.0029774228845014,training years only (before development holdout)
+1,"notes, indenture, bank, registration, agreement, principal, aggregate, underwriting",4967,-0.0005220273703492,-0.0087511326771116,training years only (before development holdout)
+2,"officers, directors, board, election, appointment, departure, committee, compensatory",4138,0.0002708524438241,-0.0002028388100403,training years only (before development holdout)
+3,"looking, forward, future, statements, customers, ability, risks, services",12567,0.0006691120652201,0.0028306694063427,training years only (before development holdout)
+4,"votes, vote, broker, proposal, meeting, advisory, abstain, abstentions",2783,1.792977316207191e-05,-0.0047746591182123,training years only (before development holdout)
+5,"analysis, discussion, condition, management, operations, results, qualitative, risk",778,-0.0039728626390252,-0.0116817307798765,training years only (before development holdout)
+6,"exhibits, item, agreement, definitive, entry, statements, financial, material",2939,0.0007217711423927,0.0049605211551346,training years only (before development holdout)
+7,"cfr, rule, registrant, commencement, pursuant, act, communications, filing",1652,0.0004407767891589,0.0047092106716276,training years only (before development holdout)
+8,"sales, increased, quarter, compared, million, higher, offset, primarily",9757,0.0006582832453586,-0.0004483419119835,training years only (before development holdout)
+9,"gas, oneok, natural, energy, ngl, partners, gathering, liquids",3266,0.0009430426382669,-0.002427778774674,training years only (before development holdout)
+10,"labcorp, clinical, laboratory, testing, holdings, burlington, care, genomic",1882,-0.0005237558997002,-0.0021440608993173,training years only (before development holdout)
+11,"release, press, com, www, firm, exhibit, looking, forward",8603,0.0008822382213642,-0.0025937693739873,training years only (before development holdout)

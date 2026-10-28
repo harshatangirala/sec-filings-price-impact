@@ -6,3 +6,6 @@ data/
 *.sqlite3
 notebooks/.ipynb_checkpoints/
 src/*.egg-info/
+
+# the dashboard's data snapshot must be committed (the deployed app reads it)
+!dashboard/data/

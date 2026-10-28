@@ -1,0 +1,23 @@
+{
+ "passed": false,
+ "lift": {
+  "value": -0.0009536219660593037,
+  "ci_low": -0.0068956184186511945,
+  "ci_high": 0.0052390446593604985,
+  "p_boot": 0.74,
+  "n_months": 144
+ },
+ "best_L7": {
+  "rung": "L7",
+  "encoder": "bge_base",
+  "head": "lightgbm",
+  "params": "{\"learning_rate\": 0.06930861795531851, \"num_leaves\": 13, \"min_child_samples\": 74, \"subsample\": 0.7459113162861031, \"colsample_bytree\": 0.49640833265292406, \"reg_alpha\": 1.107538009240819, \"reg_lambda\": 7.224650481979384, \"max_depth\": -1}",
+  "default_mean_f1": 0.38266248355473836,
+  "tuned_mean_f1": 0.3897691684861367,
+  "tuned_std": 0.015267213280193714,
+  "run_id": "common_emb|L7|lightgbm|bge_base|T_trade|h1|tuned",
+  "pooled_f1": 0.39331505951815277
+ },
+ "n_events": 28533,
+ "rule": "lift >= 0.01 macro-F1 and CI excludes 0"
+}

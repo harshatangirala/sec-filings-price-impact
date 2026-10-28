@@ -1,0 +1,107 @@
+year,earnings_type,events
+2000,earnings_date_ambiguous,91
+2000,not earnings,312
+2000,periodic_filing_only,480
+2001,earnings_date_ambiguous,142
+2001,not earnings,424
+2001,periodic_filing_only,497
+2002,earnings_announcement_verified,111
+2002,earnings_date_ambiguous,67
+2002,not earnings,730
+2002,periodic_filing_only,461
+2003,earnings_announcement_verified,530
+2003,earnings_date_ambiguous,19
+2003,not earnings,1030
+2003,periodic_filing_only,130
+2004,earnings_announcement_verified,596
+2004,earnings_date_ambiguous,62
+2004,not earnings,1374
+2004,periodic_filing_only,63
+2005,earnings_announcement_verified,563
+2005,earnings_date_ambiguous,57
+2005,not earnings,1942
+2005,periodic_filing_only,59
+2006,earnings_announcement_verified,582
+2006,earnings_date_ambiguous,38
+2006,not earnings,1948
+2006,periodic_filing_only,58
+2007,earnings_announcement_verified,579
+2007,earnings_date_ambiguous,27
+2007,not earnings,1994
+2007,periodic_filing_only,54
+2008,earnings_announcement_verified,627
+2008,earnings_date_ambiguous,25
+2008,not earnings,1864
+2008,periodic_filing_only,46
+2009,earnings_announcement_verified,598
+2009,earnings_date_ambiguous,23
+2009,not earnings,1795
+2009,periodic_filing_only,48
+2010,earnings_announcement_verified,606
+2010,earnings_date_ambiguous,15
+2010,not earnings,1863
+2010,periodic_filing_only,33
+2011,earnings_announcement_verified,598
+2011,earnings_date_ambiguous,9
+2011,not earnings,1793
+2011,periodic_filing_only,34
+2012,earnings_announcement_verified,624
+2012,earnings_date_ambiguous,14
+2012,not earnings,1781
+2012,periodic_filing_only,29
+2013,earnings_announcement_verified,619
+2013,earnings_date_ambiguous,18
+2013,not earnings,1767
+2013,periodic_filing_only,22
+2014,earnings_announcement_verified,613
+2014,earnings_date_ambiguous,9
+2014,not earnings,1824
+2014,periodic_filing_only,29
+2015,earnings_announcement_verified,603
+2015,earnings_date_ambiguous,17
+2015,not earnings,1858
+2015,periodic_filing_only,25
+2016,earnings_announcement_verified,610
+2016,earnings_date_ambiguous,18
+2016,not earnings,1807
+2016,periodic_filing_only,32
+2017,earnings_announcement_verified,607
+2017,earnings_date_ambiguous,12
+2017,not earnings,1819
+2017,periodic_filing_only,32
+2018,earnings_announcement_verified,600
+2018,earnings_date_ambiguous,17
+2018,not earnings,1774
+2018,periodic_filing_only,29
+2019,earnings_announcement_verified,621
+2019,earnings_date_ambiguous,10
+2019,not earnings,1735
+2019,periodic_filing_only,21
+2020,earnings_announcement_verified,639
+2020,earnings_date_ambiguous,24
+2020,not earnings,1987
+2020,periodic_filing_only,33
+2021,earnings_announcement_verified,622
+2021,earnings_date_ambiguous,12
+2021,not earnings,1843
+2021,periodic_filing_only,29
+2022,earnings_announcement_verified,615
+2022,earnings_date_ambiguous,12
+2022,not earnings,1615
+2022,periodic_filing_only,24
+2023,earnings_announcement_verified,620
+2023,earnings_date_ambiguous,16
+2023,not earnings,1634
+2023,periodic_filing_only,29
+2024,earnings_announcement_verified,614
+2024,earnings_date_ambiguous,24
+2024,not earnings,1568
+2024,periodic_filing_only,30
+2025,earnings_announcement_verified,611
+2025,earnings_date_ambiguous,18
+2025,not earnings,1617
+2025,periodic_filing_only,33
+2026,earnings_announcement_verified,399
+2026,earnings_date_ambiguous,20
+2026,not earnings,959
+2026,periodic_filing_only,21

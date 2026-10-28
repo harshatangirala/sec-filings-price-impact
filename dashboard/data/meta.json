@@ -1,0 +1,380 @@
+{
+ "source_root": "C:\\Users\\harsh\\Downloads\\sec_report_mini\\full",
+ "built_utc": "2026-10-28T13:17:11.493775+00:00",
+ "profile": "full",
+ "config_hash": "1712ef1bc4060b43",
+ "git_commit": "7dcf29bf2b8fbe420a949cb8d86e4b922123b573",
+ "code_hash": "ee0b946c76c8",
+ "timing_policy": {
+  "public_lag_minutes": 5,
+  "public_lag_sensitivity": [
+   0,
+   15,
+   60
+  ],
+  "decision_latency_minutes": 30,
+  "decision_latency_sensitivity": [
+   10,
+   120
+  ],
+  "date_only_assumed_time": "17:30",
+  "json_rule_max_mismatch": 0.01
+ },
+ "data_sources": {
+  "hf_dataset": "JanosAudran/financial-reports-sec@5da7e3c8b920a586b8c36eecba4aaa0152a59a52",
+  "sp500_membership": "fja05680/sp500@a2430f2af0c79ddf0748e91de11bdeb1616ab5a7",
+  "prices": {
+   "provider": "local_triframe_plus_yfinance",
+   "local_ohlcv_subdir": "ohlcv_1day",
+   "yfinance": {
+    "auto_adjust": false,
+    "actions": true,
+    "back_adjust": false,
+    "repair": false,
+    "interval": "1d"
+   },
+   "frozen_file": "inputs/yf_frozen.parquet"
+  },
+  "factors": {
+   "ff5_url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip",
+   "mom_url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_daily_CSV.zip"
+  },
+  "sec": "EDGAR submissions JSON, archives (SGML), companyfacts"
+ },
+ "eda": {
+  "firms": 150,
+  "events": 60261,
+  "events_by_type": {
+   "8K": 45193,
+   "periodic_10Q": 11271,
+   "periodic_10K": 3797
+  },
+  "filings": 64213,
+  "filings_parsed_ok": 63933,
+  "tables_flattened": 2550579,
+  "sections": 121398,
+  "firm_name_masks": 881908,
+  "ticker_masks": 249224,
+  "chunks_est": 900694,
+  "tokens_est": 474394039,
+  "xbrl_facts": 304348,
+  "xbrl_tags": 14,
+  "release_rows": 19050,
+  "results_releases": 14981,
+  "sue_filings": 27756,
+  "sue_available": 18750,
+  "price_first": "1998-01-02",
+  "price_last": "2026-10-09",
+  "price_bars": 1024405,
+  "eligible_firms": 743,
+  "candidate_firms": 979,
+  "exclusions": {
+   "not_in_hf_10k_corpus": 236
+  },
+  "sectors": {
+   "BusEq": 26,
+   "Other": 25,
+   "Manuf": 19,
+   "Shops": 19,
+   "Money": 17,
+   "Hlth": 14,
+   "NoDur": 9,
+   "Utils": 7,
+   "Chems": 5,
+   "Enrgy": 5,
+   "Durbl": 3,
+   "Telcm": 1
+  },
+  "event_first": "2000-01-04",
+  "event_last": "2026-07-31",
+  "ts_quality": {
+   "A": 57817,
+   "B": 1672,
+   "C": 772
+  },
+  "session_buckets": {
+   "POST": 32689,
+   "INTRA": 14373,
+   "PRE": 12927,
+   "NONTRADING": 272
+  },
+  "clean_share_h60": 0.05552513234098344,
+  "availability_violations": 0,
+  "sue_rule_violations": 0,
+  "feature_families": {
+   "metadata": 68,
+   "price": 19,
+   "lexical": 18,
+   "change": 11,
+   "accounting": 10,
+   "ear": 1,
+   "novelty": 1
+  },
+  "audit_counts": {
+   "pass": 16,
+   "info": 6,
+   "pass (code-enforced; unit test)": 1,
+   "na": 1
+  },
+  "planted_leaks_caught": 4,
+  "configs_tried_s11": 237,
+  "common_cohort": 53167,
+  "labelled_events": 59698
+ },
+ "modelling": {
+  "class_shares": {
+   "walk-forward": {
+    "down": 0.2942557740160516,
+    "sideways": 0.40037850909473244,
+    "up": 0.305365716889216,
+    "always_sideways_accuracy": 0.40037850909473244,
+    "majority_class_accuracy": 0.40037850909473244
+   },
+   "development": {
+    "down": 0.30980813095397824,
+    "sideways": 0.39648463705890247,
+    "up": 0.2937072319871193,
+    "always_sideways_accuracy": 0.39648463705890247,
+    "majority_class_accuracy": 0.39648463705890247
+   },
+   "locked": {
+    "down": 0.3262592999146237,
+    "sideways": 0.3663861446517868,
+    "up": 0.30735455543358947,
+    "always_sideways_accuracy": 0.3663861446517868,
+    "majority_class_accuracy": 0.3663861446517868
+   }
+  },
+  "majority_baseline_f1": 0.19060490026778787,
+  "permutation_null_mean": 0.251473078399784,
+  "l6_head": "enet",
+  "l7": {
+   "head": "lightgbm",
+   "encoder": "bge_base",
+   "wf": 0.3897691684861367
+  },
+  "s15_l6_best_mean_fold": 0.39094030955272246
+ },
+ "rag_summary": {
+  "prefilled": 149,
+  "seconds_per_filing": 47.16,
+  "generation_hours": 1.9517777777777776
+ },
+ "config": {
+  "study": {
+   "start": "2000-01-01",
+   "end": "2026-07-31"
+  },
+  "timing": {
+   "public_lag_minutes": 5,
+   "public_lag_sensitivity": [
+    0,
+    15,
+    60
+   ],
+   "decision_latency_minutes": 30,
+   "decision_latency_sensitivity": [
+    10,
+    120
+   ],
+   "date_only_assumed_time": "17:30",
+   "json_rule_max_mismatch": 0.01
+  },
+  "targets": {
+   "horizons": [
+    1,
+    2,
+    5,
+    20,
+    60
+   ],
+   "primary": {
+    "target_def": "T_trade",
+    "horizon": 1,
+    "kind": "label3"
+   },
+   "complementary": {
+    "target_def": "T_info",
+    "horizon": 1,
+    "kind": "label3"
+   },
+   "regression": [
+    "ar",
+    "vol_ratio",
+    "abs_std"
+   ],
+   "est_window": [
+    -250,
+    -30
+   ],
+   "est_min_obs": 120,
+   "vol_post": [
+    1,
+    20
+   ],
+   "vol_pre": [
+    -60,
+    -5
+   ],
+   "sensitivity_horizons": [
+    1,
+    5
+   ]
+  },
+  "labels": {
+   "k": 0.5,
+   "k_sensitivity": [
+    0.25,
+    0.75
+   ]
+  },
+  "splits": {
+   "min_train_years": 8,
+   "val_block_years": 2,
+   "dev_years": 3,
+   "dev_start": "2020-01-01",
+   "locked_test_start": "2023-01-01",
+   "embargo_days": 90,
+   "stress_folds": 5,
+   "purge_horizon_sessions": 60
+  },
+  "text": {
+   "predecessor_lookback_years": 2,
+   "sections": {
+    "10-K": [
+     "10K_1",
+     "10K_1A",
+     "10K_7",
+     "10K_7A"
+    ],
+    "10-Q": [
+     "10Q_MDA",
+     "10Q_MR",
+     "10Q_RF"
+    ],
+    "8-K": [
+     "8K_ITEMS",
+     "8K_EX99"
+    ]
+   },
+   "max_chars_per_section": 300000,
+   "chunk_words": 350,
+   "chunk_overlap_words": 50,
+   "max_chunks_per_section": 24,
+   "drop_numeric_lines": true,
+   "model_text_chars": 12000
+  },
+  "tuning": {
+   "sampler": "tpe",
+   "pruner": "median",
+   "heads": [
+    "lightgbm",
+    "catboost",
+    "enet"
+   ],
+   "trials": {
+    "lightgbm": 15,
+    "catboost": 6,
+    "enet": 8
+   },
+   "tuned_rungs": [
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L6"
+   ],
+   "tune_max_train_rows": 30000,
+   "tune_last_folds": 3,
+   "timeout_s_per_study": 5400,
+   "inner_val_frac": 0.15,
+   "min_train_rows": 50,
+   "min_test_rows": 10,
+   "permutations": 10,
+   "finetune_grid": {
+    "lr": [
+     1e-05,
+     2e-05,
+     3e-05
+    ],
+    "batch": [
+     8,
+     16
+    ],
+    "epochs": 3,
+    "weight_decay": [
+     0.0,
+     0.01
+    ],
+    "max_trials": 12
+   },
+   "finetune_max_train_events": 60000,
+   "finetune_eval_folds": "last"
+  },
+  "models": {
+   "roster_file": "configs/models.yaml",
+   "encoders": [
+    "sec_bert",
+    "finbert_tone",
+    "chrono_bert",
+    "bge_base"
+   ],
+   "max_seq_len": 512,
+   "embed_batch": 128,
+   "pca_dims": 64
+  },
+  "backtest": {
+   "horizon": 5,
+   "long_pct": 0.8,
+   "short_pct": 0.2,
+   "max_weight": 0.05,
+   "min_names_per_side": 10,
+   "costs_bps": [
+    10,
+    20
+   ],
+   "borrow_bps_per_year": 50,
+   "lag_sessions_sensitivity": 1
+  },
+  "speed": {
+   "mode": "full",
+   "fast": {
+    "encoders": [
+     "chrono_bert",
+     "bge_base"
+    ],
+    "heads": [
+     "lightgbm",
+     "enet"
+    ],
+    "trials": {
+     "lightgbm": 8,
+     "enet": 4
+    },
+    "finetune": false
+   }
+  },
+  "contam_window_sessions": 60,
+  "gates": {
+   "text_lift": 0.01,
+   "detector_min_precision": 0.8,
+   "extraction_min_f1": 0.7,
+   "faithfulness_min": 0.9,
+   "owner_override_g3_finetune": false
+  },
+  "bootstrap": {
+   "n": 1000,
+   "block": "month"
+  }
+ },
+ "profile_overrides": {
+  "full": {
+   "require_pilot_success": true
+  },
+  "sec": {
+   "cache_max_bytes": 400000
+  }
+ },
+ "gpu_hours": 4.4991666666666665,
+ "cpu_hours": 2.6793333333333336
+}

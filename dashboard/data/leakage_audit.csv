@@ -1,0 +1,25 @@
+item,check,status,detail
+1,overlapping windows across blocks -> purge + embargo,pass,training events whose window reaches the next block: 0
+2,same-date shocks -> date-disjoint splits,pass,dates shared by train and val across folds: 0
+3,duplicate / near-duplicate filings -> split by accession; hashes,pass,accessions in >1 event: 0; identical-text events across blocks: n/a
+4,firm memorization -> anonymization; firm-held-out test,"built, not scored",masked firm-name hits: 881908; stress_firm folds: 5; firm- and sector-held-out fold scores were not produced in this run (report-level relabel)
+5,"preprocessing fitted on training indices only (scalers, TF-IDF, PCA, imputers, calibration, thresholds, clip bounds)",pass (code-enforced; unit test),fold pipelines fit on train rows only
+6,test peeking -> prereg hash; G4 freeze; lockbox,info,checked at S18/S19 (lockbox log)
+7,intraday / pre-publication contamination -> T_info eligibility,pass,INTRA events eligible for T_info: 0; median pre-publication window (min): 166
+8,timestamp errors -> four timestamps; quality flags; sensitivity,pass,"ts_quality counts {'A': 57817, 'B': 1672, 'C': 772}; JSON-rule header mismatch rate 0.2975281199338158"
+9,EAR misuse -> registry rule + planted leak,pass,violations: 0
+10,earnings-date fabrication -> three earnings types,pass,"{'earnings_announcement_verified': 14407, 'periodic_filing_only': 2381, 'earnings_date_ambiguous': 816}"
+11,SUE from a later cluster accession -> registry rule + planted leak,pass,violations: 0
+12,XBRL ordering -> accession / public_available_time ordering,pass,quarterly EPS = earliest public accession per period (as first reported)
+13,same-firm overlaps -> flags + clean cohort,pass,clean events: 3346 of 60261
+14,survivorship -> universe table + wording,info,"delisted firms in universe: 0; SURVIVOR-ONLY universe (current listings only, survivorship-biased): stated in the report, reported with the share of historical S&P 500 members our data covers"
+15,right-censoring -> per horizon,pass,censored target rows dropped: 2702
+16,retrieval leakage -> historical index time filter; separate current path,pass,guard unit check on planted future document
+17,analogue outcomes (extension),na,ext_analogue disabled
+18,pretrained-model look-ahead -> provenance rules,pass,per-fold strict/retrospective labels written
+19,distillation / continued pretraining -> training-period data only,info,asserted at S17
+20,stacking -> walk-forward out-of-fold predictions only,info,asserted in ext_stacking
+21,outcome-based selection -> event construction reads no price fields,pass,price fields in events: []
+22,data snooping -> configuration counter; FDR; MCS / PBO diagnostics,info,configuration counter in results_long; FDR families in preregistration
+23,covariate shift -> adversarial validation (AUC near 0.5 does not prove a split unbiased),info,computed in S11 (F39)
+24,broken audit -> planted-leak self-tests (4),pass,future_return_feature: caught; same_event_EAR: caught; later_cluster_SUE: caught; future_document_retrieval: caught

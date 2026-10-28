@@ -1,0 +1,27 @@
+{
+ "mcs": {
+  "included": [
+   "L6_nochange",
+   "L7",
+   "STACK"
+  ],
+  "pvalues": {
+   "L1": 0.0,
+   "L6": 0.006,
+   "L6_nochange": 0.282,
+   "L7": 0.282,
+   "STACK": 1.0
+  },
+  "n_blocks": 36,
+  "method": "arch.bootstrap.MCS (Hansen-Lunde-Nason)",
+  "streams": "monthly mean log-loss on the development holdout, finalists only"
+ },
+ "pbo": {
+  "pbo": 0.0,
+  "n_combinations": 70,
+  "n_configs": 93,
+  "n_blocks": 144,
+  "logit_median": 3.1135153092103756,
+  "streams": "monthly walk-forward macro-F1 of every stored configuration (S11, S15)"
+ }
+}

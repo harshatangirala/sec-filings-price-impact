@@ -1,0 +1,25 @@
+run_id,rung,head,mean_val,mean_train,std,verdict
+common|L1|lightgbm|-|T_trade|h1|tuned,L1,lightgbm,0.3581952645889283,0.5074757957205339,0.0180794814403661,overfit
+common|L1|catboost|-|T_trade|h1|tuned,L1,catboost,0.3176624353278653,0.4515021655407173,0.0618823044034168,"overfit, unstable"
+common|L1|enet|-|T_trade|h1|tuned,L1,enet,0.3450121398520284,0.3517996876476484,0.0286694241701009,good fit
+common|L2|lightgbm|-|T_trade|h1|tuned,L2,lightgbm,0.3706668812647457,0.3972018310815943,0.0218388387202526,good fit
+common|L2|catboost|-|T_trade|h1|tuned,L2,catboost,0.3503682752991798,0.4070500225052789,0.0274800063817816,good fit
+common|L2|enet|-|T_trade|h1|tuned,L2,enet,0.330950259401414,0.3579394989461674,0.065531661345492,unstable
+common|L3|lightgbm|-|T_trade|h1|tuned,L3,lightgbm,0.3225728406981487,0.3286741764678716,0.0499329929738228,unstable
+common|L3|catboost|-|T_trade|h1|tuned,L3,catboost,0.312123122447182,0.2878369333648343,0.0716009917769296,unstable
+common|L3|enet|-|T_trade|h1|tuned,L3,enet,0.237875455614779,0.2249930236195824,0.074089709830867,unstable
+common|L4|lightgbm|-|T_trade|h1|tuned,L4,lightgbm,0.3646424166531697,0.482995643894607,0.0255203401519325,overfit
+common|L4|catboost|-|T_trade|h1|tuned,L4,catboost,0.3589975759155735,0.5549009503163195,0.0252418389784753,overfit
+common|L4|enet|-|T_trade|h1|tuned,L4,enet,0.3518263353041023,0.3808678450365549,0.0354502311703346,unstable
+common|L6|lightgbm|-|T_trade|h1|tuned,L6,lightgbm,0.3869000945548679,0.5805566786267656,0.0186445747378284,overfit
+common|L6|catboost|-|T_trade|h1|tuned,L6,catboost,0.3777040941988341,0.6467250296264124,0.0130027969894833,overfit
+common|L6|enet|-|T_trade|h1|tuned,L6,enet,0.3887704769137652,0.4078698903242137,0.010388828210391,good fit
+common|L4_levels|lightgbm|-|T_trade|h1|tuned,L4_levels,lightgbm,0.3590213908575907,0.4561585121940207,0.0330669366206119,unstable
+common|L4_levels|catboost|-|T_trade|h1|tuned,L4_levels,catboost,0.3508794731219891,0.5162481868440518,0.0429230168246398,"overfit, unstable"
+common|L4_levels|enet|-|T_trade|h1|tuned,L4_levels,enet,0.3524404051477829,0.3752816578909534,0.0263361979786954,good fit
+common|L4_change|lightgbm|-|T_trade|h1|tuned,L4_change,lightgbm,0.3381955376173011,0.4049294766147024,0.0384387960870252,unstable
+common|L4_change|catboost|-|T_trade|h1|tuned,L4_change,catboost,0.3340976339770787,0.4259852546639163,0.0383269674917526,unstable
+common|L4_change|enet|-|T_trade|h1|tuned,L4_change,enet,0.3305867461118794,0.3348756450922097,0.0447686069482378,unstable
+common|L6_nochange|lightgbm|-|T_trade|h1|tuned,L6_nochange,lightgbm,0.3843635964870193,0.5576980793066283,0.0096035607790898,overfit
+common|L6_nochange|catboost|-|T_trade|h1|tuned,L6_nochange,catboost,0.3824493342650384,0.5870041613188258,0.0181633076668401,overfit
+common|L6_nochange|enet|-|T_trade|h1|tuned,L6_nochange,enet,0.3884686748816925,0.4068828629074938,0.0096640106604152,good fit

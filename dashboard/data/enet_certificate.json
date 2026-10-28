@@ -1,0 +1,10 @@
+{
+ "objective_by_start": [
+  1.0718667136647306,
+  1.0718667141024822,
+  1.0718667153432906
+ ],
+ "spread": 1.6785599576962795e-09,
+ "certified_global_min": true,
+ "note": "elastic-net logistic loss is convex; equal objectives from different starts = global optimum"
+}

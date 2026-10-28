@@ -1,0 +1,37 @@
+{
+ "stage": "S15",
+ "stage_hash": "35a2e0f3003d3a15",
+ "finished": "2026-10-25T21:45:31Z",
+ "config_hash": "1f682d816adfaa83",
+ "outputs": {
+  "curves.json": 75284,
+  "emb_ladder_summary.csv": 2484,
+  "finetune_status.json": 18,
+  "g3.json": 852,
+  "h4.csv": 508,
+  "optuna.sqlite3": 159744,
+  "predictions.parquet": 13892770,
+  "results_long.parquet": 41324
+ },
+ "wall_s": 2947.8,
+ "gpu_active_s": 2947.7999999523163,
+ "warnings": [],
+ "common_cohort": 53167,
+ "encoders": [
+  "chrono_bert",
+  "bge_base"
+ ],
+ "g3": {
+  "passed": false,
+  "lift": {
+   "value": -0.0009536219660593037,
+   "ci_low": -0.0068956184186511945,
+   "ci_high": 0.0052390446593604985,
+   "p_boot": 0.74,
+   "n_months": 144
+  },
+  "n_events": 28533,
+  "rule": "lift >= 0.01 macro-F1 and CI excludes 0"
+ },
+ "finetune": false
+}

@@ -1,0 +1,13 @@
+key,group,model_id,revision,card_url,license,training_corpus,stated_cutoff,fine_tune_data,task,labels
+sec_bert,encoders,nlpaueb/sec-bert-base,d511591f5e74052afdab08f1f14c4ff2a1e55749,https://huggingface.co/nlpaueb/sec-bert-base,cc-by-sa-4.0,"260,773 10-K filings 1993-2019 (model card)",2019-12-31,none,masked-LM encoder,none
+finbert_tone,encoders,yiyanghkust/finbert-tone,4921590d3c0c3832c0efea24c8381ce0bda7844b,https://huggingface.co/yiyanghkust/finbert-tone,not stated on card,"10-K/10-Q (2.5B tokens), earnings calls (1.3B), analyst reports (1.1B); tone fine-tune on analyst-report sentences",unknown,analyst-report sentences (tone),tone classifier (Neutral/Positive/Negative),"['Neutral', 'Positive', 'Negative']"
+chrono_bert,encoders,manelalab/chrono-bert-v1-{year}1231,per-vintage (see models.yaml),https://huggingface.co/collections/manelalab/chronobert,mit,timestamped open-source text; each vintage trained only on text up to its date,vintage,none,masked-LM encoder (ModernBERT architecture),none
+bge_base,encoders,BAAI/bge-base-en-v1.5,a5beb1e3e68b9ab74eb54cfd186867f64f240e1a,https://huggingface.co/BAAI/bge-base-en-v1.5,mit,general web-scale text (card); no date cutoff stated,unknown,contrastive retrieval pairs,"sentence embedding (CLS, normalized); dense retriever",none
+bge_reranker,reranker,BAAI/bge-reranker-base,2cfc18c9415c912f9d8155881c133215df768a70,https://huggingface.co/BAAI/bge-reranker-base,mit,,unknown,,,
+qwen,llm,Qwen/Qwen2.5-7B-Instruct,a09a35458c702b33eeacc393d103063234e8bc28,https://huggingface.co/Qwen/Qwen2.5-7B-Instruct,apache-2.0,,unknown,,,
+nli_judge,judge,cross-encoder/nli-deberta-v3-base,6c749ce3425cd33b46d187e45b92bbf96ee12ec7,https://huggingface.co/cross-encoder/nli-deberta-v3-base,apache-2.0,,unknown,,,
+modernbert_base,student,answerdotai/ModernBERT-base,8949b909ec900327062f0ebf497f51aef5e6f0c8,https://huggingface.co/answerdotai/ModernBERT-base,apache-2.0,,unknown,,,
+bert_ner,ner,dslim/bert-base-NER,d1a3e8f13f8c3566299d95fcfc9a8d2382a9affc,https://huggingface.co/dslim/bert-base-NER,mit,,unknown,,,
+lightgbm,tabular,lightgbm,library version in environment manifest,,,,trained on our folds only,,head,
+catboost,tabular,catboost,library version in environment manifest,,,,trained on our folds only,,head,
+enet,tabular,enet,library version in environment manifest,,,,trained on our folds only,,head,
