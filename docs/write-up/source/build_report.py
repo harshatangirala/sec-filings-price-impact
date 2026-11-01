@@ -135,28 +135,28 @@ a(f"""
 
 a("<h2>The short version</h2>")
 a(para(
-    "Public companies in the US have to file reports with the SEC. There are yearly ones (10-K), quarterly ones (10-Q), and short \"something just happened\" ones (8-K) that cover things like earnings, a merger or a CEO leaving. "
-    "I wanted to know whether you could read one of these the moment it appears and say anything useful about how the stock will react. "
-    "And a second question sat underneath that one: do the <i>words</i> in a filing add anything, once you already know the numbers?",
-    f"The short answers are these. The reaction is partly predictable, but only the <i>size</i> of it. On the final test period the best model without text scored a macro-F1 of {L6L.macro_f1:.3f} (the one with text scored {L7L.macro_f1:.3f}), against about 0.33 for pure luck. "
-    f"It can tell which filings will move a stock (AUC {L6L.move_auc:.2f}) but it is a coin flip on <i>which way</i> (AUC {L6L.direction_auc:.2f}). "
-    f"The text did not help at all: adding language models changed the score by {TL.lift:+.3f}, with an interval that sits comfortably around zero. "
-    "And one result surprised me. After very good earnings, stocks did slightly <i>worse</i> over the following months, not better. I checked hard for a mistake. Below I explain why I think the pattern is real in this sample, and why I still wouldn't lean on it.",
-    "Most of what follows is about how I got there, since that is where most of the work went. Several bugs along the way would have flattered the results, and I've left them in rather than tidy them away."))
+    "Public companies in the US have to file reports with the SEC: yearly ones (10-K), quarterly ones (10-Q), and short \"something just happened\" ones (8-K) for anything that just happened, like earnings, a merger or a CEO walking out. "
+    "I wanted to know whether you could read one the moment it lands and say anything useful about how the stock will react. "
+    "Underneath that sat a second question. Once you already know the numbers, do the <i>words</i> in a filing add anything?",
+    f"Short answers. The reaction is partly predictable, but only its <i>size</i>. On the final test period the best model without text scored a macro-F1 of {L6L.macro_f1:.3f} (the one with text scored {L7L.macro_f1:.3f}), against about 0.33 for pure luck. "
+    f"It can tell which filings will move a stock (AUC {L6L.move_auc:.2f}) and is a coin flip on <i>which way</i> (AUC {L6L.direction_auc:.2f}). "
+    f"The text didn't help. Adding language models changed the score by {TL.lift:+.3f}, with an interval centred on zero. "
+    "One result surprised me: after very good earnings, stocks did slightly <i>worse</i> over the following months. I checked hard for a mistake. Below I explain why I think the pattern is real in this sample, and why I still wouldn't lean on it.",
+    "Most of this report is about how I got there, because that's where most of the work went. Several bugs along the way would have flattered the results. I've left them in."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>1. The idea, and the one rule I kept to</h2>")
 a(para(
-    "There is an obvious way to do this badly. You take every filing, look up what the stock did around it, fit a model, and get a lovely score. The problem is that you have quietly used information that nobody had at the time. "
-    "If a filing was published at 4:30 in the afternoon, you can't use that day's closing price as an input, and you can't trade at that close either. So the one rule I kept to is this: <b>act like a trader sitting at the screen the moment the filing becomes public</b>. "
-    "Every input has to be something that trader could have known, and the thing I predict has to be something they could have actually captured.",
-    "I split the work into three tracks and tried hard not to mix them. Track A is an event study: how prices move around filings, which describes the data and predicts nothing. "
+    "The obvious way to do this badly: take every filing, look up what the stock did around it, fit a model, enjoy the lovely score. The catch is that you've quietly used information nobody had at the time. "
+    "A filing that came out at 4:30 in the afternoon can't use that day's closing price as an input, and you can't trade at that close either. So I kept to one rule: <b>act like a trader sitting at the screen the moment the filing becomes public</b>. "
+    "Every input has to be something that trader could have known, and whatever I predict has to be something they could actually have captured.",
+    "I split the work into three tracks and tried not to mix them. Track A is an event study of how prices move around filings. It describes the data and predicts nothing. "
     "Track B is the prediction problem. Track C asks whether the facts a language model pulls out of a filing match what a human would pull out, and it is judged on the text, never on prices. "
-    "Track C turned out to need hand-labelled examples that I don't have yet, so it only half exists. I'll be clear about that when we get there.",
-    "The questions, in the order I wanted to answer them:"))
+    "Track C turned out to need hand-labelled examples that I haven't made, so only half of it exists.",
+    "The questions, in order:"))
 a("<ol><li>Can we predict the next reaction at all?</li><li>Does the text add anything beyond numbers that are already public (price history, company size, accounting)?</li>"
   "<li>Does the well-known post-earnings drift show up in this data?</li><li>Could any of it make money?</li></ol>")
-a(para("I also wrote these down, along with the metric and the pass or fail rules, before looking at the final test. That is called pre-registering. It is dull, but it stops you quietly changing the question once you have seen the answer."))
+a(para("I wrote these down before looking at the final test, along with the metric and the pass or fail rules. That's called pre-registering. It's dull, but it stops you quietly changing the question once you've seen the answer."))
 a(fig("A01", "The whole pipeline: 25 stages in three parts. Part 1 ran on my laptop, Part 2 on a Colab GPU, and Part 3 back on CPU. The two orange boxes ran but couldn't produce a result because they need human-labelled data I don't have."))
 
 # --------------------------------------------------------------------------------------------------------------
@@ -169,18 +169,18 @@ a(para(
     f"I picked 150 companies that were members of the S&amp;P 500 at some point since 2000, using a fixed random seed and spreading them across 12 industries. They came from {E['eligible_firms']} firms that had prices in my files and at least one 10-K in the Hugging Face corpus. "
     f"That gave {E['events']:,} <b>events</b>: {E['events_by_type']['8K']:,} 8-Ks, {E['events_by_type']['periodic_10Q']:,} 10-Qs and {E['events_by_type']['periodic_10K']:,} 10-Ks. If a firm filed several 8-Ks on the same day I merged them into one event. "
     f"Events run from January {E['event_first'][:4]} to July 2026.",
-    "I started out planning 500 stocks, 353 from the S&amp;P 500 and 147 that were not. The first half of that run finished. Then, while checking it, I found a bug in how I looked up accounting numbers (more on that later), and rather than re-run everything at the larger size I dropped to the 150-stock version, which I could finish properly. "
-    "That is why the final study is 150 S&amp;P stocks only, and why I don't compare S&amp;P and non-S&amp;P firms in the end."))
+    "I started out planning 500 stocks, 353 from the S&amp;P 500 and 147 that were not. The first half of that run finished. Then, while checking it, I found a bug in how I looked up accounting numbers (more on that later). Rather than re-run everything at the larger size, I dropped to the 150-stock version, which I could finish properly. "
+    "So the final study is 150 S&amp;P stocks only, and I don't compare S&amp;P with non-S&amp;P firms."))
 a(fig("filings_by_year", "Filings downloaded per year. Quarterly and yearly reports take off in the early 2000s, and most of the volume is 8-Ks."))
 a(fig("sectors", "The 150 firms by Fama-French industry. \"BusEq\" is business equipment (software, chips, hardware) and \"Other\" is a grab bag.", "62%"))
 a(para(
-    "<b>The weakness I have to flag right here.</b> All 150 firms still exist today. Companies that were delisted, bought, or went bust are not in the sample. That is survivorship bias, and it matters most for the earnings-drift result later. "
+    "<b>One weakness has to go here.</b> All 150 firms still exist today. Companies that were delisted, bought, or went bust are not in the sample. That's survivorship bias, and it matters most for the earnings-drift result later. "
     "Of the 1,094 tickers that were ever in the index during these years, I had usable data for about a third (353), and this study uses 150 of those. Free price data was the limit, and I couldn't get around it."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>3. Turning filings into text a model can read</h2>")
 a(para(
-    f"The raw filings are messy HTML, sometimes ancient SGML, full of tables and page numbers. Getting from there to clean text took a big chunk of the project. I'll go through what happens, in order.",
+    f"The raw filings are messy HTML, sometimes ancient SGML, full of tables and page numbers. Getting from there to clean text took a big chunk of the project. Here is what happens, in order.",
     f"<b>Download and clean.</b> I downloaded {E['filings']:,} filings from EDGAR politely (a few requests a second, with my contact details in the header, as the SEC asks). {E['filings_parsed_ok']:,} parsed cleanly, and 280 had none of the sections I wanted. I turned HTML into plain text and flattened tables into rows, since the earnings numbers I wanted are in tables. That meant flattening {E['tables_flattened']:,} of them.",
     "<b>Keep only the parts that carry news.</b> A 10-K is mostly boilerplate. I kept the business description, risk factors, MD&amp;A and market-risk sections from 10-Ks; MD&amp;A, market-risk and risk-factor sections from 10-Qs; and the item text plus the press-release exhibit from 8-Ks. "
     "Finding these sections is harder than it sounds, because the table of contents repeats every heading. My rule was to take the candidate start that has the longest span before the next heading. That left "
@@ -238,8 +238,8 @@ a(para(
     "There are two quite different kinds of models in this project, and I don't want to blur them. The ones that make the predictions are small, classical models that I trained on my own data. The big neural models are borrowed and frozen: I use them only to turn text into numbers or to answer questions, and I never changed their weights."))
 a(models_table())
 a(para(
-    "For the trained models I used LightGBM, CatBoost and an elastic-net logistic regression, because they are the standard tools for tables of mixed features and they are quick to tune. Using three different ones was a cross-check as much as anything else: if all three agree, the result is not an accident of one library. "
-    "The elastic net was a good conservative baseline. Its optimisation problem is convex, so I could even verify it found the global optimum, which you can't say for trees. It ended up being the best model on the all-numbers rung.",
+    "For the trained models I used LightGBM, CatBoost and an elastic-net logistic regression. They are the standard tools for tables of mixed features, and they're quick to tune. Three different ones works as a cross-check too: if they all agree, the result isn't an accident of one library. "
+    "The elastic net is a conservative baseline, and its optimisation problem is convex, so I could check that it found the global optimum, which you can't say for trees. It ended up the best model on the all-numbers rung.",
     "I tuned settings with Optuna on the three most recent validation folds, then refit on every fold. The class weights balance the three classes and also down-weight events that overlap in time. Predicted probabilities are corrected back to the real class frequencies, and the final class is whichever has the highest probability relative to its frequency.",
     f"On tuning: I expected it to matter more than it did. Across 32 combinations of rung and model, the median change in the validation score from tuning was {gain.median():+.3f}, and only {(gain > 0).mean():.0%} improved at all. The few big improvements were the elastic net, whose default settings were bad. "
     "The search budgets were also tiny (6 to 15 trials), smaller than the ten random starts Optuna uses by default, so several rungs ended up with identical settings. I would not call any of these models \"fully tuned\"."))
@@ -262,9 +262,9 @@ a(para(
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>9. Fine-tuning: what I planned and why I didn't do it</h2>")
 a(para(
-    "I had a fine-tuning stage in the plan. The idea was to take the two best encoders and train them end to end on my labels, with a grid over learning rate, batch size and weight decay. But I made it conditional. Fine-tuning is expensive, and it multiplies the number of configurations you try, which is how people fool themselves. "
+    "I had a fine-tuning stage in the plan: take the two best encoders and train them end to end on my labels, with a grid over learning rate, batch size and weight decay. I made it conditional, because fine-tuning is expensive and multiplies the number of configurations you try, which is how people fool themselves. "
     "So the rule was: fine-tune only if adding text to the numbers improves the score by at least 0.01, with an interval that excludes zero.",
-    f"It didn't come close. Across the validation folds the change was −0.001 with an interval from −0.007 to +0.005, and on the development and locked periods the estimates were +0.007 and −0.001, neither with an interval that excluded zero. So the gate stayed closed and <b>no encoder was fine-tuned</b>. The honest label for the language side of this project is \"frozen embeddings, plus a retrieval and extraction pipeline\", not \"fine-tuned models\". "
+    f"It didn't come close. Across the validation folds the change was −0.001 with an interval from −0.007 to +0.005, and on the development and locked periods the estimates were +0.007 and −0.001, neither with an interval that excluded zero. So the gate stayed closed and <b>no encoder was fine-tuned</b>. The right description of the language side of this project is \"frozen embeddings, plus a retrieval and extraction pipeline\", not \"fine-tuned models\". "
     "If you do want to see what fine-tuning would have looked like, the code is in the repository and runs on a smoke test, but it has never run on the real data."))
 
 # --------------------------------------------------------------------------------------------------------------
@@ -314,7 +314,7 @@ a(para(
     "So it is a tilt in the averages, not a rule: 45% of those stocks went on to rise. Why would it tilt this way? I have four candidate reasons and I did not test any of them. "
     "First, my surprise compares earnings with the same quarter last year, not with what analysts expected, so a result can beat last year and still disappoint. Second, prices can overreact to a headline and settle back, and the worst-news group shows the mirror image. Third, these are large, closely followed companies where good news is priced in within hours. "
     "Fourth, survivorship. Companies that got bad news and kept falling were often delisted, and they aren't in my data. That alone makes the worst-news group look better afterwards and could manufacture part of this pattern.",
-    "The wording I'm comfortable with is this. I did not find classic post-earnings drift in this survivor-only sample, and the data point the other way. That is a finding about this sample, not a refutation of the theory. To settle it I'd add delisted firms and use analyst forecasts for the surprise."))
+    "Here's the wording I'm comfortable with. I did not find classic post-earnings drift in this survivor-only sample, and the data point the other way. That says something about this sample, not about whether the theory is right. To settle it I'd add delisted firms and use analyst forecasts for the surprise."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>13. Could you trade it?</h2>")
