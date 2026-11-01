@@ -93,6 +93,8 @@ cum = lambda c: ((1 + x[c].fillna(0)).cumprod().iloc[-1] - 1) * 100  # noqa: E73
 BT_LONG, BT_SPY, BT_EXC = cum("long_ret"), cum("spy_matched"), cum("long_excess_spy")
 sk = csv("skill.csv")
 L6L = sk[(sk.period == "locked") & (sk.model == "L6")].iloc[0]
+L7L = sk[(sk.period == "locked") & (sk.model == "L7")].iloc[0]
+WF6 = sk[(sk.period == "walk-forward") & (sk.model == "L6")].iloc[0]
 li = csv("lifts.csv")
 TL = li[(li.period == "locked") & li.comparison.str.startswith("L7")].iloc[0]
 tun = csv("tuning.csv").dropna(subset=["default_mean_f1", "tuned_mean_f1"])
@@ -109,6 +111,8 @@ def btrow(block, leg, lag, cost=10):
 
 lk_long, lk_exc, lk_ls = btrow("locked", "long_only", 0), btrow("locked", "long_minus_spy_matched", 0), btrow("locked", "long_short_hypothetical", 0)
 dv_long, dv_exc, dv_ls = btrow("dev", "long_only", 1), btrow("dev", "long_minus_spy_matched", 1), btrow("dev", "long_short_hypothetical", 1)
+dv0_long, dv0_exc = btrow("dev", "long_only", 0), btrow("dev", "long_minus_spy_matched", 0)
+lk1_long, lk1_exc = btrow("locked", "long_only", 1), btrow("locked", "long_minus_spy_matched", 1)
 
 # ----------------------------------------------------------------------------------------------------------- the report text
 H = []
@@ -134,11 +138,11 @@ a(para(
     "Public companies in the US have to file reports with the SEC. There are yearly ones (10-K), quarterly ones (10-Q), and short \"something just happened\" ones (8-K) that cover things like earnings, a merger or a CEO leaving. "
     "I wanted to know whether you could read one of these the moment it appears and say anything useful about how the stock will react. "
     "And a second question sat underneath that one: do the <i>words</i> in a filing add anything, once you already know the numbers?",
-    f"The short answers are these. The reaction is partly predictable, but only the <i>size</i> of it. On the final test period the best model scored a macro-F1 of {L6L.macro_f1:.3f}, against about 0.33 for pure luck. "
+    f"The short answers are these. The reaction is partly predictable, but only the <i>size</i> of it. On the final test period the best model without text scored a macro-F1 of {L6L.macro_f1:.3f} (the one with text scored {L7L.macro_f1:.3f}), against about 0.33 for pure luck. "
     f"It can tell which filings will move a stock (AUC {L6L.move_auc:.2f}) but it is a coin flip on <i>which way</i> (AUC {L6L.direction_auc:.2f}). "
     f"The text did not help at all: adding language models changed the score by {TL.lift:+.3f}, with an interval that sits comfortably around zero. "
-    "And one result surprised me. After very good earnings, stocks did slightly <i>worse</i> over the following months, not better. I spent a long time checking whether that was a mistake, and I explain below why I think it is mostly real in this sample, and why I still wouldn't trust it too much.",
-    "Most of what follows is about how I got there, because that is where the actual work was. I found several bugs that would have made the results look better than they were, and I'd rather show those than hide them."))
+    "And one result surprised me. After very good earnings, stocks did slightly <i>worse</i> over the following months, not better. I checked hard for a mistake. Below I explain why I think the pattern is real in this sample, and why I still wouldn't lean on it.",
+    "Most of what follows is about how I got there, since that is where most of the work went. Several bugs along the way would have flattered the results, and I've left them in rather than tidy them away."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>1. The idea, and the one rule I kept to</h2>")
@@ -146,13 +150,13 @@ a(para(
     "There is an obvious way to do this badly. You take every filing, look up what the stock did around it, fit a model, and get a lovely score. The problem is that you have quietly used information that nobody had at the time. "
     "If a filing was published at 4:30 in the afternoon, you can't use that day's closing price as an input, and you can't trade at that close either. So the one rule I kept to is this: <b>act like a trader sitting at the screen the moment the filing becomes public</b>. "
     "Every input has to be something that trader could have known, and the thing I predict has to be something they could have actually captured.",
-    "I split the work into three tracks and tried hard not to mix them. Track A is an event study: how do prices move around filings, nothing more. That is description, not prediction. "
+    "I split the work into three tracks and tried hard not to mix them. Track A is an event study: how prices move around filings, which describes the data and predicts nothing. "
     "Track B is the prediction problem. Track C asks whether the facts a language model pulls out of a filing match what a human would pull out, and it is judged on the text, never on prices. "
     "Track C turned out to need hand-labelled examples that I don't have yet, so it only half exists. I'll be clear about that when we get there.",
     "The questions, in the order I wanted to answer them:"))
 a("<ol><li>Can we predict the next reaction at all?</li><li>Does the text add anything beyond numbers that are already public (price history, company size, accounting)?</li>"
   "<li>Does the well-known post-earnings drift show up in this data?</li><li>Could any of it make money?</li></ol>")
-a(para("I also wrote these down, along with the metric and the pass or fail rules, before looking at the final test. That is called pre-registering, and it is boring, and it is the thing that stops you from changing the question after you've seen the answer."))
+a(para("I also wrote these down, along with the metric and the pass or fail rules, before looking at the final test. That is called pre-registering. It is dull, but it stops you quietly changing the question once you have seen the answer."))
 a(fig("A01", "The whole pipeline: 25 stages in three parts. Part 1 ran on my laptop, Part 2 on a Colab GPU, and Part 3 back on CPU. The two orange boxes ran but couldn't produce a result because they need human-labelled data I don't have."))
 
 # --------------------------------------------------------------------------------------------------------------
@@ -171,12 +175,12 @@ a(fig("filings_by_year", "Filings downloaded per year. Quarterly and yearly repo
 a(fig("sectors", "The 150 firms by Fama-French industry. \"BusEq\" is business equipment (software, chips, hardware) and \"Other\" is a grab bag.", "62%"))
 a(para(
     "<b>The weakness I have to flag right here.</b> All 150 firms still exist today. Companies that were delisted, bought, or went bust are not in the sample. That is survivorship bias, and it matters most for the earnings-drift result later. "
-    "My data covers about a third of the 1,094 tickers that were ever in the index during these years, and I couldn't fix that with free price data."))
+    "Of the 1,094 tickers that were ever in the index during these years, I had usable data for about a third (353), and this study uses 150 of those. Free price data was the limit, and I couldn't get around it."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>3. Turning filings into text a model can read</h2>")
 a(para(
-    f"The raw filings are messy HTML, sometimes ancient SGML, full of tables and page numbers. Getting from there to clean text was a large part of the first week. I'll go through what happens, in order.",
+    f"The raw filings are messy HTML, sometimes ancient SGML, full of tables and page numbers. Getting from there to clean text took a big chunk of the project. I'll go through what happens, in order.",
     f"<b>Download and clean.</b> I downloaded {E['filings']:,} filings from EDGAR politely (a few requests a second, with my contact details in the header, as the SEC asks). {E['filings_parsed_ok']:,} parsed cleanly, and 280 had none of the sections I wanted. I turned HTML into plain text and flattened tables into rows, since the earnings numbers I wanted are in tables. That meant flattening {E['tables_flattened']:,} of them.",
     "<b>Keep only the parts that carry news.</b> A 10-K is mostly boilerplate. I kept the business description, risk factors, MD&amp;A and market-risk sections from 10-Ks; MD&amp;A, market-risk and risk-factor sections from 10-Qs; and the item text plus the press-release exhibit from 8-Ks. "
     "Finding these sections is harder than it sounds, because the table of contents repeats every heading. My rule was to take the candidate start that has the longest span before the next heading. That left "
@@ -225,7 +229,7 @@ a(para(
 a(fig("splits", "How the 26 years were used. The first folds start in 2008 because the model needs at least eight years of history to learn from.", "92%"))
 a(para(
     "<b>The metric.</b> My main number is macro-F1: the average of how well the model does on Down, Sideways and Up, weighting the three equally. It stops a model scoring well just by predicting the biggest class. I also report accuracy, AUC (how well the probabilities rank events), log-loss and calibration error (do the stated probabilities match reality), and every interval comes from resampling whole months, since events in the same month share market shocks.",
-    f"<b>What a score of 0.38 means.</b> This tripped me up at first. The report originally compared scores to a \"majority class\" baseline of 0.19, which makes everything look great. But a model with balanced predictions gets about 0.33 by luck on three roughly equal classes. I measured that directly by shuffling a model's own predictions against the true labels (0.33), so that is the line to read scores against."))
+    f"<b>What a score of 0.38 means.</b> It is easy to get this wrong. An earlier version of my report compared scores to a \"majority class\" baseline of 0.19, which makes everything look great. But a model with balanced predictions gets about 0.33 by luck on three roughly equal classes. I measured that directly by shuffling a model's own predictions against the true labels (0.33), so that is the line to read scores against."))
 a(fig("chance", "Macro-F1 for three models in three periods. The dashed line is what luck gives you."))
 
 # --------------------------------------------------------------------------------------------------------------
@@ -237,19 +241,19 @@ a(para(
     "For the trained models I used LightGBM, CatBoost and an elastic-net logistic regression, because they are the standard tools for tables of mixed features and they are quick to tune. Using three different ones was a cross-check as much as anything else: if all three agree, the result is not an accident of one library. "
     "The elastic net was a good conservative baseline. Its optimisation problem is convex, so I could even verify it found the global optimum, which you can't say for trees. It ended up being the best model on the all-numbers rung.",
     "I tuned settings with Optuna on the three most recent validation folds, then refit on every fold. The class weights balance the three classes and also down-weight events that overlap in time. Predicted probabilities are corrected back to the real class frequencies, and the final class is whichever has the highest probability relative to its frequency.",
-    f"One honest observation about tuning. I expected it to matter more than it did. Across 32 combinations of rung and model, the median change in the validation score from tuning was {gain.median():+.3f}, and only {(gain > 0).mean():.0%} improved at all. The few big improvements were the elastic net, whose default settings were bad. "
+    f"On tuning: I expected it to matter more than it did. Across 32 combinations of rung and model, the median change in the validation score from tuning was {gain.median():+.3f}, and only {(gain > 0).mean():.0%} improved at all. The few big improvements were the elastic net, whose default settings were bad. "
     "The search budgets were also tiny (6 to 15 trials), smaller than the ten random starts Optuna uses by default, so several rungs ended up with identical settings. I would not call any of these models \"fully tuned\"."))
 a(fig("tuning", "Almost nothing changed when I tuned. A few elastic-net models improved a lot, which is the right-hand bump.", "62%"))
 a(para("The experiment is built as a ladder, so I can see exactly what each kind of information adds. Each rung gets the one before plus something new, always on identical events."))
 a(fig("A03", "The ablation ladder. Green rungs only use information that was clearly available at the time, red ones use a model whose training cutoff is unknown."))
 a(fig("ladder", "Validation results for every rung and model. Metadata (L2) is the strongest single group. Accounting alone (L3) is the weakest, and putting everything together (L6) is best."))
-a(para("Two rungs surprised me. Text vectors on their own (L5) come close to the word features, a little below them, so the language models do contain some real signal. And the elastic net got much <i>worse</i> when I added the text vectors to everything else (0.39 down to 0.35). A regularised linear model drowning in hundreds of correlated extra columns is not a shock in hindsight, but it was a good reminder that more features is not more information."))
+a(para("Two results surprised me. Text vectors on their own (L5) come close to the word features, a little below them, so the language models do contain some real signal. And the elastic net got much <i>worse</i> when I added the text vectors to everything else (0.39 down to 0.35 on the pooled score). With hindsight that is not shocking: a regularised linear model drowning in hundreds of correlated extra columns is going to struggle. More features is not more information."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>8. The pre-trained models, and where the embeddings come from</h2>")
 a(para(
-    "People sometimes ask where the embeddings were downloaded from. They weren't. I downloaded the <i>models</i> from Hugging Face, at fixed versions, and ran my own filing text through them on a Colab GPU. The embeddings exist only for my 60,030 filing events and never saw a price.",
-    "<b>ChronoBERT</b> is the one I'm happiest with. It comes as 26 yearly versions, and each was trained only on text written up to its date. For an event in year Y I use the version trained to the end of year Y-1, so the encoder cannot know anything from after the filing. If a model has read the future, it can look clever for the wrong reason, and this removes that worry. "
+    "A common question is where the embeddings were downloaded from. They weren't. I downloaded the <i>models</i> from Hugging Face, at fixed versions, and ran my own filing text through them on a Colab GPU. The embeddings exist only for my 60,030 filing events and never saw a price.",
+    "<b>ChronoBERT</b> is the encoder I trust most for a study like this. It comes as 26 yearly versions, and each was trained only on text written up to its date. For an event in year Y I use the version trained to the end of year Y-1, so the encoder cannot know anything from after the filing. If a model has read the future, it can look clever for the wrong reason, and this removes that worry. "
     "<b>BGE-base</b> is a strong general-purpose encoder with no stated cutoff, so it only counts on the less strict leaderboard. It also drives the passage search I describe later.",
     "Each of the 900,000 chunks becomes 768 numbers. I averaged and took the maximum over a section's chunks, then combined sections into one vector of 1,536 numbers per event, and also stored how far the vector moved compared with the same firm's previous filing of the same type. Before using them I shrank the vectors with PCA, fitted inside each training fold. "
     "Embedding took 56 minutes with ChronoBERT and 39 minutes with BGE on the Colab GPU.",
@@ -269,7 +273,7 @@ a(para(
     "The other use of a language model was to pull specific events out of a filing: did the company give guidance, record an impairment, announce a restructuring, a buyback, a dividend, a merger, a lawsuit, a change of management. Embeddings blur all of that into one vector, and I wanted facts I could check.",
     "The pipeline works like this. A filing's text is cut into chunks, and I search them two ways at once, by keywords and by embedding similarity, then merge the two rankings and let a reranking model sort the top thirty. The best eight passages go to Qwen2.5-7B, which answers twelve questions in a fixed JSON format with a quote and a chunk id for every answer. "
     "Then a set of guards checks the answer. Every quote has to appear word-for-word in the chunk it cites, any number has to appear in its evidence, and anything that fails is blanked out.",
-    "It ran on 149 filings from the development period, at about 47 seconds each, two hours in total. And that is where the story stops. To say whether it is any good I need human-labelled examples to compare against, and I haven't made them. The templates are pre-filled and ready, but I haven't annotated them. "
+    "It ran on 149 filings from the development period, at about 47 seconds each, two hours in total. That is as far as it got. To say whether it is any good I need human-labelled examples to compare against, and I haven't made them. The templates are pre-filled and ready, but I haven't annotated them. "
     "So I can't report accuracy for the extraction, I couldn't test whether the extracted events improve the predictions, and I could not train the smaller student model I'd planned. The chart below only shows how often the model said each event was present. Treat it as a description of what the system produces, not as evidence that it works."))
 a(fig("A04", "The retrieval and extraction system. Solid boxes ran. Dashed grey boxes are built but waiting on human labels."))
 a(fig("rag", "How often Qwen said each field was present in 141 filings that returned a valid answer (8 returned nothing usable). Unchecked output.", "78%"))
@@ -285,8 +289,9 @@ a(para(
     if (lock_ece := csv('locked_results.csv').query("run_id == 'locked|L6'").iloc[0].ece) is not None else ""))
 a(fig("move_direction", "The most important chart in the project. The model is good at telling which events will produce a big move, and no better than a coin at telling which direction. An AUC of 0.5 means no information."))
 a(para(
-    "That split explains what the model is actually doing. Metadata like event type, time of day, and the stock's recent volatility predict how much the stock will react. An earnings release after the close for a volatile stock is going to move, whatever the content. "
-    "Whether the move is up or down depends on whether the news is better or worse than expected, and my numbers contain almost nothing about that. The accounting-based surprise is the nearest thing, and as the earnings section shows, it behaves strangely."))
+    "That split says a lot about what the model is doing. Metadata like event type, time of day, and the stock's recent volatility predict how much the stock will react. An earnings release after the close for a volatile stock is going to move, whatever the content. "
+    "Whether the move is up or down depends on whether the news is better or worse than expected, and my numbers contain almost nothing about that. The accounting-based surprise is the nearest thing, and as the earnings section shows, it behaves strangely. "
+    f"On the earlier validation folds the direction AUC was a little higher ({WF6.direction_auc:.2f}), barely above a coin, so \"a coin flip\" is a fair summary of the locked test and close to true before it."))
 a(fig("confusion", "The all-numbers model on the locked test. It finds the Sideways events best (53%) and does little better than chance on telling Down from Up.", "52%"))
 a(para(
     f"<b>Did the text help?</b> No. The comparison I care about is the same model with and without the language-model embeddings, scored on identical events. On the locked test, adding text changed macro-F1 by {TL.lift:+.3f} (95% interval {TL.ci_low:+.3f} to {TL.ci_high:+.3f}). "
@@ -298,10 +303,10 @@ a(fig("lifts", "Every comparison I pre-registered, with its interval. Where the 
 a("<h2>12. The earnings drift puzzle</h2>")
 a(para(
     "The classic finding in this area is that stocks keep drifting in the direction of an earnings surprise for weeks afterwards. Good news, then more gains. So I sorted earnings reports into five groups by the size of the surprise and tracked the average abnormal return for the next 2 to 60 trading days.",
-    "It went the other way. On announcement day it behaves the way you would hope: the best-news group rose 0.81% and the worst-news group fell 0.54%. Then, over the following months, the best-news group <i>lost</i> 1.85% and the worst-news group <i>gained</i> 1.40%."))
+    "It went the other way. In the three days around the announcement it behaves the way you would hope: the best-news group rose 0.81% and the worst-news group fell 0.54%. Then, over the following months, the best-news group <i>lost</i> 1.85% and the worst-news group <i>gained</i> 1.40%."))
 a(fig("sue", "Left: the immediate reaction goes in the direction of the news. Right: the later drift goes the other way, and it gets steadily more negative as the news gets better."))
 a(para(
-    "My first reaction was that I had got a sign wrong somewhere, so I tested it. The announcement-day move has the right sign, so the surprise is not flipped. The reversal is there in 2000 to 2009 (−4.4% between best and worst news), 2010 to 2019 (−2.0%) and 2020 to 2026 (−4.3%), and it survives when I keep only events with no other filing nearby (−2.1%). "
+    "The first thing to rule out was a sign error, so I tested for one. The announcement-day move has the right sign, so the surprise is not flipped. The reversal is there in 2000 to 2009 (−4.4% between best and worst news), 2010 to 2019 (−2.0%) and 2020 to 2026 (−4.3%), and it survives when I keep only events with no other filing nearby (−2.1%). "
     "It rises smoothly from group to group, which is not what noise looks like. The formal test, which uses a stricter surprise measure built from the press-release figures (3,825 reports), gives −2.6% with an interval from −3.5% to −1.7%. The chart above uses a broader sample of 9,359 reports, which is why its gap is larger, about −3.3%.",
     "A fair objection is that good news should push a stock up, not down. It did, on the day. Here is how the best-news reports break down over the next two months:"))
 a(fig("twobytwo", "The 1,908 best-news earnings reports, split by what the stock did on the day and what it did over the next two months. 55% fell afterwards, and 31% rose first and then gave back about 10%.", "72%"))
@@ -314,16 +319,17 @@ a(para(
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>13. Could you trade it?</h2>")
 a(para(
-    "I added a simple backtest as a sanity check, not as a strategy. The signal is the probability of Up minus the probability of Down from the frozen model. Go long the top fifth, short the bottom fifth, enter at the first open after the decision time, and charge 10 basis points a side (20 in a second run), plus a borrow cost on shorts. I also ran a version with a one-session delay.",
-    f"On the development years it looked pleasant: with the one-session delay the long book returned {dv_long.ann_return:.1%} a year, {dv_exc.ann_return:+.1%} a year ahead of the S&amp;P 500 on the same days. On the locked test it fell apart. "
-    f"The long book earned {lk_long.ann_return:.1%} a year, the long-minus-index line {lk_exc.ann_return:+.1%} a year, and the hypothetical long-short {lk_ls.ann_return:+.1%}. Over the 3.6 years the long book gained about {BT_LONG:.0f}% while the index, on the same days, gained about {BT_SPY:.0f}%.",
-    "That is a useful lesson in itself. A good-looking result on the set you used to choose the model is not the same thing as a result on data you haven't touched, and the locked test did what it was there to do."))
+    "I added a simple backtest as a sanity check, not as a strategy. The signal is the probability of Up minus the probability of Down from the frozen model. Go long the top fifth, short the bottom fifth, enter at the first open after the decision time, hold for five sessions, and charge 10 basis points a side (20 in a second run), plus a borrow cost on shorts. I also ran a version with a one-session delay.",
+    f"Under the same rules (no delay, 10 basis points), the development years looked decent: the long book returned {dv0_long.ann_return:.1%} a year, {dv0_exc.ann_return:+.1%} a year ahead of the S&amp;P 500 on the same days. On the locked test it fell apart. "
+    f"The long book earned {lk_long.ann_return:.1%} a year, the long-minus-index line {lk_exc.ann_return:+.1%} a year, and the hypothetical long-short {lk_ls.ann_return:+.1%}. Over the 3.6 years the long book gained about {BT_LONG:.0f}% while the index, on the same days, gained about {BT_SPY:.0f}%. "
+    f"The one-session-delay version looked better on the development years ({dv_long.ann_return:.1%} a year, {dv_exc.ann_return:+.1%} ahead of the index) and still lost on the locked test ({lk1_long.ann_return:+.1%} a year, {lk1_exc.ann_return:+.1%} against the index).",
+    "There is a lesson in that. A good-looking result on the set you used to choose the model is not the same as a result on data you haven't touched, and the locked test did what it was there to do."))
 a(fig("backtest", "The locked test period, with no delay and 10 bps per side. Shorts are hypothetical, there is no capacity or delisting model, and this is a sanity check rather than a strategy."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>14. Things that went wrong</h2>")
 a(para(
-    "I want this part to be useful, not apologetic, because it is where I learned the most. Besides the three data bugs in section 5, these are the ones I remember:"))
+    "This part is meant to be useful rather than apologetic, since most of what I learned came from these. Besides the three data bugs in section 5, these are the ones I remember:"))
 a("<ul>"
   "<li><b>My own benchmark.</b> The first time I ran the GPU part on Colab it refused to start, saying the embeddings would take 19 GPU-hours against a 10-hour budget. The cause was my speed test: it timed a cold start, including the one-off cost of waking the GPU up. After adding a warm-up the projection was under an hour (the real run took 1.65 hours).</li>"
   "<li><b>A regular expression that never finished.</b> A pattern for table rows had a nasty backtracking case, and three worker processes sat at full CPU for half an hour on one filing. I now run an adversarial timing test against every parsing pattern.</li>"
@@ -333,7 +339,7 @@ a("<ul>"
   "<li><b>Drive, and Streamlit.</b> Google Drive on Windows would not sync thousands of small files, so I uploaded zips through the browser. Getting the dashboard online took a second attempt: the first deployment stalled, so I added a requirements file listing only the six packages the dashboard needs instead of the whole project's.</li>"
   "</ul>")
 a(fig("compute", "Wall-clock time per stage. The long bars are the tuning of the tree models (S11, two hours, on my laptop), the embeddings (S14) and the extraction run (S16).", "88%"))
-a(para("The pipeline has 114 automated tests, and each of the problems above has one that fails on the old code."))
+a(para("The pipeline has 114 automated tests (plus one skipped), and most of the code bugs above have a test that fails on the old version."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>15. What the results do and don't show</h2>")
@@ -355,18 +361,17 @@ a("<h2>17. Look at it yourself</h2>")
 a(para(
     f"Everything is public. The repository ({link(GH)}) has the pipeline, the configuration, the decision log (78 entries explaining each choice and bug), the notebook for Colab, the dashboard and its data, the automated tests, the slide deck, this report, and the analysis scripts behind the earnings-drift numbers. "
     f"The interactive dashboard is at {link(APP)}. It walks the same story as a clickable flowchart of 16 steps with the charts behind each one, plus an 18-slide deck. If the app has gone to sleep, press the button and give it a minute.",
-    "To rerun it: open the notebook in Colab, set the profile and stock count in the first cell, and run all. Finished stages are skipped, so a disconnect costs nothing. You do not need any paid API or key, only a contact email for the SEC if you re-download."))
+    "To rerun it: open the notebook in Colab, set the profile and stock count in the first cell, and run all. Finished stages are skipped, so a disconnect costs nothing. You do not need any paid API or key, only a contact email for the SEC if you re-download. Parameter counts in this report are approximate, taken from model cards and file sizes, and nothing here is investment advice."))
 
 a("<h2>Appendix: where each thing is</h2>")
-a("<table><tr><th>what</th><th>where</th></tr>"
-  f"<tr><td>pipeline code</td><td>{link(GH + '/tree/main/src/secprice')}</td></tr>"
-  f"<tr><td>decision log (every choice and bug)</td><td>{link(GH + '/blob/main/docs/decision_log.md')}</td></tr>"
-  f"<tr><td>Colab notebook</td><td>{link(GH + '/tree/main/notebooks')}</td></tr>"
-  f"<tr><td>dashboard code and data</td><td>{link(GH + '/tree/main/dashboard')}</td></tr>"
-  f"<tr><td>automated report, figures, results tables</td><td>{link(GH + '/tree/main/reports')}</td></tr>"
-  f"<tr><td>this report, the slide deck, and how I built them</td><td>{link(GH + '/tree/main/docs/write-up')}</td></tr>"
-  f"<tr><td>earnings-drift analysis scripts</td><td>{link(GH + '/tree/main/analysis')}</td></tr></table>")
-a("<p class='small'>Parameter counts are approximate, taken from model cards and file sizes. Nothing here is investment advice.</p>")
+a("<table><tr><th>what</th><th>where (in the repository)</th></tr>"
+  f"<tr><td>pipeline code</td><td>{link(GH + '/tree/main/src/secprice', 'src/secprice')}</td></tr>"
+  f"<tr><td>decision log (every choice and bug)</td><td>{link(GH + '/blob/main/docs/decision_log.md', 'docs/decision_log.md')}</td></tr>"
+  f"<tr><td>Colab notebook</td><td>{link(GH + '/tree/main/notebooks', 'notebooks')}</td></tr>"
+  f"<tr><td>dashboard code and data</td><td>{link(GH + '/tree/main/dashboard', 'dashboard')}</td></tr>"
+  f"<tr><td>automated report, figures, results tables</td><td>{link(GH + '/tree/main/reports', 'reports')}</td></tr>"
+  f"<tr><td>this report, the slide deck, and how I built them</td><td>{link(GH + '/tree/main/docs/write-up', 'docs/write-up')}</td></tr>"
+  f"<tr><td>earnings-drift analysis scripts</td><td>{link(GH + '/tree/main/analysis', 'analysis')}</td></tr></table>")
 
 REFS = [
     ("He, S., Lv, L., Manela, A., &amp; Wu, J. (2026). Chronologically consistent large language models. <i>Journal of Financial Economics</i>, 185, 104374.",
