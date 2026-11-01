@@ -368,6 +368,35 @@ a("<table><tr><th>what</th><th>where</th></tr>"
   f"<tr><td>earnings-drift analysis scripts</td><td>{link(GH + '/tree/main/analysis')}</td></tr></table>")
 a("<p class='small'>Parameter counts are approximate, taken from model cards and file sizes. Nothing here is investment advice.</p>")
 
+REFS = [
+    ("He, S., Lv, L., Manela, A., &amp; Wu, J. (2026). Chronologically consistent large language models. <i>Journal of Financial Economics</i>, 185, 104374.",
+     "https://doi.org/10.1016/j.jfineco.2026.104374",
+     "The ChronoBERT paper. The models are trained only on text that existed at each date, and the authors find look-ahead bias in news-based return forecasts to be modest. It is the reason I used a different yearly vintage for each event year (section 8)."),
+    ("Fink, J., Palan, S., &amp; Theissen, E. (2024). Earnings autocorrelation and the post-earnings-announcement drift: Experimental evidence. <i>Journal of Financial and Quantitative Analysis</i>, 59(6), 2799-2837.",
+     "https://doi.org/10.1017/S0022109023000881",
+     "A lab experiment showing the drift appears whether or not earnings surprises are correlated, and is stronger when they are. Useful background for the drift puzzle in section 12."),
+    ("Karolyi, S., Ruchti, T., &amp; Truong, P. (2025). Number processing constraints and earnings news. <i>Management Science</i>, 71(3), 2413-2442.",
+     "https://doi.org/10.1287/mnsc.2023.01722",
+     "Finds investors react less in the short run to earnings news for stocks with a high earnings-per-share level, which strengthens the later drift. A reminder that the drift depends on how the surprise is measured and who the firms are."),
+    ("Zhang, S., Gregoriou, A., &amp; Wu, H. (2024). Asymmetric post earnings announcement drift and order flow imbalance: The impact on stock market returns. <i>International Review of Financial Analysis</i>, 94, 103316.",
+     "https://doi.org/10.1016/j.irfa.2024.103316",
+     "An event study of earnings announcements in which the drift differs between good-news and bad-news cases and is linked to order flow. Close in spirit to my good-news-then-falls count in section 12."),
+    ("Lan, Q., Xie, Y., Mi, X., &amp; Zhang, C. (2024). Post earnings announcement drift: A simple earnings surprise measure, the medium effect of investor attention and investing strategy. <i>International Review of Financial Analysis</i>, 95(PB), 103460.",
+     "https://doi.org/10.1016/j.irfa.2024.103460",
+     "Builds a surprise measure from the overnight return around the announcement, tested on Chinese stocks. Similar in idea to the price-based announcement-return feature in my model, though the market is different."),
+    ("Magner, N., Henríquez, P. A., &amp; Sanhueza, A. (2025). Decoding risk sentiment in 10-K filings: Predictability for U.S. stock indices. <i>Finance Research Letters</i>, 81, 107472.",
+     "https://doi.org/10.1016/j.frl.2025.107472",
+     "Reports that the tone of the risk-factors section of 10-Ks predicts weekly returns on major U.S. stock indices. It works at the index level, whereas my study is firm by firm and next day."),
+    ("Fengler, M. R., &amp; Phan, T. M. (2025). Unveiling themes in 10-K disclosures: A new topic modeling perspective. <i>International Review of Financial Analysis</i>, 103, 104121.",
+     "https://doi.org/10.1016/j.irfa.2025.104121",
+     "Uses word embeddings to find topics in the MD&amp;A section of 10-Ks and relates topic-level sentiment to returns over different horizons. Related to how I turned filing sections into embeddings."),
+]
+a("<h2 style='page-break-before: always;'>References</h2>")
+a("<div class='refnote'><p>Seven peer-reviewed articles from 2024 to 2026 that sit closest to this project. I checked the authors, journal, volume and DOI of each against the publisher's or an indexing page. I read abstracts and the parts available online, not every paper end to end, so the notes say what each paper is about and why I list it, not more.</p></div>")
+a("<ol class='refs'>" + "".join(f"<li>{c} {link(u)}<br/><span class='why'>{w}</span></li>" for c, u, w in REFS) + "</ol>")
+a("<div class='refnote'><p>Several of these report that filing text or earnings news carries information about returns, while I found no added value from text over the structured features. That is not necessarily a conflict: the studies differ in level (index versus single stock), horizon, market and controls, and I did not test whether those differences explain the gap.</p>"
+  "<p class='small'>Quartile: International Review of Financial Analysis and Finance Research Letters are listed as best quartile Q1 on Scimago (SJR 2025). Quartiles change between years and ranking systems, so check the one your institution uses.</p></div>")
+
 body = "\n".join(H)
 css = """
 @page { size: A4; margin: 20mm 20mm 22mm 20mm; }
@@ -387,6 +416,8 @@ table.links td { border: none; padding: 2pt 8pt 2pt 0; font-size: 9.6pt; } table
 figure { margin: 8pt auto 12pt auto; page-break-inside: avoid; text-align: center; } figure img { max-width: 100%; }
 figcaption { font-size: 8.6pt; color: #4b5563; text-align: left; margin-top: 3pt; line-height: 1.4; }
 .small { font-size: 8.8pt; color: #6b7280; }
+ol.refs li { margin-bottom: 5pt; font-size: 9.1pt; line-height: 1.42; page-break-inside: avoid; } ol.refs a { font-size: 8.2pt; } .why { color: #4b5563; font-size: 8.6pt; }
+.refnote p { font-size: 9.3pt; line-height: 1.45; margin-bottom: 5pt; }
 """
 open(r"C:\Users\harsh\Downloads\sec_report_build\report.html", "w", encoding="utf-8").write(
     f"<!doctype html><html><head><meta charset='utf-8'><title>Can a company's own filing tell you what its stock will do next?</title><style>{css}</style></head><body>{body}</body></html>")
