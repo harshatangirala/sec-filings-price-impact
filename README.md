@@ -4,6 +4,21 @@ SEC filing text (10-K, 10-Q, 8-K) → price impact, built to `SPEC.md` (v5) and 
 Three tracks: **A** event study (association), **B** prospective prediction (primary target T_trade h=1, 3-class),
 **C** content validity (human gold labels).
 
+## Start here
+
+| | |
+|---|---|
+| **Written report** (21 pages, plain-language, start here) | [`docs/write-up/SEC_Filings_Price_Impact_Report.pdf`](docs/write-up/SEC_Filings_Price_Impact_Report.pdf) |
+| **Interactive dashboard** (clickable flowchart + slide deck) | https://sec-filings-study.streamlit.app/ (free apps sleep: press the wake-up button and wait a minute) |
+| **Slide deck** (13 slides, with speaker notes) | [`docs/write-up/SEC_Filings_Study_13_Slides.pptx`](docs/write-up/SEC_Filings_Study_13_Slides.pptx) |
+| Automated pipeline report (tables, 48 figures) | [`reports/`](reports/) |
+| Why each choice was made, every bug found | [`docs/decision_log.md`](docs/decision_log.md) |
+| Earnings-drift analysis scripts | [`analysis/`](analysis/) (set `RUN_ROOT` to a finished run folder) |
+| Models used (all on Hugging Face) | [ChronoBERT](https://huggingface.co/collections/manelalab/chronobert), [BGE-base](https://huggingface.co/BAAI/bge-base-en-v1.5), [BGE reranker](https://huggingface.co/BAAI/bge-reranker-base), [Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) |
+
+Result in one line: on 150 surviving S&P 500 stocks, filing-text embeddings add no out-of-sample value over price, metadata and accounting
+features (locked-test lift -0.001, 95% interval [-0.012, +0.010]); the models predict whether a stock moves, not which way.
+
 ## Quick start
 
 **Colab (recommended for the full study).** Open `notebooks/SEC_Filings_Price_Impact_v5_EndToEnd.ipynb` in Colab, add the

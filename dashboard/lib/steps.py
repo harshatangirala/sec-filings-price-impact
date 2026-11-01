@@ -579,6 +579,10 @@ def spec(sid: str, F: dict) -> dict:
         c1, c2 = st.columns(2)
         with c1:
             _plot(C.sue_quintiles(), "sueq")
+            sq = D.csv("sue_quintiles.csv")
+            st.caption(f"Quintiles use the broader surprise score (about {int(sq.events.sum()):,} earnings reports), so the Q5-Q1 gap here "
+                       f"({(sq['mean'].iloc[-1] - sq['mean'].iloc[0]) * 100:+.1f}%) is larger than the headline {sue.estimate * 100:+.2f}% from the stricter "
+                       f"release-based test (n = {int(sue.n):,}).") if sq is not None and sue is not None else None
         with c2:
             h = D.csv("hypothesis_tests.csv")
             if h is not None:
