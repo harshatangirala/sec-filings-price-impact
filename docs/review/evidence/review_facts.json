@@ -1,0 +1,123 @@
+{
+ "n_features_total": 131,
+ "missing_by_family": {
+  "accounting": 0.421,
+  "change": 0.175,
+  "ear": 0.068,
+  "lexical": 0.013,
+  "metadata": 0.011,
+  "novelty": 0.006,
+  "price": 0.006
+ },
+ "dup_px_rev_1m_px_ret_20": true,
+ "zero_variance_features": [
+  "meta_cat_abs",
+  "meta_cat_shell_status"
+ ],
+ "n_feature_pairs_abs_spearman_gt_0.95": 18,
+ "top_correlated_pairs": [
+  [
+   "px_ret_20",
+   "px_rev_1m",
+   1.0
+  ],
+  [
+   "meta_has_10K_7",
+   "meta_type_periodic_10K",
+   0.997
+  ],
+  [
+   "meta_has_10K_7",
+   "meta_has_10K_7A",
+   0.992
+  ],
+  [
+   "meta_has_10K_7A",
+   "meta_type_periodic_10K",
+   0.991
+  ],
+  [
+   "meta_has_10Q_MDA",
+   "meta_type_periodic_10Q",
+   0.988
+  ],
+  [
+   "meta_has_8K_ITEMS",
+   "meta_type_8K",
+   0.993
+  ],
+  [
+   "lm_n_words",
+   "txt_doc_chars",
+   0.999
+  ],
+  [
+   "boilerplate_share",
+   "chg_jaccard_sent",
+   0.979
+  ]
+ ],
+ "sue_event_available_share": 0.31051592240420833,
+ "acc_features_available_share": 0.6651565689251755,
+ "txt_has_text_share": 0.996166674963907,
+ "ttrade_sd_over_sigma": 1.4327633685587122,
+ "ttrade_share_abs_gt_0.5sigma": 0.5947770444571008,
+ "normal_share_abs_gt_0.5sigma_if_sd_equals_sigma": 0.6170750774519738,
+ "ttrade_median_abs_z": 0.6535657528984864,
+ "mean_abs_ar_earnings_vs_other": [
+  0.02374538220603106,
+  0.01358358000429616
+ ],
+ "events_per_year_recent": {
+  "2019": 2387,
+  "2020": 2683,
+  "2021": 2506,
+  "2022": 2266,
+  "2023": 2299,
+  "2024": 2236,
+  "2025": 2279
+ },
+ "fundamental_law_gross_IR": {
+  "IC=0.010": 0.49,
+  "IC=0.020": 0.98,
+  "IC=0.030": 1.46,
+  "IC=0.050": 2.44
+ },
+ "breadth_per_year": 2379.4285714285716,
+ "breadth_if_universe_x6": 14276.57142857143,
+ "top_8k_categories": {
+  "[]": 15068,
+  "[\"earnings\", \"exhibits\"]": 10040,
+  "[\"exhibits\", \"other_events\"]": 5683,
+  "[\"exhibits\", \"reg_fd\"]": 3540,
+  "[\"management_change\"]": 2817,
+  "[\"exhibits\", \"management_change\"]": 2459,
+  "[\"other_events\"]": 2389,
+  "[\"reg_fd\"]": 2375,
+  "[\"earnings\", \"exhibits\", \"reg_fd\"]": 1545,
+  "[\"shareholder_vote\"]": 1336,
+  "[\"exhibits\", \"material_agreement\"]": 1257,
+  "[\"exhibits\", \"financial_obligation\", \"material_agreement\"]": 1112,
+  "[\"earnings\", \"exhibits\", \"other_events\"]": 974,
+  "[\"material_agreement\"]": 563,
+  "[\"exhibits\", \"management_change\", \"reg_fd\"]": 546
+ },
+ "events_per_firm_quantiles": {
+  "0.0": 86.0,
+  "0.1": 304.0,
+  "0.5": 386.0,
+  "0.9": 529.0,
+  "1.0": 967.0
+ },
+ "firms": 150,
+ "target_defs_stored": {
+  "T_info": 301305,
+  "T_info@pub0": 120522,
+  "T_info@pub15": 120522,
+  "T_info@pub60": 120522,
+  "T_trade": 301305,
+  "T_trade@lat10": 120522,
+  "T_trade@lat120": 120522,
+  "T_trade_lag1": 120522
+ }
+}
