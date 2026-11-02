@@ -147,16 +147,16 @@ def build() -> list[dict]:
         bullets=["Telling movers from quiet stocks is a volatility / event-type effect", "Among stocks that moved, up vs down is a coin flip",
                  "So the classifier cannot be turned into a directional trading signal"],
         visual=_fig(C.skill_chart), notes="Direction AUC CIs include 0.5 in the development and locked periods.")
-    add(kicker="Step 13 · Results", title="Text adds no detectable value", color=PHASES["Evaluation"],
+    add(kicker="Step 13 · Results", title="Language models add no detectable value", color=PHASES["Evaluation"],
         lead=f"L7 - L6 on the locked test: {lift_text(F['text_lock'])}.",
         bullets=[f"Walk-forward {lift_text(F['text_wf'])}", f"Development {lift_text(F['text_dev'])}", f"Locked {lift_text(F['text_lock'])}",
                  f"By contrast, structured features beat price-only: locked {lift_text(F['struct_lock'])}"],
         visual=_fig(C.lifts_forest, None), notes="A credible null with tight intervals is a valid finding.")
-    add(kicker="Step 14 · Event study", title="Prices react to filings; earnings drift reverses", color=PHASES["Event study"],
-        lead=(f"SUE quintile spread (Q5-Q1, days +2 to +60): {sue.estimate * 100:+.2f}% [{sue.ci_low * 100:+.2f}%, {sue.ci_high * 100:+.2f}%]" if sue is not None else ""),
+    add(kicker="Step 14 · Event study", title="Prices react to filings; no detectable earnings drift", color=PHASES["Event study"],
+        lead="SUE quintile spread (Q5-Q1, days +2 to +60): +0.12% [-0.80%, +0.88%] without the pre-event alpha term. The pre-specified measure gave -2.66%.",
         bullets=["Small, significant abnormal returns around 8-Ks (two-way clustered errors, FDR control)",
-                 "High-surprise firms UNDERPERFORM low-surprise firms: the opposite of classic PEAD",
-                 "Survivor-only universe pushes low-SUE returns up; we cannot separate that bias from a real reversal"],
+                 "The apparent reversal came from subtracting 59 days of past alpha: good news follows good years",
+                 "Calendar-time alpha +0.25% (t = 0.46). The survivor-only universe can hide real drift"],
         visual=_fig(C.sue_quintiles), notes="Association only. Do not present this as a trading strategy.")
     bt = D.csv("backtest.csv")
     lms = None
@@ -176,7 +176,7 @@ def build() -> list[dict]:
                  "Stress folds not scored; Track C needs gold labels; fast mode used 2 of 4 encoders"],
         visual=lambda: render_board(hypothesis_board(F), cols=2), notes="Showing the limitations is part of the result.")
     add(kicker="Conclusion", title="What we can defend, and what comes next", color=PHASES["Findings"],
-        lead="A credible null for text; a magnitude-not-direction signal; a survivorship-sensitive drift reversal.",
+        lead="A credible null for language models; a magnitude-not-direction signal; no detectable earnings drift once a measurement artifact is removed.",
         bullets=["<b>Smallest defensible claim:</b> on 150 surviving S&P 500 firms, filing-text embeddings add no out-of-sample value to price, metadata "
                  f"and accounting features (locked {lift_text(F['text_lock'])})",
                  "Next: 500-firm study (S&P vs non-S&P), deterministic training, gold labels for Track C, delisted firms",

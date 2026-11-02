@@ -8,7 +8,8 @@ Three tracks: **A** event study (association), **B** prospective prediction (pri
 
 | | |
 |---|---|
-| **Written report** (21 pages, plain-language, start here) | [`docs/write-up/SEC_Filings_Price_Impact_Report.pdf`](docs/write-up/SEC_Filings_Price_Impact_Report.pdf) |
+| **Research paper** (working paper for SSRN: full design, 21 figures, 18 tables) | [`paper/Tangirala_SEC_Filings_Point_in_Time_Test.pdf`](paper/Tangirala_SEC_Filings_Point_in_Time_Test.pdf) |
+| **Written report** (plain-language) | [`docs/write-up/SEC_Filings_Price_Impact_Report.pdf`](docs/write-up/SEC_Filings_Price_Impact_Report.pdf) |
 | **Interactive dashboard** (clickable flowchart + slide deck) | https://sec-filings-study.streamlit.app/ (free apps sleep: press the wake-up button and wait a minute) |
 | **Slide deck** (13 slides, with speaker notes) | [`docs/write-up/SEC_Filings_Study_13_Slides.pptx`](docs/write-up/SEC_Filings_Study_13_Slides.pptx) |
 | Automated pipeline report (tables, 48 figures) | [`reports/`](reports/) |
@@ -16,8 +17,9 @@ Three tracks: **A** event study (association), **B** prospective prediction (pri
 | Earnings-drift analysis scripts | [`analysis/`](analysis/) (set `RUN_ROOT` to a finished run folder) |
 | Models used (all on Hugging Face) | [ChronoBERT](https://huggingface.co/collections/manelalab/chronobert), [BGE-base](https://huggingface.co/BAAI/bge-base-en-v1.5), [BGE reranker](https://huggingface.co/BAAI/bge-reranker-base), [Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) |
 
-Result in one line: on 150 surviving S&P 500 stocks, filing-text embeddings add no out-of-sample value over price, metadata and accounting
-features (locked-test lift -0.001, 95% interval [-0.012, +0.010]); the models predict whether a stock moves, not which way.
+Result in brief: on 150 surviving S&P 500 stocks, language-model embeddings add no out-of-sample value over price, metadata, accounting and classical text
+features (locked-test lift -0.001, 95% interval [-0.012, +0.009]), and a later model with no text does about as well; the models predict whether a stock moves, not
+which way; and an apparent post-earnings reversal is an artifact of subtracting pre-event alpha (D-079).
 
 ## Quick start
 
@@ -87,7 +89,7 @@ beyond momentum not supported. Association is not causation; prediction is not p
 ## Mini study: complete run and report (26 Oct 2026)
 The 150-stock study is finished end to end (CPU part locally, GPU part on Colab, locked test scored once). Headline results: locked-test
 macro-F1 0.384 for the best structured model against a real chance level of about 0.33; text adds nothing (L7 - L6 = -0.001 [-0.012, +0.009]);
-the models know WHETHER a stock moves (AUC 0.635) but not WHICH WAY (AUC 0.494 [0.475, 0.509]); SUE drift -2.6% (a reversal, survivor-only
+the models know WHETHER a stock moves (AUC 0.635) but not WHICH WAY (AUC 0.494 [0.475, 0.509]); SUE drift -2.6% on the pre-specified measure, an artifact of its pre-event alpha term, +0.1% without it (D-079; survivor-only
 caveat). The full report (architecture, data, pre-processing, models, RAG, evaluation design, 48 figures, known issues) is
 `reports/results_report.html` / `.pdf` / `results_summary.md` (decision D-078). Rebuild only the report from finished stages with S24
 (`force=["S24"]`; it never re-runs a model or the locked test).
@@ -102,7 +104,7 @@ work: roughly 5-8 h in fast mode, 7-11 h in full mode, unmeasured).
 |---|---|
 | L6 all CPU features | macro-F1 0.390 [0.383, 0.397] (best head: elastic net 0.392); shuffled-label null 0.251 (max 0.273) |
 | L2 metadata / L1 price / L4 text / L3 accounting | 0.379 / 0.362 / 0.374 / 0.347 (same ranking and level as the 500-firm run) |
-| SUE-conditioned drift Q5-Q1 | -2.6% [-3.5%, -1.7%], n=3,825: a reversal, survivor-only caveat applies |
+| SUE-conditioned drift Q5-Q1 | Pre-specified measure -2.6% [-3.5%, -1.7%], n=3,825; without the pre-event alpha term +0.1% [-0.8%, +0.9%] (D-079); survivor-only caveat applies |
 | Checks | events, timestamps and targets identical to the 500-firm run for the same firms (60,261 events; 1.3M target rows); 0 availability violations; 4/4 planted leaks caught; accounting features match a brute-force oracle in 1,500 of 1,500 sampled events |
 
 ## Superseded numbers (D-077)

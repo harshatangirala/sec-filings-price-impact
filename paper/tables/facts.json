@@ -1,0 +1,23 @@
+{
+ "locked_L6L7_same_class": 0.7244785949506037,
+ "locked_L6L7_signal_corr": 0.5579987048230093,
+ "member_at_event_share": 0.706310881000979,
+ "label_rows_t_trade_h1": 59698,
+ "quarterly_spread_mean": -0.02691416814555929,
+ "quarterly_spread_t": -5.472528374877479,
+ "quarterly_spread_n": 91,
+ "quarterly_spread_negative_share": 0.7912087912087912,
+ "pct_quarters_min_obs": 91,
+ "bound_q1": 0.008024107814085668,
+ "bound_q5": -0.018273249140741715,
+ "sue_reports_all_quintiles": 9359,
+ "sue_reports_with_q": 9503,
+ "verified_releases": 14407,
+ "sue_nonmissing": 9535,
+ "n_firms": 150,
+ "replica_corr_mm": 0.9999999999999998,
+ "replica_corr_c4": 1.0,
+ "spearman_sue_alpha_c4": 0.16306587159901437,
+ "spearman_mom_alpha_c4": 0.709690056653635,
+ "spearman_sue_mom": 0.22572820410774533
+}

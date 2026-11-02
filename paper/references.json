@@ -1,0 +1,1264 @@
+{
+"ball_brown": {
+"doi": "10.2307/2490232",
+"title": "An Empirical Evaluation of Accounting Income Numbers",
+"authors": [
+[
+"Ray",
+"Ball"
+],
+[
+"Philip",
+"Brown"
+]
+],
+"journal": "Journal of Accounting Research",
+"volume": "6",
+"page": "159-178",
+"year": 1968
+},
+"bernard_thomas89": {
+"doi": "10.2307/2491062",
+"title": "Post-Earnings-Announcement Drift: Delayed Price Response or Risk Premium?",
+"authors": [
+[
+"Victor L.",
+"Bernard"
+],
+[
+"Jacob K.",
+"Thomas"
+]
+],
+"journal": "Journal of Accounting Research",
+"volume": "27",
+"page": "1-36",
+"year": 1989
+},
+"bernard_thomas90": {
+"doi": "10.1016/0165-4101(90)90008-R",
+"title": "Evidence that stock prices do not fully reflect the implications of current earnings for future earnings",
+"authors": [
+[
+"Victor L.",
+"Bernard"
+],
+[
+"Jacob K.",
+"Thomas"
+]
+],
+"journal": "Journal of Accounting and Economics",
+"volume": "13",
+"page": "305-340",
+"year": 1990
+},
+"tetlock07": {
+"doi": "10.1111/j.1540-6261.2007.01232.x",
+"title": "Giving Content to Investor Sentiment: The Role of Media in the Stock Market",
+"authors": [
+[
+"Paul C.",
+"Tetlock"
+]
+],
+"journal": "Journal of Finance",
+"volume": "62",
+"page": "1139-1168",
+"year": 2007
+},
+"tetlock08": {
+"doi": "10.1111/j.1540-6261.2008.01362.x",
+"title": "More Than Words: Quantifying Language to Measure Firms' Fundamentals",
+"authors": [
+[
+"Paul C.",
+"Tetlock"
+],
+[
+"Maytal",
+"Saar-Tsechansky"
+],
+[
+"Sofus",
+"Macskassy"
+]
+],
+"journal": "Journal of Finance",
+"volume": "63",
+"page": "1437-1467",
+"year": 2008
+},
+"lm11": {
+"doi": "10.1111/j.1540-6261.2010.01625.x",
+"title": "When Is a Liability Not a Liability? Textual Analysis, Dictionaries, and 10‐Ks",
+"authors": [
+[
+"Tim",
+"Loughran"
+],
+[
+"Bill",
+"McDonald"
+]
+],
+"journal": "Journal of Finance",
+"volume": "66",
+"page": "35-65",
+"year": 2011
+},
+"lm16": {
+"doi": "10.1111/1475-679X.12123",
+"title": "Textual Analysis in Accounting and Finance: A Survey",
+"authors": [
+[
+"Tim",
+"Loughran"
+],
+[
+"Bill",
+"McDonald"
+]
+],
+"journal": "Journal of Accounting Research",
+"volume": "54",
+"page": "1187-1230",
+"year": 2016
+},
+"li10": {
+"doi": "10.1111/j.1475-679X.2010.00382.x",
+"title": "The Information Content of Forward‐Looking Statements in Corporate Filings—A Naïve Bayesian Machine Learning Approach",
+"authors": [
+[
+"Feng",
+"Li"
+]
+],
+"journal": "Journal of Accounting Research",
+"volume": "48",
+"page": "1049-1102",
+"year": 2010
+},
+"cohen20": {
+"doi": "10.1111/jofi.12885",
+"title": "Lazy Prices",
+"authors": [
+[
+"Lauren",
+"Cohen"
+],
+[
+"Christopher",
+"Malloy"
+],
+[
+"Quoc",
+"Nguyen"
+]
+],
+"journal": "Journal of Finance",
+"volume": "75",
+"page": "1371-1415",
+"year": 2020
+},
+"ke_kelly_xiu": {
+"doi": "10.3386/w26186",
+"title": "Predicting Returns With Text Data",
+"authors": [
+[
+"Zheng Tracy",
+"Ke"
+],
+[
+"Bryan",
+"Kelly"
+],
+[
+"Dacheng",
+"Xiu"
+]
+],
+"journal": "",
+"volume": null,
+"page": null,
+"year": 2019,
+"note": "NBER Working Paper 26186"
+},
+"huang23": {
+"doi": "10.1111/1911-3846.12832",
+"title": "FinBERT: A large language model for extracting information from financial text",
+"authors": [
+[
+"Allen H.",
+"Huang"
+],
+[
+"Hui",
+"Wang"
+],
+[
+"Yi",
+"Yang"
+]
+],
+"journal": "Contemporary Accounting Research",
+"volume": "40",
+"page": "806-841",
+"year": 2023
+},
+"gu20": {
+"doi": "10.1093/rfs/hhaa009",
+"title": "Empirical Asset Pricing via Machine Learning",
+"authors": [
+[
+"Shihao",
+"Gu"
+],
+[
+"Bryan",
+"Kelly"
+],
+[
+"Dacheng",
+"Xiu"
+]
+],
+"journal": "Review of Financial Studies",
+"volume": "33",
+"page": "2223-2273",
+"year": 2020
+},
+"jiang23": {
+"doi": "10.1111/jofi.13268",
+"title": "(Re‐)Imag(in)ing Price Trends",
+"authors": [
+[
+"Jingwen",
+"Jiang"
+],
+[
+"Bryan",
+"Kelly"
+],
+[
+"Dacheng",
+"Xiu"
+]
+],
+"journal": "Journal of Finance",
+"volume": "78",
+"page": "3193-3249",
+"year": 2023
+},
+"chordia14": {
+"doi": "10.1016/j.jacceco.2014.06.001",
+"title": "Have capital market anomalies attenuated in the recent era of high liquidity and trading activity?",
+"authors": [
+[
+"Tarun",
+"Chordia"
+],
+[
+"Avanidhar",
+"Subrahmanyam"
+],
+[
+"Qing",
+"Tong"
+]
+],
+"journal": "Journal of Accounting and Economics",
+"volume": "58",
+"page": "41-58",
+"year": 2014
+},
+"martineau22": {
+"doi": "10.1561/104.00000122",
+"title": "Rest in Peace Post-Earnings Announcement Drift",
+"authors": [
+[
+"Charles",
+"Martineau"
+]
+],
+"journal": "Critical Finance Review",
+"volume": "11",
+"page": "613-646",
+"year": 2022
+},
+"mclean16": {
+"doi": "10.1111/jofi.12365",
+"title": "Does Academic Research Destroy Stock Return Predictability?",
+"authors": [
+[
+"R. David",
+"McLean"
+],
+[
+"Jeffrey",
+"Pontiff"
+]
+],
+"journal": "Journal of Finance",
+"volume": "71",
+"page": "5-32",
+"year": 2016
+},
+"hou20": {
+"doi": "10.1093/rfs/hhy131",
+"title": "Replicating Anomalies",
+"authors": [
+[
+"Kewei",
+"Hou"
+],
+[
+"Chen",
+"Xue"
+],
+[
+"Lu",
+"Zhang"
+]
+],
+"journal": "Review of Financial Studies",
+"volume": "33",
+"page": "2019-2133",
+"year": 2020
+},
+"harvey16": {
+"doi": "10.1093/rfs/hhv059",
+"title": "... and the cross-section of expected returns",
+"authors": [
+[
+"Campbell R.",
+"Harvey"
+],
+[
+"Yan",
+"Liu"
+],
+[
+"Heqing",
+"Zhu"
+]
+],
+"journal": "Review of Financial Studies",
+"volume": "29",
+"page": "5-68",
+"year": 2016
+},
+"shumway97": {
+"doi": "10.1111/j.1540-6261.1997.tb03818.x",
+"title": "The Delisting Bias in CRSP Data",
+"authors": [
+[
+"Tyler",
+"Shumway"
+]
+],
+"journal": "Journal of Finance",
+"volume": "52",
+"page": "327-340",
+"year": 1997
+},
+"carhart97": {
+"doi": "10.1111/j.1540-6261.1997.tb03808.x",
+"title": "On Persistence in Mutual Fund Performance",
+"authors": [
+[
+"Mark M.",
+"Carhart"
+]
+],
+"journal": "Journal of Finance",
+"volume": "52",
+"page": "57-82",
+"year": 1997
+},
+"fama_macbeth": {
+"doi": "10.1086/260061",
+"title": "Risk, Return, and Equilibrium: Empirical Tests",
+"authors": [
+[
+"Eugene F.",
+"Fama"
+],
+[
+"James D.",
+"MacBeth"
+]
+],
+"journal": "Journal of Political Economy",
+"volume": "81",
+"page": "607-636",
+"year": 1973
+},
+"newey_west": {
+"doi": "10.2307/1913610",
+"title": "A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix",
+"authors": [
+[
+"Whitney K.",
+"Newey"
+],
+[
+"Kenneth D.",
+"West"
+]
+],
+"journal": "Econometrica",
+"volume": "55",
+"page": "703-708",
+"year": 1987
+},
+"petersen09": {
+"doi": "10.1093/rfs/hhn053",
+"title": "Estimating Standard Errors in Finance Panel Data Sets: Comparing Approaches",
+"authors": [
+[
+"Mitchell A.",
+"Petersen"
+]
+],
+"journal": "Review of Financial Studies",
+"volume": "22",
+"page": "435-480",
+"year": 2009
+},
+"cameron11": {
+"doi": "10.1198/jbes.2010.07136",
+"title": "Robust Inference With Multiway Clustering",
+"authors": [
+[
+"A. Colin",
+"Cameron"
+],
+[
+"Jonah B.",
+"Gelbach"
+],
+[
+"Douglas L.",
+"Miller"
+]
+],
+"journal": "Journal of Business and Economic Statistics",
+"volume": "29",
+"page": "238-249",
+"year": 2011
+},
+"bh95": {
+"doi": "10.1111/j.2517-6161.1995.tb02031.x",
+"title": "Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing",
+"authors": [
+[
+"Yoav",
+"Benjamini"
+],
+[
+"Yosef",
+"Hochberg"
+]
+],
+"journal": "Journal of the Royal Statistical Society Series B (Statistical Methodology)",
+"volume": "57",
+"page": "289-300",
+"year": 1995
+},
+"hansen11": {
+"doi": "10.3982/ECTA5771",
+"title": "The Model Confidence Set",
+"authors": [
+[
+"Peter R.",
+"Hansen"
+],
+[
+"Asger",
+"Lunde"
+],
+[
+"James M.",
+"Nason"
+]
+],
+"journal": "Econometrica",
+"volume": "79",
+"page": "453-497",
+"year": 2011
+},
+"bailey14": {
+"doi": "10.3905/jpm.2014.40.5.094",
+"title": "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality",
+"authors": [
+[
+"David H.",
+"Bailey"
+],
+[
+"Marcos",
+"López de Prado"
+]
+],
+"journal": "Journal of Portfolio Management",
+"volume": "40",
+"page": "94-107",
+"year": 2014
+},
+"bailey17": {
+"doi": "10.21314/JCF.2016.322",
+"title": "The probability of backtest overfitting",
+"authors": [
+[
+"David H.",
+"Bailey"
+],
+[
+"Jonathan M.",
+"Borwein"
+],
+[
+"Marcos",
+"López de Prado"
+],
+[
+"Qiji Jim",
+"Zhu"
+]
+],
+"journal": "Journal of Computational Finance",
+"volume": "20",
+"page": "39-69",
+"year": 2017
+},
+"zou05": {
+"doi": "10.1111/j.1467-9868.2005.00503.x",
+"title": "Regularization and Variable Selection Via the Elastic Net",
+"authors": [
+[
+"Hui",
+"Zou"
+],
+[
+"Trevor",
+"Hastie"
+]
+],
+"journal": "Journal of the Royal Statistical Society Series B (Statistical Methodology)",
+"volume": "67",
+"page": "301-320",
+"year": 2005
+},
+"he26": {
+"doi": "10.1016/j.jfineco.2026.104374",
+"title": "Chronologically consistent large language models",
+"authors": [
+[
+"Songrun",
+"He"
+],
+[
+"Linying",
+"Lv"
+],
+[
+"Asaf",
+"Manela"
+],
+[
+"Jimmy",
+"Wu"
+]
+],
+"journal": "Journal of Financial Economics",
+"volume": "185",
+"page": "104374",
+"year": 2026
+},
+"fink24": {
+"doi": "10.1017/S0022109023000881",
+"title": "Earnings Autocorrelation and the Post-Earnings-Announcement Drift: Experimental Evidence",
+"authors": [
+[
+"Josef",
+"Fink"
+],
+[
+"Stefan",
+"Palan"
+],
+[
+"Erik",
+"Theissen"
+]
+],
+"journal": "Journal of Financial and Quantitative Analysis",
+"volume": "59",
+"page": "2799-2837",
+"year": 2024
+},
+"karolyi25": {
+"doi": "10.1287/mnsc.2023.01722",
+"title": "Number Processing Constraints and Earnings News",
+"authors": [
+[
+"Stephen",
+"Karolyi"
+],
+[
+"Thomas",
+"Ruchti"
+],
+[
+"Phong",
+"Truong"
+]
+],
+"journal": "Management Science",
+"volume": "71",
+"page": "2413-2442",
+"year": 2025
+},
+"zhang24": {
+"doi": "10.1016/j.irfa.2024.103316",
+"title": "Asymmetric post earnings announcement drift and order flow imbalance: The impact on stock market returns",
+"authors": [
+[
+"Sijia",
+"Zhang"
+],
+[
+"Andros",
+"Gregoriou"
+],
+[
+"He",
+"Wu"
+]
+],
+"journal": "International Review of Financial Analysis",
+"volume": "94",
+"page": "103316",
+"year": 2024
+},
+"lan24": {
+"doi": "10.1016/j.irfa.2024.103460",
+"title": "Post earnings announcement drift: A simple earnings surprise measure, the medium effect of investor attention and investing strategy",
+"authors": [
+[
+"Qiujun",
+"Lan"
+],
+[
+"Yuxuan",
+"Xie"
+],
+[
+"Xianhua",
+"Mi"
+],
+[
+"Chunyu",
+"Zhang"
+]
+],
+"journal": "International Review of Financial Analysis",
+"volume": "95",
+"page": "103460",
+"year": 2024
+},
+"magner25": {
+"doi": "10.1016/j.frl.2025.107472",
+"title": "Decoding risk sentiment in 10-K filings: Predictability for U.S. stock indices",
+"authors": [
+[
+"Nicolás",
+"Magner"
+],
+[
+"Pablo A.",
+"Henríquez"
+],
+[
+"Aliro",
+"Sanhueza"
+]
+],
+"journal": "Finance Research Letters",
+"volume": "81",
+"page": "107472",
+"year": 2025
+},
+"fengler25": {
+"doi": "10.1016/j.irfa.2025.104121",
+"title": "Unveiling themes in 10-K disclosures: A new topic modeling perspective",
+"authors": [
+[
+"Matthias R.",
+"Fengler"
+],
+[
+"Tri Minh",
+"Phan"
+]
+],
+"journal": "International Review of Financial Analysis",
+"volume": "103",
+"page": "104121",
+"year": 2025
+},
+"glasserman23": {
+"doi": "10.2139/ssrn.4586726",
+"title": "Assessing Look-Ahead Bias in Stock Return Predictions Generated By GPT Sentiment Analysis",
+"authors": [
+[
+"Paul",
+"Glasserman"
+],
+[
+"Caden",
+"Lin"
+]
+],
+"journal": "",
+"volume": null,
+"page": null,
+"year": 2023,
+"note": "Working paper, SSRN"
+},
+"kim_llm": {
+"doi": "10.2139/ssrn.4835311",
+"title": "Financial Statement Analysis with Large Language Models",
+"authors": [
+[
+"Alex",
+"Kim"
+],
+[
+"Maximilian",
+"Muhn"
+],
+[
+"Valeri",
+"Nikolaev"
+]
+],
+"journal": "",
+"volume": null,
+"page": null,
+"year": 2024,
+"note": "Working paper, SSRN"
+},
+"hirshleifer09": {
+"doi": "10.1111/j.1540-6261.2009.01501.x",
+"title": "Driven to Distraction: Extraneous Events and Underreaction to Earnings News",
+"authors": [
+[
+"David",
+"Hirshleifer"
+],
+[
+"Sonya Seongyeon",
+"Lim"
+],
+[
+"Siew Hong",
+"Teoh"
+]
+],
+"journal": "Journal of Finance",
+"volume": "64",
+"page": "2289-2325",
+"year": 2009
+},
+"livnat06": {
+"doi": "10.1111/j.1475-679X.2006.00196.x",
+"title": "Comparing the Post-Earnings Announcement Drift for Surprises Calculated from Analyst and Time Series Forecasts",
+"authors": [
+[
+"Joshua",
+"Livnat"
+],
+[
+"Richard R.",
+"Mendenhall"
+]
+],
+"journal": "Journal of Accounting Research",
+"volume": "44",
+"page": "177-205",
+"year": 2006
+},
+"cormack09": {
+"doi": "10.1145/1571941.1572114",
+"title": "Reciprocal rank fusion outperforms condorcet and individual rank learning methods",
+"authors": [
+[
+"Gordon V.",
+"Cormack"
+],
+[
+"Charles L. A.",
+"Clarke"
+],
+[
+"Stefan",
+"Büttcher"
+]
+],
+"journal": "Proceedings of the 32nd International ACM SIGIR Conference on Research and Development in Information Retrieval",
+"volume": null,
+"page": "758-759",
+"year": 2009
+},
+"xiao24": {
+"doi": "10.1145/3626772.3657878",
+"title": "C-Pack: Packed Resources For General Chinese Embeddings",
+"authors": [
+[
+"Shitao",
+"Xiao"
+],
+[
+"Zheng",
+"Liu"
+],
+[
+"Peitian",
+"Zhang"
+],
+[
+"Niklas",
+"Muennighoff"
+],
+[
+"Defu",
+"Lian"
+],
+[
+"Jian-Yun",
+"Nie"
+]
+],
+"journal": "Proceedings of the 47th International ACM SIGIR Conference on Research and Development in Information Retrieval",
+"volume": null,
+"page": "641-649",
+"year": 2024
+},
+"optuna": {
+"doi": "10.1145/3292500.3330701",
+"title": "Optuna: A next-generation hyperparameter optimization framework",
+"authors": [
+[
+"Takuya",
+"Akiba"
+],
+[
+"Shotaro",
+"Sano"
+],
+[
+"Toshihiko",
+"Yanase"
+],
+[
+"Takeru",
+"Ohta"
+],
+[
+"Masanori",
+"Koyama"
+]
+],
+"journal": "Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining",
+"volume": null,
+"page": "2623-2631",
+"year": 2019
+},
+"dyer17": {
+"doi": "10.1016/j.jacceco.2017.07.002",
+"title": "The evolution of 10-K textual disclosure: Evidence from Latent Dirichlet Allocation",
+"authors": [
+[
+"Travis",
+"Dyer"
+],
+[
+"Mark",
+"Lang"
+],
+[
+"Lorien",
+"Stice-Lawrence"
+]
+],
+"journal": "Journal of Accounting and Economics",
+"volume": "64",
+"page": "221-245",
+"year": 2017
+},
+"frankel21": {
+"doi": "10.1287/mnsc.2021.4156",
+"title": "Disclosure Sentiment: Machine Learning vs. Dictionary Methods",
+"authors": [
+[
+"Richard",
+"Frankel"
+],
+[
+"Jared",
+"Jennings"
+],
+[
+"Joshua",
+"Lee"
+]
+],
+"journal": "Management Science",
+"volume": "68",
+"page": "5514-5532",
+"year": 2022
+},
+"bochkay23": {
+"doi": "10.1111/1911-3846.12825",
+"title": "Textual analysis in accounting: What's next?",
+"authors": [
+[
+"Khrystyna",
+"Bochkay"
+],
+[
+"Stephen V.",
+"Brown"
+],
+[
+"Andrew J.",
+"Leone"
+],
+[
+"Jennifer Wu",
+"Tucker"
+]
+],
+"journal": "Contemporary Accounting Research",
+"volume": "40",
+"page": "765-805",
+"year": 2023
+},
+"fama98": {
+"doi": "10.1016/S0304-405X(98)00026-9",
+"title": "Market efficiency, long-term returns, and behavioral finance",
+"authors": [
+[
+"Eugene F.",
+"Fama"
+]
+],
+"journal": "Journal of Financial Economics",
+"volume": "49",
+"page": "283-306",
+"year": 1998
+},
+"kothari97": {
+"doi": "10.1016/S0304-405X(96)00899-9",
+"title": "Measuring long-horizon security price performance",
+"authors": [
+[
+"S. P.",
+"Kothari"
+],
+[
+"Jerold B.",
+"Warner"
+]
+],
+"journal": "Journal of Financial Economics",
+"volume": "43",
+"page": "301-339",
+"year": 1997
+},
+"brown92": {
+"doi": "10.1093/rfs/5.4.553",
+"title": "Survivorship Bias in Performance Studies",
+"authors": [
+[
+"Stephen J.",
+"Brown"
+],
+[
+"William N.",
+"Goetzmann"
+],
+[
+"Roger G.",
+"Ibbotson"
+],
+[
+"Stephen A.",
+"Ross"
+]
+],
+"journal": "Review of Financial Studies",
+"volume": "5",
+"page": "553-580",
+"year": 1992
+},
+"nosek18": {
+"doi": "10.1073/pnas.1708274114",
+"title": "The preregistration revolution",
+"authors": [
+[
+"Brian A.",
+"Nosek"
+],
+[
+"Charles R.",
+"Ebersole"
+],
+[
+"Alexander C.",
+"DeHaven"
+],
+[
+"David T.",
+"Mellor"
+]
+],
+"journal": "Proceedings of the National Academy of Sciences",
+"volume": "115",
+"page": "2600-2606",
+"year": 2018
+},
+"ke17": {
+"authors": [
+[
+"Guolin",
+"Ke"
+],
+[
+"Qi",
+"Meng"
+],
+[
+"Thomas",
+"Finley"
+],
+[
+"Taifeng",
+"Wang"
+],
+[
+"Wei",
+"Chen"
+],
+[
+"Weidong",
+"Ma"
+],
+[
+"Qiwei",
+"Ye"
+],
+[
+"Tie-Yan",
+"Liu"
+]
+],
+"year": 2017,
+"title": "LightGBM: A highly efficient gradient boosting decision tree",
+"journal": "Advances in Neural Information Processing Systems",
+"volume": "30",
+"page": null
+},
+"catboost": {
+"authors": [
+[
+"Liudmila",
+"Prokhorenkova"
+],
+[
+"Gleb",
+"Gusev"
+],
+[
+"Aleksandr",
+"Vorobev"
+],
+[
+"Anna Veronika",
+"Dorogush"
+],
+[
+"Andrey",
+"Gulin"
+]
+],
+"year": 2018,
+"title": "CatBoost: Unbiased boosting with categorical features",
+"journal": "Advances in Neural Information Processing Systems",
+"volume": "31",
+"page": null
+},
+"lewis20": {
+"authors": [
+[
+"Patrick",
+"Lewis"
+],
+[
+"Ethan",
+"Perez"
+],
+[
+"Aleksandra",
+"Piktus"
+],
+[
+"Fabio",
+"Petroni"
+],
+[
+"Vladimir",
+"Karpukhin"
+],
+[
+"Naman",
+"Goyal"
+],
+[
+"Heinrich",
+"Küttler"
+],
+[
+"Mike",
+"Lewis"
+],
+[
+"Wen-tau",
+"Yih"
+],
+[
+"Tim",
+"Rocktäschel"
+],
+[
+"Sebastian",
+"Riedel"
+],
+[
+"Douwe",
+"Kiela"
+]
+],
+"year": 2020,
+"title": "Retrieval-augmented generation for knowledge-intensive NLP tasks",
+"journal": "Advances in Neural Information Processing Systems",
+"volume": "33",
+"page": null
+},
+"sarkar24": {
+"authors": [
+[
+"Suproteem",
+"Sarkar"
+],
+[
+"Keyon",
+"Vafa"
+]
+],
+"year": 2024,
+"title": "Lookahead bias in pretrained language models",
+"journal": "",
+"volume": null,
+"page": null,
+"note": "Working paper"
+},
+"lopezdeprado": {
+"authors": [
+[
+"Marcos",
+"López de Prado"
+]
+],
+"year": 2018,
+"title": "<i>Advances in Financial Machine Learning</i>",
+"journal": "",
+"volume": null,
+"page": null,
+"note": "Wiley, Hoboken, NJ"
+},
+"lopezlira": {
+"doi": null,
+"authors": [
+[
+"Alejandro",
+"Lopez-Lira"
+],
+[
+"Yuehua",
+"Tang"
+]
+],
+"year": 2026,
+"title": "Can ChatGPT forecast stock price movements? Return predictability and large language models",
+"journal": "Journal of Financial Economics",
+"volume": "184",
+"page": "104335"
+},
+"lerman10": {
+"doi": "10.1007/s11142-009-9115-1",
+"authors": [
+[
+"Alon",
+"Lerman"
+],
+[
+"Joshua",
+"Livnat"
+]
+],
+"year": 2010,
+"title": "The new Form 8-K disclosures",
+"journal": "Review of Accounting Studies",
+"volume": "15",
+"page": "752-778"
+},
+"you_zhang09": {
+"doi": "10.1007/s11142-008-9083-x",
+"authors": [
+[
+"Haifeng",
+"You"
+],
+[
+"Xiao-jun",
+"Zhang"
+]
+],
+"year": 2009,
+"title": "Financial reporting complexity and investor underreaction to 10-K information",
+"journal": "Review of Accounting Studies",
+"volume": "14",
+"page": "559-586"
+},
+"dellavigna09": {
+"doi": "10.1111/j.1540-6261.2009.01433.x",
+"authors": [
+[
+"Stefano",
+"DellaVigna"
+],
+[
+"Joshua M.",
+"Pollet"
+]
+],
+"year": 2009,
+"title": "Investor inattention and Friday earnings announcements",
+"journal": "Journal of Finance",
+"volume": "64",
+"page": "709-749"
+}
+}

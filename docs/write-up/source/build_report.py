@@ -139,10 +139,10 @@ a(para(
     "Public companies in the US have to file reports with the SEC: yearly ones (10-K), quarterly ones (10-Q), and short \"something just happened\" ones (8-K) for anything that just happened, like earnings, a merger or a CEO walking out. "
     "I wanted to know whether you could read one the moment it lands and say anything useful about how the stock will react. "
     "Underneath that sat a second question. Once you already know the numbers, do the <i>words</i> in a filing add anything?",
-    f"The reaction is partly predictable, but only its <i>size</i>. On the final test period the best model without text scored a macro-F1 of {L6L.macro_f1:.3f} (the one with text scored {L7L.macro_f1:.3f}), against about 0.33 for pure luck. "
+    f"The reaction is partly predictable, but only its <i>size</i>. On the final test period the best model without language models scored a macro-F1 of {L6L.macro_f1:.3f} (the one with them scored {L7L.macro_f1:.3f}), against about 0.33 for pure luck. "
     f"It can tell which filings will move a stock (AUC {L6L.move_auc:.2f}) and is a coin flip on <i>which way</i> (AUC {L6L.direction_auc:.2f}). "
-    f"The text didn't help. Adding language models changed the score by {TL.lift:+.3f}, with an interval centred on zero. "
-    "One result surprised me: after very good earnings, stocks did slightly <i>worse</i> over the following months. I checked hard for a mistake. Below I explain why I think the pattern is real in this sample, and why I still wouldn't lean on it.",
+    f"The text didn't help. Adding language models changed the score by {TL.lift:+.3f}, with an interval centred on zero, and a later check with no text at all did about as well. "
+    "One result looked surprising and turned out to be my own mistake: an apparent fall in stocks after very good earnings came from how I measured abnormal returns, and it goes away when that is fixed.",
     "Most of this report is about how I got there, because that's where most of the work went. Several bugs along the way would have flattered the results. I've left them in."))
 
 # --------------------------------------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ a(para(
     f"On tuning: I expected it to matter more than it did. Across 32 combinations of rung and model, the median change in the validation score from tuning was {gain.median():+.3f}, and only {(gain > 0).mean():.0%} improved at all. The few big improvements were the elastic net, whose default settings were bad. "
     "The search budgets were also tiny (6 to 15 trials), smaller than the ten random starts Optuna uses by default, so several rungs ended up with identical settings. I would not call any of these models \"fully tuned\"."))
 a(fig("tuning", "Almost nothing changed when I tuned. A few elastic-net models improved a lot, which is the right-hand bump.", "62%"))
-a(para("The experiment is built as a ladder, so I can see exactly what each kind of information adds. Each rung gets the one before plus something new, always on identical events."))
+a(para("The experiment is built as a ladder, always on identical events. L1 to L5 each use one kind of information on its own, despite the plus signs in the diagram. L6 combines everything except the language models, including word counts and TF-IDF, and L7 adds the language models."))
 a(fig("A03", "The ablation ladder. Green rungs only use information that was clearly available at the time, red ones use a model whose training cutoff is unknown."))
 a(fig("ladder", "Validation results for every rung and model. Metadata (L2) is the strongest single group. Accounting alone (L3) is the weakest, and putting everything together (L6) is best."))
 a(para("Two results surprised me. Text vectors on their own (L5) come close to the word features, a little below them, so the language models do contain some real signal. And the elastic net got much <i>worse</i> when I added the text vectors to everything else (0.39 down to 0.35 on the pooled score). With hindsight that is not shocking: a regularised linear model drowning in hundreds of correlated extra columns is going to struggle. More features is not more information."))
@@ -283,7 +283,7 @@ a(fig("rag", "How often Qwen said each field was present in 141 filings that ret
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>11. Results</h2>")
 a(para(
-    "\"All the numbers\" is the best model with no text, and \"numbers + text\" adds the embeddings. The development and locked periods are the ones where the model never saw the data it was scored on."))
+    "\"All the numbers\" is the best model without language models (it does include word counts and TF-IDF), and \"numbers + text\" adds the embeddings. The development and locked periods are the ones where the model never saw the data it was scored on."))
 a(metrics_table())
 a(para(
     f"A few things to take from it. The scores are modest but real, and they hold up: validation, development and the final test all land around 0.38 to 0.40. "
@@ -292,31 +292,24 @@ a(para(
 a(fig("move_direction", "The most important chart in the project. The model is good at telling which events will produce a big move, and no better than a coin at telling which direction. An AUC of 0.5 means no information."))
 a(para(
     "That split says a lot about what the model is doing. Metadata like event type, time of day, and the stock's recent volatility predict how much the stock will react. An earnings release after the close for a volatile stock is going to move, whatever the content. "
-    "Whether the move is up or down depends on whether the news is better or worse than expected, and my numbers contain almost nothing about that. The accounting-based surprise is the nearest thing, and as the earnings section shows, it behaves strangely. "
+    "Whether the move is up or down depends on whether the news is better or worse than expected, and my numbers contain almost nothing about that. The accounting-based surprise is the nearest thing, and as the earnings section shows, it predicts little. "
     f"On the earlier validation folds the direction AUC was a little higher ({WF6.direction_auc:.2f}), barely above a coin, so \"a coin flip\" is a fair summary of the locked test and close to true before it."))
 a(fig("confusion", "The all-numbers model on the locked test. It finds the Sideways events best (53%) and does little better than chance on telling Down from Up.", "52%"))
 a(para(
     f"The text did not help. The comparison I care about is the same model with and without the language-model embeddings, scored on identical events. On the locked test, adding text changed macro-F1 by {TL.lift:+.3f} (95% interval {TL.ci_low:+.3f} to {TL.ci_high:+.3f}). "
     "On the earlier folds and the development period it was equally flat. The yearly ChronoBERT versions did not behave differently from the single BGE model either, and a stacked ensemble did not beat the best single model. "
-    "The numbers beat price alone by about 0.03 in the validation and locked periods, so the structured features are doing real work, and the text adds nothing on top."))
+    "The numbers beat price alone by about 0.03 in the validation and locked periods, so the structured features are doing real work, and the language models add nothing on top. Because that baseline already contains word counts and TF-IDF, I later fitted a model with no text at all, using the same settings. With LightGBM on both sides, adding all the text changed macro-F1 by +0.003 [-0.004, +0.009], +0.002 [-0.008, +0.012] and -0.005 [-0.014, +0.005] across the three periods. With an elastic net, word features showed a small gain of about 0.01 in the two later periods, so text may help a little in some models, but I would not rely on it. That check came after the final test, so treat it as exploratory."))
 a(fig("lifts", "Every comparison I pre-registered, with its interval. Where the bar crosses the vertical line, I can't tell the difference from zero."))
 
 # --------------------------------------------------------------------------------------------------------------
-a("<h2>12. The earnings drift puzzle</h2>")
+a("<h2>12. The earnings drift test, and a mistake of mine</h2>")
 a(para(
-    "The classic finding in this area is that stocks keep drifting in the direction of an earnings surprise for weeks afterwards. Good news, then more gains. So I sorted earnings reports into five groups by the size of the surprise and tracked the average abnormal return for the next 2 to 60 trading days.",
-    "It went the other way. In the three days around the announcement it behaves the way you would hope: the best-news group rose 0.81% and the worst-news group fell 0.54%. Then, over the following months, the best-news group <i>lost</i> 1.85% and the worst-news group <i>gained</i> 1.40%."))
-a(fig("sue", "Left: the immediate reaction goes in the direction of the news. Right: the later drift goes the other way, and it gets steadily more negative as the news gets better."))
+    "The classic finding in this area is that stocks keep drifting in the direction of an earnings surprise for weeks afterwards. So I sorted earnings reports into five groups by the size of the surprise and tracked abnormal returns for the next 2 to 60 trading days. In the three days around the announcement the news moves prices the right way: the best-news group rose 0.81% and the worst-news group fell 0.54%.",
+    "My pre-planned test then gave a striking answer: over the next two months the best-news group did worse than the worst-news group, by -2.66% after adjusting for market, size, value and momentum. It held in every period and every sample split I tried, and earlier versions of this report presented it as a puzzle.",
+    "It was a measurement error. The abnormal return I used subtracts each stock's average outperformance over the previous year (its alpha) for each of the 59 days. Stocks with good news have usually had a good year, with an average past return of 27% in the best-news group and 5% in the worst. So the subtraction took 2.40% from the best-news group and added 0.38% to the worst, and that gap is the whole result. Every robustness check used the same subtraction, which is why they all agreed."))
+a(fig("sue2", "Left: how much the old measure subtracted from each group. Right: the return over days 2 to 60 with and without that term, on the same reports."))
 a(para(
-    "The first thing to rule out was a sign error, so I tested for one. The announcement-day move has the right sign, so the surprise is not flipped. The reversal is there in 2000 to 2009 (−4.4% between best and worst news), 2010 to 2019 (−2.0%) and 2020 to 2026 (−4.3%), and it survives when I keep only events with no other filing nearby (−2.1%). "
-    "It rises smoothly from group to group, which is not what noise looks like. The formal test, which uses a stricter surprise measure built from the press-release figures (3,825 reports), gives −2.6% with an interval from −3.5% to −1.7%. The chart above uses a broader sample of 9,359 reports, which is why its gap is larger, about −3.3%.",
-    "Good news should push a stock up, not down, and on the day it did. Over the next two months the best-news reports break down like this:"))
-a(fig("twobytwo", "The 1,908 best-news earnings reports, split by what the stock did on the day and what it did over the next two months. 55% fell afterwards, and 31% rose first and then gave back about 10%.", "72%"))
-a(para(
-    "So it is a tilt in the averages, not a rule: 45% of those stocks went on to rise. Why would it tilt this way? I have four candidate reasons and I did not test any of them. "
-    "First, my surprise compares earnings with the same quarter last year, not with what analysts expected, so a result can beat last year and still disappoint. Second, prices can overreact to a headline and settle back, and the worst-news group shows the mirror image. Third, these are large, closely followed companies where good news is priced in within hours. "
-    "Fourth, survivorship. Companies that got bad news and kept falling were often delisted, and they aren't in my data. That alone makes the worst-news group look better afterwards and could manufacture part of this pattern.",
-    "I did not find classic post-earnings drift in this survivor-only sample, and the data point the other way. That says something about this sample, not about whether the theory is right. To settle it I'd add delisted firms and use analyst forecasts for the surprise."))
+    "Without the alpha term the gap is +0.12%, with an interval from -0.80% to +0.88%. A calendar-time portfolio, which estimates nothing from before the event, gives +0.25% (t = 0.46). So there is no reversal, and no detectable drift in either direction. That fits other work finding the effect has faded in large stocks, though this sample is biased against finding it: my surprise is a crude one, and firms that kept falling after bad news are missing. The research paper in this repository sets out the full diagnosis."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>13. Could you trade it?</h2>")
@@ -337,17 +330,17 @@ a(para(
     "A regular expression for table rows had a bad backtracking case, and three worker processes sat at full CPU for half an hour on one filing. Every parsing pattern now gets an adversarial timing test.",
     "A burst of HTTP 503 responses from the SEC quietly dropped 63 filings. A retry pass now recovers them on the next run, and all 63 came back.",
     "In the drift-robustness check, a p-value of exactly zero was being read as missing, which marked a real effect as non-robust. I fixed it and added a test.",
-    "A long end-to-end test hung for two hours because Windows had put the laptop into standby, and the timeout fired when it woke up. The test was fine. The setup wasn't.",
+    "The worst of them is in section 12: a drift measure that subtracted past alpha and produced a convincing false reversal. A long end-to-end test also hung for two hours because Windows had put the laptop into standby, and the timeout fired when it woke up. The test was fine. The setup wasn't.",
     "Google Drive on Windows would not sync thousands of small files, so I uploaded zips through the browser. The dashboard also took two attempts to get online: the first deployment stalled, so I added a requirements file listing only the six packages it needs instead of the whole project's."))
 a(fig("compute", "Wall-clock time per stage. The long bars are the tuning of the tree models (S11, two hours, on my laptop), the embeddings (S14) and the extraction run (S16).", "88%"))
-a(para("The pipeline has 114 automated tests (plus one skipped), and most of the code bugs above have a test that fails on the old version."))
+a(para("The pipeline has 114 automated tests (plus one skipped), and most of the code bugs above have a test that fails on the old version. The alpha problem is a method choice, not a code bug, so the stored pipeline output keeps the old measure and the paper's scripts compute the corrected ones."))
 
 # --------------------------------------------------------------------------------------------------------------
 a("<h2>15. What the results do and don't show</h2>")
 a(para(
     "What I'm comfortable claiming: on 150 surviving S&amp;P 500 stocks, with careful point-in-time controls, adding language-model embeddings of filing text to price, metadata and accounting features gave no out-of-sample gain. The models beat chance mostly by predicting <i>whether</i> a stock moves, not which way. "
-    "The post-earnings drift reverses in this sample, with a survivorship caveat I can't remove.",
-    "I'm not claiming that text never helps. I only tested two encoders with small tuning budgets, on 150 big companies, with daily prices. I'm not claiming the reversal is a real market effect, or that anyone could trade on it, and the backtest says otherwise. And I'm not claiming the language-model extraction works, because I haven't scored it.",
+    "I found no detectable post-earnings drift in this survivor-only sample. An apparent reversal came from my abnormal-return measure.",
+    "I'm not claiming that text never helps. I only tested two encoders with small tuning budgets, on 150 big companies, with daily prices. I'm not claiming the drift is gone, because this sample is biased against finding it. I'm not claiming anyone could trade on these models either, and the backtest says otherwise. And I'm not claiming the language-model extraction works, because I haven't scored it.",
     f"The known limits: the universe is survivors only, with daily bars only. The choice between the two top models was a statistical tie, though the rule froze the one with text: scored in the same run the model without text was slightly ahead, and LightGBM's predictions changed for about {1 - lg.same_class_share:.0%} of events when I re-scored the same model on a different machine. "
     "The firm-held-out and sector-held-out stress tests are built but I never ran their scores. The GPU model used on Colab was not recorded in the manifest. And everything about Track C is waiting for human labels."))
 
@@ -380,13 +373,13 @@ REFS = [
      "The ChronoBERT paper. The models are trained only on text that existed at each date, and the authors find look-ahead bias in news-based return forecasts to be modest. It is the reason I used a different yearly vintage for each event year (section 8)."),
     ("Fink, J., Palan, S., &amp; Theissen, E. (2024). Earnings autocorrelation and the post-earnings-announcement drift: Experimental evidence. <i>Journal of Financial and Quantitative Analysis</i>, 59(6), 2799-2837.",
      "https://doi.org/10.1017/S0022109023000881",
-     "A lab experiment showing the drift appears whether or not earnings surprises are correlated, and is stronger when they are. Useful background for the drift puzzle in section 12."),
+     "A lab experiment showing the drift appears whether or not earnings surprises are correlated, and is stronger when they are. Useful background for the drift test in section 12."),
     ("Karolyi, S., Ruchti, T., &amp; Truong, P. (2025). Number processing constraints and earnings news. <i>Management Science</i>, 71(3), 2413-2442.",
      "https://doi.org/10.1287/mnsc.2023.01722",
      "Finds investors react less in the short run to earnings news for stocks with a high earnings-per-share level, which strengthens the later drift. A reminder that the drift depends on how the surprise is measured and who the firms are."),
     ("Zhang, S., Gregoriou, A., &amp; Wu, H. (2024). Asymmetric post earnings announcement drift and order flow imbalance: The impact on stock market returns. <i>International Review of Financial Analysis</i>, 94, 103316.",
      "https://doi.org/10.1016/j.irfa.2024.103316",
-     "An event study of earnings announcements in which the drift differs between good-news and bad-news cases and is linked to order flow. Close in spirit to my good-news-then-falls count in section 12."),
+     "An event study of earnings announcements in which the drift differs between good-news and bad-news cases and is linked to order flow. Related to the quintile comparison in section 12."),
     ("Lan, Q., Xie, Y., Mi, X., &amp; Zhang, C. (2024). Post earnings announcement drift: A simple earnings surprise measure, the medium effect of investor attention and investing strategy. <i>International Review of Financial Analysis</i>, 95(PB), 103460.",
      "https://doi.org/10.1016/j.irfa.2024.103460",
      "Builds a surprise measure from the overnight return around the announcement, tested on Chinese stocks. Similar in idea to the price-based announcement-return feature in my model, though the market is different."),

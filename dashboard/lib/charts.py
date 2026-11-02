@@ -544,17 +544,16 @@ def car_paths(groups: list[str], event_set: str = "all"):
 
 
 def sue_quintiles():
-    d = D.csv("sue_quintiles.csv")
+    d = D.csv("drift_quintiles_alpha.csv")
     if d is None:
         return None
-    c = ["#EF4444", "#F97316", "#94A3B8", "#22C55E", "#15803D"]
-    fig = go.Figure(go.Bar(x=[f"Q{int(q)}" + (" (most negative surprise)" if q == 1 else " (most positive)" if q == 5 else "") for q in d.q],
-                           y=d["mean"] * 100, marker_color=c[:len(d)],
-                           error_y=dict(type="data", array=1.96 * d["sem"] * 100), text=[f"{v * 100:+.2f}%" for v in d["mean"]],
-                           textposition="outside"))
+    labs = [f"Q{int(q)}" + (" (most negative surprise)" if q == 1 else " (most positive)" if q == 5 else "") for q in d.q]
+    fig = go.Figure()
+    fig.add_bar(x=labs, y=d.c4_alpha * 100, name="pre-event alpha subtracted", marker_color="#94A3B8", text=[f"{v * 100:+.2f}%" for v in d.c4_alpha], textposition="outside")
+    fig.add_bar(x=labs, y=d.c4_noalpha * 100, name="no alpha subtracted", marker_color="#2563EB", text=[f"{v * 100:+.2f}%" for v in d.c4_noalpha], textposition="outside")
     fig.add_hline(y=0, line=dict(color="#0F172A"))
-    fig.update_layout(yaxis_title="mean CAR days +2 to +60, %")
-    return _h(fig, 360, "Post-earnings drift by earnings-surprise quintile: a reversal, not classic drift")
+    fig.update_layout(yaxis_title="mean Carhart return, days +2 to +60, %", barmode="group")
+    return _h(fig, 360, "Post-earnings drift by surprise quintile: the apparent reversal comes from the alpha term")
 
 
 def backtest_cum(block: str, lag: int, cost: int, legs: list[str]):

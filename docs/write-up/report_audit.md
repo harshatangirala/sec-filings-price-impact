@@ -35,3 +35,11 @@ not drift from them. The hand-written sentences are where errors can hide, and t
 - LightGBM re-scores differ for about 20% of class labels across machines (`reproducibility.csv`); already stated in the report.
 - The live Streamlit app showed a blank page after wake-up when tested; the cause is not known (logs are only visible to the app owner).
 - The first-person narrative of what happened, in what order and how it felt, was drafted from the project record. Anything you remember differently should be changed.
+
+## Correction, 2 November 2026
+- The report, dashboard and deck explained -3.3% versus -2.6% as a broader sample versus a stricter test. That was wrong. Both numbers compare the same 3,825 Q1 and Q5 reports; -3.25% is market-model adjusted and -2.63% is Carhart adjusted. All three now say so.
+- Open item closed: the identical locked direction AUC of L6 and L7 is a coincidence (0.4939021 versus 0.4939016; the two signals correlate 0.56 and predict the same class for 72% of events).
+
+## Correction, 2 November 2026 (second)
+- The post-earnings reversal in earlier versions is an artifact of subtracting pre-event alpha over 59 days (decision D-079). Section 12 of the report, slides 11 and 12 of the deck, and the dashboard now say so.
+- 'Text adds nothing' overstated the test: L6 already contains word counts and TF-IDF, and the ladder rungs are not cumulative. The report now says what was tested, and reports a numbers-only comparison.

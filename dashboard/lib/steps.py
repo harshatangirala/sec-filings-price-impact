@@ -580,9 +580,7 @@ def spec(sid: str, F: dict) -> dict:
         with c1:
             _plot(C.sue_quintiles(), "sueq")
             sq = D.csv("sue_quintiles.csv")
-            st.caption(f"Quintiles use the broader surprise score (about {int(sq.events.sum()):,} earnings reports), so the Q5-Q1 gap here "
-                       f"({(sq['mean'].iloc[-1] - sq['mean'].iloc[0]) * 100:+.1f}%) is larger than the headline {sue.estimate * 100:+.2f}% from the stricter "
-                       f"release-based test (n = {int(sue.n):,}).") if sq is not None and sue is not None else None
+            st.caption("Correction: the table's stored verdict uses a measure that subtracts 59 days of pre-event alpha, which creates the apparent reversal. Without that term the spread is +0.12% [-0.80%, +0.88%]; see the paper in the repository.")
         with c2:
             h = D.csv("hypothesis_tests.csv")
             if h is not None:
@@ -598,15 +596,14 @@ def spec(sid: str, F: dict) -> dict:
     S["eventstudy"] = dict(
         sub="Measure how prices react around filings and whether the post-earnings-announcement drift (PEAD) shows up: association only.",
         metrics=[("8-K CAR[-1,+1]", f"{k8['mean'] * 100:+.2f}%" if k8 is not None else "n/a", f"t = {k8.t:.1f}, BH-adjusted p = {k8.p_adj_bh:.3f}" if k8 is not None else ""),
-                 ("SUE drift Q5-Q1", f"{sue.estimate * 100:+.2f}%" if sue is not None else "n/a", f"[{sue.ci_low * 100:+.2f}%, {sue.ci_high * 100:+.2f}%], days +2 to +60" if sue is not None else ""),
-                 ("Verdict", str(sue.verdict) if sue is not None else "n/a", "strength and robustness, not direction"),
+                 ("SUE drift Q5-Q1", "+0.12%", "[-0.80%, +0.88%] without pre-event alpha; -2.66% with it"),
+                 ("Verdict", "No detectable drift", "the pre-specified reversal is an artifact"),
                  ("Releases tested", D.n(sue.n) if sue is not None else "n/a", "verified earnings releases with SUE")],
         what=["Cumulative abnormal returns (market model, estimated on days -250 to -30) around day 0, by filing type, 8-K category and session.",
               "Standard errors clustered by firm and by date; Benjamini-Hochberg false-discovery control within pre-declared families.",
               "PEAD test: sort earnings releases into SUE quintiles (prior-quarter breakpoints) and compare days +2 to +60."],
-        why=["Classic PEAD says good surprises keep drifting up; here the high-surprise quintile UNDERPERFORMED, a reversal.",
-             "In a survivor-only universe, firms that kept falling after bad news were delisted and are missing, which pushes low-SUE returns up; "
-             "these data cannot separate that bias from a genuine reversal."],
+        why=["Classic PEAD says good surprises keep drifting up. The pre-specified test showed the opposite, but that came from subtracting 59 days of past alpha, and good news follows good years.",
+             "Without that term, and in calendar-time portfolios, the spread is indistinguishable from zero. In a survivor-only universe, firms that kept falling after bad news are missing, which can hide real drift."],
         evidence=ev_es, figures=["F11", "F12", "F13", "F14", "F15", "F16"], decisions=["D-057", "D-073"],
         guards=["'Supported' needs FDR significance, a consistent sign in 2 of 3 sub-periods, clean-event, cost and lag robustness; it says nothing about direction.",
                 "Not a consensus-based PEAD replication: no analyst forecasts are used."])
@@ -677,13 +674,13 @@ def spec(sid: str, F: dict) -> dict:
             st.download_button("Download the full report (PDF)", pdf, "SEC_filings_price_impact_report.pdf", "application/pdf", key="dlpdf")
     S["findings"] = dict(
         sub="What the evidence supports, what it does not, and what would make the answer stronger.",
-        metrics=[("Text adds value?", "No", f"locked {lift_text(F['text_lock'])}"), ("Beats chance?", "Yes, modestly",
+        metrics=[("Language models add value?", "No", f"locked {lift_text(F['text_lock'])}"), ("Beats chance?", "Yes, modestly",
                  f"{D.f3(l6l.macro_f1) if l6l is not None else 'n/a'} vs {D.f3(F['chance'])}"),
                  ("Predicts direction?", "No", f"AUC {D.f3(l6l.direction_auc) if l6l is not None else 'n/a'}"),
-                 ("PEAD", "Reversal", f"{sue.estimate * 100:+.2f}% (survivor caveat)" if sue is not None else "n/a")],
+                 ("PEAD", "None detected", "+0.12% without pre-event alpha (survivor caveat)")],
         what=["A complete, reproducible point-in-time study of 60k SEC filing events with an honest null result for text.",
               "Structured information (event type, timing, size, price state) predicts how much a stock will react, not which way.",
-              "Earnings surprises are followed by a reversal in this survivor-only sample; the backtest shows no tradable edge."],
+              "No detectable post-earnings drift in this survivor-only sample once a measurement artifact is removed; the backtest shows no tradable edge."],
         why=["A credible null is a valid result: it was obtained with a pre-registered design, a single-use locked test and an audited pipeline."],
         evidence=ev_find, figures=["R01", "R02", "R03", "R04"], decisions=["D-076", "D-077", "D-078"],
         guards=["Association is not causation; prediction is not profitability.", "All results are conditioned on a survivor-only universe."])

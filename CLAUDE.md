@@ -39,5 +39,5 @@ rebuild only S24 with `force=["S24"]`, it never re-runs a model). 110 tests; the
 (L7 - L6 = -0.001 [-0.012, +0.009] on the locked test); the models predict whether a stock moves, not which way. Not done: Track C (no gold
 labels), stress-fold scores, a deterministic LightGBM and a strict-model tie-break (listed in report section 11). The 500-firm results predate
 the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h) and that study is the planned major project. Owner decisions: no pilot gate (D-058),
-S&P / non-S&P / combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-078; audit in
-docs/audit_2026-10-23.md.
+S&P / non-S&P / combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-079; audit in
+docs/audit_2026-10-23.md. **2026-11-02 (D-079):** the SUE 'reversal' is an artifact of pre-event alpha over long CAR windows, and L6 already contains classical text; the working paper and its scripts are in `paper/`.

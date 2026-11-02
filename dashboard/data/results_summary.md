@@ -6,6 +6,10 @@ Generated 2026-10-26 10:43 UTC | config hash `1712ef1bc4060b43` | code `7dcf29bf
 
 **Reading rules:** association is not causation; prediction is not profitability. Results are validation-selected, never a global optimum. Power labels: n<30 warning, 30-99 exploratory, wide CI inconclusive.
 
+> **Correction, 2 November 2026 (decision D-079).** This report is the pipeline's stored output and is kept as generated. Two of its conclusions need correcting.
+> (1) The SUE drift "reversal" (-2.63%) comes from subtracting 59 days of pre-event alpha. Without that term the spread is +0.12% [-0.80%, +0.88%], and the calendar-time Carhart alpha is +0.25% (t = 0.46). The same term affects every CAR over days [+2,+60] here.
+> (2) L7 - L6 tests language-model embeddings over a baseline that already contains word counts and TF-IDF, so "text adds nothing" overstates what it shows, and rungs L1 to L5 are not cumulative. See `paper/` for the corrected analysis.
+
 ## Executive summary
 - 150 firms, 60,261 events (8K 45,193, periodic_10Q 11,271, periodic_10K 3,797), 2000-01-01 to 2026-07-31.
 - Best strict-leaderboard model on the walk-forward folds: L6/lightgbm mean macro-F1 0.391 (pooled 0.394, CI 0.388 to 0.401).

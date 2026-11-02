@@ -1,0 +1,17 @@
+var,sample,window,spearman,n
+main_lm_net_tone,All events,car_m1_1,0.021597062827979054,54383
+main_lm_net_tone,All events,car_2_60,-0.017115822241158846,53859
+main_lm_net_tone,Earnings releases,car_m1_1,0.04785550886299312,14285
+main_lm_net_tone,Earnings releases,car_2_60,-0.027953604768614155,14150
+novelty_share,All events,car_m1_1,-0.010057575934179002,59330
+novelty_share,All events,car_2_60,0.004007431713880928,58772
+novelty_share,Earnings releases,car_m1_1,0.010882297395777325,14289
+novelty_share,Earnings releases,car_2_60,0.015074968702405588,14154
+chg_cosine,All events,car_m1_1,-6.823455216614962e-05,59066
+chg_cosine,All events,car_2_60,0.0008777540206077245,58508
+chg_cosine,Earnings releases,car_m1_1,-0.0060271625978089265,14288
+chg_cosine,Earnings releases,car_2_60,-0.0079313623013123,14153
+sue_event,All events,car_m1_1,0.07361995222611747,18679
+sue_event,All events,car_2_60,-0.08086897685673695,18447
+sue_event,Earnings releases,car_m1_1,0.08787943237215111,9515
+sue_event,Earnings releases,car_2_60,-0.07423030928570078,9391
