@@ -96,11 +96,11 @@ def table(key, title, note, head, rows, cls="", align=None):
 # ---------------------------------------------------------------------------------------------- title page
 ABSTRACT = (f"I test whether the text of 10-K, 10-Q, and 8-K filings predicts the abnormal return available after an investor reads them. For {E['events']:,} events at 150 S&amp;P 500 firms, 2000-2026, with a single-use test period, language-model embeddings add nothing to price, metadata, accounting, and dictionary features (macro-F1 change {num(TXL.lift, 3)}; 95% interval {num(TXL.lo, 3)} to {num(TXL.hi, 3)}), and a model without text does about as well. Skill concerns the size of the move, not its direction. A pre-specified test also shows a large post-earnings reversal, which I trace to subtracting pre-event alpha; in calendar-time tests the spread is indistinguishable from zero.")
 a(f"""<div class='titlepage'><h1>{TITLE}</h1>
-<div class='author'>Krishna Harsha Tangirala</div><div class='date'>Working paper draft, November 2026</div>
+<div class='author'>Krishna Harsha Tangirala</div><div class='aff'>MBA student, David Eccles School of Business, University of Utah<br/>harshatangirala2@gmail.com</div><div class='date'>Working paper, November 2026</div>
 <div class='abstract'><b>Abstract</b><br/>{ABSTRACT}</div>
 <div class='kw'><b>JEL classification:</b> G12, G14, C52, C53, M41<br/><b>Keywords:</b> SEC filings, textual analysis, language models, look-ahead bias, out-of-sample prediction, post-earnings announcement drift, event-study methodology</div>
 <div class='thanks'>Code, configuration, decision log, and result tables are available at <a href='{GH}'>{GH}</a>. Raw prices and the Loughran-McDonald dictionary are not redistributed; Section IX explains how to rebuild them.
-<b>Disclosure of AI use:</b> an AI assistant (Claude, Anthropic) was used to write code, carry out analyses, and draft this text. The author reviewed the work and takes responsibility for its content. All errors are the author's.</div></div>""")
+<br/><b>Funding and computing:</b> no external funding. GPU computing used a personal Google Colab Pro+ subscription.<br/><b>Use of AI:</b> an AI assistant (Claude, Anthropic) wrote analysis code, ran the analyses, and drafted this text under the author's direction. The author is responsible for the content and for all errors. Comments are welcome.</div></div>""")
 
 # ---------------------------------------------------------------------------------------------- I
 h1("I. Introduction")
@@ -502,7 +502,7 @@ h2 { font-size: 12.5pt; text-align: center; font-weight: bold; margin: 20pt 0 8p
 h2.pb { page-break-before: always; }
 h3 { font-size: 11.5pt; font-style: italic; font-weight: bold; text-align: left; margin: 12pt 0 5pt 0; page-break-after: avoid; }
 .titlepage { page-break-after: always; }
-.author { text-align: center; font-size: 13pt; margin-bottom: 4pt; } .date { text-align: center; color: #333; margin-bottom: 24pt; }
+.author { text-align: center; font-size: 13pt; margin-bottom: 3pt; } .aff { text-align: center; font-size: 10.5pt; line-height: 1.35; margin-bottom: 7pt; } .date { text-align: center; color: #333; margin-bottom: 24pt; }
 .abstract { margin: 0 34pt 18pt 34pt; text-align: justify; } .kw { margin: 0 34pt 22pt 34pt; font-size: 10.5pt; } .thanks { border-top: 0.6pt solid #666; padding-top: 7pt; font-size: 9.5pt; line-height: 1.3; margin-top: 40pt; text-align: justify; }
 .eq { display: flex; justify-content: center; position: relative; margin: 8pt 0 10pt 0; } .eqb { font-size: 11.5pt; } .eqn { position: absolute; right: 0; }
 figure { margin: 10pt 0 13pt 0; text-align: center; page-break-inside: avoid; } figure img { max-width: 100%; }

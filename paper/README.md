@@ -29,3 +29,5 @@ python paper/render_pdf.py
 Nothing here changes the frozen models or the stored stage outputs. The locked test was scored once by the pipeline; anything in `analysis/` that touches that period is exploratory, and the paper says which.
 
 Raw prices and the Loughran-McDonald dictionary are not included. Filings come from EDGAR, and the pinned sources are listed in Table I of the paper.
+
+`references_check.md` records the comparison of every reference with Crossref and OpenAlex.
