@@ -1,0 +1,126 @@
+{
+ "bars": 1024405,
+ "bars_open_gt_high_or_lt_low": 0,
+ "bars_high_lt_low": 0,
+ "bars_nonpositive_price": 0,
+ "bars_zero_volume": 206,
+ "bars_open_equals_close_share": 0.012263704296640488,
+ "abs_daily_move_gt_40pct": 69,
+ "abs_daily_move_gt_25pct": 426,
+ "large_moves_by_source": {
+  "local:1min": 58,
+  "yfinance_frozen": 11
+ },
+ "stale_runs_ge5_days": 9,
+ "bars_by_source": {
+  "local:1min": 908255,
+  "yfinance_frozen": 92668,
+  "local:yahoo_ext": 23250,
+  "local:yahoo": 231,
+  "yfinance_live": 1
+ },
+ "firm_price_completeness_quantiles": {
+  "0.0": 0.837,
+  "0.05": 0.998,
+  "0.5": 0.998,
+  "0.95": 0.998,
+  "1.0": 0.999
+ },
+ "firms_with_completeness_lt_0.97": 7,
+ "events": 60261,
+ "duplicate_event_ids": 0,
+ "decision_on_weekend": 130,
+ "events_per_decision_date_top": {
+  "2023-07-27": 54,
+  "2016-07-28": 49,
+  "2022-11-03": 48,
+  "2021-04-29": 48,
+  "2017-04-27": 48
+ },
+ "share_events_on_top_20_dates": 0.01516735533761471,
+ "share_events_on_top_100_dates": 0.06130001161613647,
+ "n_distinct_decision_dates": 6615,
+ "top10_firms_share_of_events": 0.12035976834104976,
+ "ttrade_null_reasons": {
+  "ok": 59698,
+  "est_obs_lt_120": 518,
+  "missing_price": 31,
+  "censored_after_usable_cutoff": 14
+ },
+ "ar_abs_gt_20pct": 46,
+ "ar_abs_gt_50pct": 1,
+ "beta_quantiles": {
+  "0.01": 0.07,
+  "0.05": 0.36,
+  "0.5": 0.98,
+  "0.95": 1.88,
+  "0.99": 2.45
+ },
+ "beta_lt_0_share": 0.006331870414419244,
+ "sigma_quantiles": {
+  "0.01": 0.0067,
+  "0.5": 0.0149,
+  "0.99": 0.0587
+ },
+ "n_est_lt_250_share": 0.00249589600991658,
+ "uniqueness_weight_mean": 0.9502879811442894,
+ "effective_events_by_uniqueness": 57252.0,
+ "max_abs_univariate_rho_direction": 0.024649301909412728,
+ "max_abs_univariate_rho_magnitude": 0.3174785384575325,
+ "top_direction_features": [
+  [
+   "px_logdv_20",
+   -0.0246
+  ],
+  [
+   "meta_filing_lag_days",
+   0.023
+  ],
+  [
+   "meta_year",
+   -0.0216
+  ],
+  [
+   "px_amihud_20",
+   0.0196
+  ],
+  [
+   "acc_log_assets",
+   -0.0185
+  ]
+ ],
+ "top_magnitude_features": [
+  [
+   "px_idio_vol",
+   0.3175
+  ],
+  [
+   "px_vol_60",
+   0.3028
+  ],
+  [
+   "px_vol_20",
+   0.2807
+  ],
+  [
+   "px_dist_52w_high",
+   -0.2152
+  ],
+  [
+   "px_amihud_20",
+   0.159
+  ],
+  [
+   "px_beta",
+   0.1568
+  ],
+  [
+   "chg_log_len",
+   0.1519
+  ],
+  [
+   "acc_log_mcap",
+   -0.1464
+  ]
+ ]
+}

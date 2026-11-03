@@ -30,11 +30,11 @@ Power is the central limit on every conclusion.
 
 | Period | Events | Months | Detectable IC at t = 2 | at t = 3 | Notes |
 |---|---|---|---|---|---|
-| Locked | 8,199 | 43 | 0.022 (independent) to 0.032 (n_eff 3,834) | 0.033 to 0.048 | `evidence/power_ic.csv` |
-| Development | 7,453 | 36 | 0.023 to 0.035 | 0.035 to 0.052 | |
-| Walk-forward | 28,533 | 144 | 0.012 to 0.018 | 0.018 to 0.026 | |
+| Locked | 8,199 | 43 | measured: design effects 1.30 (month), 1.15 (firm), n_eff 6,320 to 7,136 | 0.036 to 0.038 | `evidence/design_effect_ic.csv` |
+| Development | 7,453 | 36 | n/a | 0.036 to 0.042 (n_eff 5,091 to 7,142) | measured |
+| Walk-forward | 28,533 | 144 | n/a | 0.019 to 0.020 (n_eff 22,126 to 26,079) | measured |
 
-The clustering assumptions in the table are illustrative, since the true effective sample depends on within-month correlation, which was not estimated. Macro-F1 intervals tell the same story: paired lifts on the locked test have half-widths of about 0.01.
+The effective samples in the table are measured by block bootstrap of the rank IC in the second pass (file 12); design effects are modest, so the first review's illustrative effective samples of 2,500 to 3,800 were too pessimistic. Macro-F1 intervals tell the same story: paired lifts on the locked test have half-widths of about 0.01.
 
 What a direction IC of 0.02 to 0.03 is worth: with 2,379 events a year (2019 to 2025 average), gross IR is roughly IC times the square root of breadth, which gives 0.98 at IC 0.02 and 1.46 at IC 0.03 (`review_facts.json`). This is a simplified fundamental-law calculation that ignores costs, correlation across events and non-independence, and is shown only to demonstrate that effects below our detection limit can be economically large.
 
@@ -104,7 +104,7 @@ Events cluster on earnings days and in earnings seasons, and firms report in blo
 
 | ID | Question | Design | Accept or kill |
 |---|---|---|---|
-| EXP-V1 | What is the true effective sample? | Estimate within-month and within-firm intraclass correlation of the loss; compute n_eff | Replace the illustrative n_eff column |
+| EXP-V1 | What is the true effective sample? | Estimate within-month and within-firm intraclass correlation of the loss; compute n_eff | Done in the second pass: see `evidence/design_effect_ic.csv` |
 | EXP-V2 | Do conclusions survive firm-and-month clustering? | Re-run the paper's paired lifts with a two-way bootstrap | If any interval changes sign or touches zero that did not before, restate |
 | EXP-V3 | How optimistic is validation? | Nested versus non-nested walk-forward macro-F1 and IC | Report the gap |
 | EXP-V4 | Does skill depend on the regime? | Score L6 by VIX tercile, earnings season versus off-season, and year | Report; if skill vanishes in any regime, state it |

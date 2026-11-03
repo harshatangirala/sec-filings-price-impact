@@ -47,6 +47,9 @@ Scores are the reviewer's judgement on a 1 to 5 scale: value if it works (V), pr
 | 1 to 2 | I-05: GitHub Actions, golden-set regression, deterministic mode and seed bagging | Green CI badge | Engineer |
 | 2 to 3 | I-06 and score stress folds: two-way bootstrap, firm- and sector-held-out scores | Updated paired lifts | Quant |
 | 2 to 3 | I-24: external registration of Phase 1 hypotheses; independent recomputation of headline tables | Registration link; recompute log | Second analyst |
+| 0 to 1 | Second-pass fixes N1 and N2: real-value accounting availability, drop `meta_year`, per-rung subsets (EXP-N1, EXP-N2) | Rebuilt L3, L6 and L7 comparisons | Quant |
+| 1 to 3 | N3 and N4: structural-break and rolling-window diagnosis of the direction IC; direct magnitude regression against the volatility baseline (EXP-N3, EXP-N4) | Decay diagnosis; magnitude benchmark | Quant |
+| 1 | N6: locate raw minute-bar files and audit coverage (EXP-N6) | Intraday data inventory | Engineer |
 
 **Gate 0 (end of week 3):** all headline numbers survive the recomputation, and conclusions are restated with firm-and-month intervals. If the direction rank IC lower bound is still below 0 and the minimum detectable IC exceeds 0.03, proceed to Phase 1 with the explicit aim of power.
 

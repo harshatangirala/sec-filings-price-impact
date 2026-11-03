@@ -81,7 +81,7 @@ Pre-registration file with a hash, hypotheses H1 to H8, gates G3, G3b, G4, a har
 3. **Predict** with the frozen models (L6 and L7 and the magnitude baseline).
 4. **Commit** each prediction to a ledger line: event id, accession, acceptance time, decision time, feature hash, model hash, outputs. Chain each line with the hash of the previous one and timestamp the chain head daily (git commit to a separate repository, or a public timestamping service).
 5. **Score** after outcomes realise: abnormal return over 1 and 5 sessions, rank IC, decile spread, calibration; monthly report; no changes to models during the test.
-6. **Pre-state the success threshold** (for example direction rank IC at or above 0.02 with a lower bound above 0 after 12 months, and a magnitude rank IC above the metadata baseline by 0.03).
+6. **Pre-state the success threshold** (for example direction rank IC at or above 0.02 with a lower bound above 0 after 12 months, and a magnitude rank IC above the volatility-times-event-type baseline by 0.03).
 7. **Cost.** Mostly engineering time; compute is small.
 
 ## 7. Additions, ranked

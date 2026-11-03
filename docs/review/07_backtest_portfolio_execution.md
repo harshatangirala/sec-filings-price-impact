@@ -63,8 +63,8 @@ Locked-test result (no delay, 10 bps): long book 1.3% a year, long minus matched
 
 | Route | Needs | What the evidence says | Risk | Verdict |
 |---|---|---|---|---|
-| **A. Stock long-short on direction** | Direction skill | Direction rank IC about 0 (W7) | No evidence of skill | Do not build until direction IC passes EXP-M1 |
-| **B. Options on magnitude** (long or short straddle against implied move) | Options prices and implied moves; model abs(AR) forecasts | Magnitude rank IC 0.20 to 0.28, but mostly metadata an options market already knows; L1 price-only is -0.02 | Implied vol already prices scheduled earnings. Edge, if any, is on unscheduled 8-Ks and relative mispricing | Test with EXP-P2 before any claim |
+| **A. Stock long-short on direction** | Direction skill | Direction rank IC +0.018 on 2008-2019 and about -0.008 since 2020 (file 12) | Skill decayed or was never robust | Do not build until the decay is diagnosed (EXP-N3) and EXP-M1 passes |
+| **B. Options on magnitude** (long or short straddle against implied move) | Options prices and implied moves; model abs(AR) forecasts | Magnitude rank IC 0.20 to 0.28, but a single trailing-volatility feature scores 0.16 to 0.26 (incremental skill about -0.01 to +0.06); the price-only classifier L1 scores about 0 only because it does not use volatility for magnitude | Implied vol already prices scheduled earnings. Edge, if any, is on unscheduled 8-Ks and relative mispricing | Test with EXP-P2 before any claim |
 | **C. Sizing overlay on an existing book** | A portfolio | Predicted magnitude lowers or raises event risk | Needs a portfolio | Cheap to test as risk-reduction around events |
 | **D. Execution and liquidity provision** | Intraday data | Predicted magnitude informs spread and inventory risk around events | Needs microstructure data | Potentially valuable for a market maker |
 | **E. Signal sale or research product** | Evidence of persistence | None yet | Reputational | Not before forward evidence |

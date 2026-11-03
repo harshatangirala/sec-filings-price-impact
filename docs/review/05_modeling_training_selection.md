@@ -32,7 +32,7 @@
 |---|---|---|
 | Macro-F1 is the target; the decision rule forces balanced classes | `metrics.py:68-78` | Rewards predicting classes in equal proportions, not predicting returns |
 | Direction rank IC is approximately zero | Locked-test rank IC of `p_up - p_down` with `ar_mm`: L6 -0.0077, L7 -0.0021; monthly IC t-values -1.3 to +0.7 across models and periods (`rank_ic.csv`) | The model has no ranking skill for direction |
-| Magnitude rank IC is large | `1 - p_side` versus abs(AR): 0.205 (development), 0.279 (locked) for L6 | Real, but mostly event metadata; L1 (price only) is -0.02 on the locked test |
+| Magnitude rank IC is large | `1 - p_side` versus abs(AR): 0.205 (development), 0.279 (locked) for L6 | Real, but a single trailing-volatility feature scores 0.16 to 0.26 and L1 (price only, which contains those features) scores about 0 because the classifier does not use them for magnitude (file 12) |
 | Up-class recall is 21.5% on the locked test | `locked_confusion.csv`: Up predicted Down 1,121 times and Up 543 times | The Up class is below its 30% base rate; the model is not finding Up |
 | Brier, log-loss and ECE improvements are slight | Locked log-loss 1.071 versus 1.096 prior | Probabilities carry little information beyond the prior |
 
@@ -114,7 +114,7 @@ No ranking objective, no quantile or heavy-tailed loss, no multi-task magnitude-
 
 | ID | Question | Design | Accept or kill |
 |---|---|---|---|
-| EXP-M1 | Is there any ranking skill in direction? | Compute rank IC and monthly ICIR on pooled walk-forward, development and locked predictions for all stored models | Already measured: about zero. Use as the baseline for every later model; require direction rank IC at or above 0.02 with a lower bound above 0 |
+| EXP-M1 | Is there any ranking skill in direction? | Compute rank IC and monthly ICIR on pooled walk-forward, development and locked predictions for all stored models | Already measured: +0.018 on 2008-2019 walk-forward and about zero since 2020 (file 12). Use as the baseline for every later model; require direction rank IC at or above 0.02 with a lower bound above 0 |
 | EXP-M2 | Is magnitude skill more than metadata? | Compare L6 with a baseline using event type, session bucket and trailing volatility only | Treat as alpha only if incremental rank IC is above 0.05 and its lower bound is above 0 |
 | EXP-M3 | Does seed bagging remove the noise? | 20 seeds on L6 and L7 under deterministic settings; compare class stability and macro-F1 spread | Adopt if class flips fall below 5% |
 | EXP-M4 | How much of validation is tuning optimism? | Nested versus current tuning | If nested scores are lower by more than 0.005, restate validation |

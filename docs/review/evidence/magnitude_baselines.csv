@@ -1,0 +1,19 @@
+period,score,rank_IC_vs_abs_AR,n
+development,model L1: 1 - P(Sideways),0.018219717939575504,7453
+development,model L6: 1 - P(Sideways),0.20500567823319804,7453
+development,model L6_nochange: 1 - P(Sideways),0.20580133888869187,7453
+development,model L7: 1 - P(Sideways),0.21389991487253263,7453
+development,single feature px_idio_vol,0.24325361410971355,7453
+development,single feature px_vol_60,0.26112341672235323,7453
+development,single feature px_vol_20,0.2575446638821215,7453
+development,baseline: group mean |AR| (train years) x px_idio_vol,0.2133151912033731,7453
+development,baseline: group mean |AR| (train years) only,0.03719925262991911,7453
+locked,model L1: 1 - P(Sideways),-0.020738715575737563,8199
+locked,model L6: 1 - P(Sideways),0.27914473600452483,8199
+locked,model L6_nochange: 1 - P(Sideways),0.27942060726068096,8199
+locked,model L7: 1 - P(Sideways),0.27978509153706715,8199
+locked,single feature px_idio_vol,0.2456254273673695,8199
+locked,single feature px_vol_60,0.18926715229865892,8199
+locked,single feature px_vol_20,0.15823645721028284,8199
+locked,baseline: group mean |AR| (train years) x px_idio_vol,0.22404537672984592,8199
+locked,baseline: group mean |AR| (train years) only,0.037365267263372484,8199

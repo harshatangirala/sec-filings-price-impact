@@ -1,0 +1,35 @@
+{
+ "accounting_columns_in_availability_rule": [
+  "acc_log_assets",
+  "acc_leverage",
+  "acc_roa",
+  "acc_log_revenue",
+  "acc_eps_q_latest",
+  "acc_log_mcap",
+  "acc_book_to_market",
+  "sue_event",
+  "sue_n_diffs",
+  "sue_last"
+ ],
+ "share_has_accounting_rule_2000_2008": 0.6489022864293027,
+ "share_with_actual_acc_values_2000_2008": 0.0,
+ "feature_meta_year_present": true,
+ "calendar_features": [
+  "meta_cat_bylaws_fiscal_year",
+  "meta_year",
+  "meta_month",
+  "meta_dow"
+ ],
+ "L6_direction_IC_2008-2012": [
+  0.0212,
+  11429
+ ],
+ "L6_direction_IC_2013-2019": [
+  0.016,
+  17104
+ ],
+ "L6_direction_IC_2020-2026": [
+  -0.0081,
+  15652
+ ]
+}

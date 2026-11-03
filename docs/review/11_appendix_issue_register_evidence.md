@@ -8,7 +8,7 @@ Severity: **H** changes conclusions, **M** costs accuracy or time, **L** hygiene
 |---|---|---|---|---|---|---|---|
 | I-001 | H | Inference | `track_a/event_study.py:56` | CAR subtracts `alpha x (b - a + 1)` with alpha from days -250 to -30; over 59 days this injects pre-event alpha | D-079: Q5 minus Q1 is -2.66% with it, +0.12% without; calendar-time alpha +0.25% (t = 0.46) | Alpha-free and calendar-time stage; regression test that fails on the old code | 04, 09 I-02 |
 | I-002 | H | Inference | `track_a/event_study.py:59-76` | Carhart CAR subtracts the intercept `coef[0]` per day | Same artifact in `car4_*` columns | Drop the intercept or estimate after the window | same |
-| I-003 | H | Power | Locked test, 8,199 events, 43 months | Minimum detectable IC at t = 3 about 0.033 to 0.048 | `evidence/power_ic.csv` | Widen universe; report MDE with every null | 06 |
+| I-003 | H | Power | Locked test, 8,199 events, 43 months | Minimum detectable IC at t = 3 about 0.036 to 0.042 (measured design effects) | `evidence/design_effect_ic.csv` | Widen universe; report MDE with every null | 06 |
 | I-004 | H | Target | `targets/build.py:147-149`, `events/timestamps.py:71-85` | Entry at the next open discards the first reaction; INTRA events enter the next day | Mean absolute T_trade / T_info = 0.67 (PRE), 0.72 (POST) | Intraday clock (I-15); non-event baseline (EXP-T1) | 04 |
 | I-005 | H | Data | `universe/build.py`, `meta.json` | Survivor-only universe, no delisting returns | 150 firms listed in 2026 | Survivor-free universe | 02 |
 | I-006 | H | Features | `parse/html.py`, `default.yaml:76`, `features/text.py:80` | Numeric lines deleted before text models | Config flag `drop_numeric_lines: true` | Typed numeric extraction | 03 |
@@ -42,6 +42,12 @@ Severity: **H** changes conclusions, **M** costs accuracy or time, **L** hygiene
 | I-034 | L | Engineering | `stages_model.py` and others | Large modules (1,000+ lines) | `wc -l` | Split | 08 |
 | I-035 | L | Dashboard | Streamlit Cloud | Blank page after wake-up when last tested | Test on 2026-11-01 | Health check, logs | 08 |
 | I-036 | L | Docs | `README.md`, reports | Earlier text described drift reversal as a finding | Corrected in D-079 | Keep correction log | 08 |
+| I-037 | H | Features | `models/ladder.py:72` | Accounting availability counts `sue_*` columns: 65% of 2000-2008 events pass the rule with 0% real accounting values | `evidence/accounting_rule_vs_content.csv` | Use real `acc_*` values; per-rung subsets | 12 |
+| I-038 | M | Features | feature set | `meta_year`, `meta_month`, `meta_dow` in a walk-forward model | `deep_checks2.json` | Drop `meta_year`; test others | 12 |
+| I-039 | H | Model | stored predictions | Direction rank IC +0.018 (2008-2019) then -0.008 (2020-2026); feature signs flip across eras | `evidence/direction_ic_by_year.csv` | EXP-N3 series | 12 |
+| I-040 | M | Model | `heads.py` | L1 magnitude IC about 0 despite volatility features at 0.2 to 0.3 | `evidence/magnitude_baselines.csv` | Fit magnitude directly | 12 |
+| I-041 | L | Data | price source tags | 908k bars tagged `local:1min`: possible intraday data to locate | `deep_checks.json` | EXP-N6 | 12 |
+| I-042 | L | Data | events 2000-2002 | No exact acceptance times for 2000-2001 and 36% of 2002 | `evidence/timestamp_quality_by_year.csv` | Sensitivity from 2003 | 12 |
 
 ## 2. Evidence table
 
@@ -72,7 +78,10 @@ All numbers computed from stored stage outputs. "Source" names the file.
 | Magnitude rank IC, development | L6 0.205; L7 0.214; L1 0.018 | same |
 | Earnings-subset direction IC, locked | L6 -0.031; L7 -0.036 | same |
 | Up-class recall, locked L6 | 543 / 2,520 = 21.5% | `locked_confusion.csv` |
-| Detectable IC at t = 3 | 0.033 (independent) to 0.048 (n_eff 3,834); 0.018 to 0.026 for walk-forward | `evidence/power_ic.csv` |
+| Direction rank IC by era (L6) | 2008-2012 +0.021 (n 11,429); 2013-2019 +0.016 (n 17,104); 2020-2026 -0.008 (n 15,652) | `deep_checks2.json` |
+| Magnitude rank IC: single volatility feature | 0.16 to 0.26 against absolute AR; L6 0.205 (dev), 0.279 (locked) | `evidence/magnitude_baselines.csv` |
+| Accounting values present by year | 2008 0%; 2009 22%; 2010 76%; 2011 98% | `evidence/accounting_rule_vs_content.csv` |
+| Detectable IC at t = 3 (measured) | 0.036 to 0.038 locked; 0.036 to 0.042 development; 0.019 to 0.020 walk-forward | `evidence/design_effect_ic.csv` |
 | Fundamental-law gross IR (breadth 2,379) | IC 0.01: 0.49; 0.02: 0.98; 0.03: 1.46; 0.05: 2.44 | `review_facts.json` |
 | LightGBM cross-machine agreement | 80.2% same class; macro-F1 0.3898 versus 0.3943 | `reproducibility.csv` |
 | Tuning gain across 32 combinations | median 0.000; mean +0.0034; 44% improved | `tuning.csv` |
@@ -101,7 +110,7 @@ Run: `RUN_ROOT=<finished run> python docs/review/evidence/review_facts.py`. The 
 
 1. **Stored outputs only.** I did not re-run the pipeline, so I cannot rule out problems that appear only in intermediate stages I did not read (for example the EPS release parser and the 8-K taxonomy).
 2. **The first-reaction share is an estimate.** It uses mean absolute abnormal returns and an independence assumption, and includes ordinary overnight variance. EXP-T1 gives the clean number.
-3. **Power calculations use illustrative effective sample sizes.** The true intraclass correlation was not estimated (EXP-V1).
+3. **Power calculations were updated in the second pass** with measured design effects (file 12); `power_ic.csv` holds the earlier illustrative values and is superseded.
 4. **The fundamental-law calculation is simplified.** It ignores costs, event correlation and non-independence of signals. It shows scale only.
 5. **Grades and probabilities are judgements,** not measurements.
 6. **Vendors, prices and licences were not checked.** Treat every data suggestion as a proposal to be priced.

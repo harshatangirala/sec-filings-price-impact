@@ -60,7 +60,7 @@ Machine readers act on 8-Ks within seconds. By the time a 35-minute decision clo
 | Claim | Beyond event-type and volatility, text and numbers predict move size, which matters for options, sizing and risk |
 | Data | Options (OptionMetrics or similar); implied move for scheduled events |
 | Test | Incremental IC over a baseline; trade or size against implied moves |
-| Risk | The IC may be mostly metadata; implied vol already prices scheduled events |
+| Risk | The IC is close to what trailing volatility alone gives (file 12); implied vol already prices scheduled events |
 | Chance | Low to moderate for scheduled events; moderate for unscheduled 8-Ks, where there is no implied move |
 
 ### F. Peer and network spillovers

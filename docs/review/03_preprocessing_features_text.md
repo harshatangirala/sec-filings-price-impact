@@ -34,6 +34,8 @@
 | `px_rev_1m` is exactly `px_ret_20` | `price.py:48` assigns one from the other; Spearman 1.000 | Drop it or define reversal on a different window |
 | 18 feature pairs with abs(rho) above 0.95 | `review_facts.json`: `meta_has_10K_7` with `meta_type_periodic_10K` (0.997), `lm_n_words` with `txt_doc_chars` (0.999), `boilerplate_share` with `chg_jaccard_sent` (0.979) | Prune by clustering on rank correlation; keep one per cluster |
 | 2 zero-variance columns | `meta_cat_abs`, `meta_cat_shell_status` | Drop |
+| `meta_year`, `meta_month`, `meta_dow` are model features | Feature set; `meta_year` has univariate rank correlation 0.047 with magnitude | Drop `meta_year` (file 12, N2) |
+| Accounting availability rule counts `sue_*` columns, so pre-2009 events pass with no accounting values | `ladder.py:72`; 65% pass in 2000-2008, 0% real values | Real-value rule and per-rung subsets (file 12, N1) |
 | Missing data by family | accounting 42.1%, change 17.5%, earnings-reaction 6.8%, others about 1% | Add missingness indicators for accounting (elastic net adds them, trees handle them) and fix coverage upstream |
 | Raw levels drift | Adversarial validation top drivers: `acc_log_assets`, `acc_roa`, `tfidf_svd1-5`, `px_ret_250` (AUC 0.9999 to 1.000) | Use cross-sectional ranks or z-scores within date, ratios to history, and drop pure levels |
 | No cross-sectional normalisation | `ladder.py:160-193` builds raw matrices | Per-date rank-gauss or z-score for price, accounting and tone features |
