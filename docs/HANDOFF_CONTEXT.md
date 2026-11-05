@@ -9,7 +9,7 @@ To start a new session: open the repository folder, tell the assistant to read t
 ## 1. Who and what
 
 - **Owner:** Krishna Harsha Tangirala, harshatangirala2@gmail.com. Master's student in **Applied Artificial Intelligence, University of Wollongong in Dubai**. GitHub: `harshatangirala`.
-- **Wrong affiliation to avoid:** an unrelated file, `C:\Users\harsh\Downloads\CLAUDE.md` (a "Pre-MBA Study Tracker"), says University of Utah / David Eccles MBA and Uber. That file describes a different project and is not about this study. An earlier version of the paper used it by mistake; the owner corrected it on 3 November 2026 and the paper, report and memory were fixed. If that file is still there, ignore it for this project (or fix or move it).
+- **Affiliation, one more time:** Master's in Applied Artificial Intelligence at the University of Wollongong in Dubai. An unrelated `CLAUDE.md` in the Downloads folder belongs to a different project and carries a different affiliation. An earlier version of the paper used it by mistake; the owner corrected this on 3 November 2026 and the paper, report and assistant memory were fixed. Never take biographical details from that file.
 - **Machine setup** (from the global `C:\Users\harsh\.claude\CLAUDE.md`): Antigravity (Gemini) and Claude Code share files at `G:\My Drive\antigravity_workspace\` and `C:\Users\harsh\.gemini\antigravity\scratch\`. GPU work runs on Google Colab Pro+ with Drive mounted at `/content/drive/MyDrive/`; the Colab study folder is `MyDrive/sec-price-study`.
 
 ## 2. The project in one page
@@ -63,9 +63,9 @@ Remote: `https://github.com/harshatangirala/sec-filings-price-impact` (public).
 
 ## 4. State of GitHub and git
 
-- On GitHub (public): code, tests, dashboard, report, deck, the paper PDF with corrected affiliation (commit 43240c0), replication data.
-- **Not pushed:** commits 8fe672c (quant review) and ad94a86 (second pass). `docs/review/`, and the files added after them (`13_SECOND_PASS_SUMMARY.md`, this file), are not on GitHub until the owner approves a push. Last known: 2 commits ahead of `origin/main`.
-- Pushing is outward-facing; do not push without being asked.
+- On GitHub (public), pushed on 5 November 2026 at the owner's request: code, tests, dashboard, report, deck, the paper PDF with corrected affiliation, replication data, the quant review (`docs/review/`, files 00 to 13 plus `evidence/`), this handoff file and `docs/original_specs/`.
+- Not on GitHub because of size or privacy: `.venv`, the pipeline run folders and raw inputs (see section 3), and the conversation transcript.
+- Check the current state with `git status` and `git log origin/main..HEAD` before assuming anything.
 
 ## 5. What was done, in order (this stretch of work)
 
@@ -102,7 +102,7 @@ Remote: `https://github.com/harshatangirala/sec-filings-price-impact` (public).
 | Direction IC about zero | +0.018 on 2008-2019, about -0.008 since 2020 |
 | Magnitude skill is event metadata | It is volatility persistence |
 | Power: MDE 0.033 to 0.048 | Measured 0.036 to 0.042 |
-| Affiliation: Utah MBA | University of Wollongong in Dubai, Master's in Applied AI |
+| A different institution on the paper's title page (taken from an unrelated file) | University of Wollongong in Dubai, Master's in Applied AI |
 
 ## 8. Open items
 
@@ -150,3 +150,34 @@ Quirks to know:
 ## 10. Prompt to paste into a new window
 
 > Read `docs/HANDOFF_CONTEXT.md`, `CLAUDE.md`, `README.md`, `docs/review/00_EXECUTIVE_SUMMARY.md` and `docs/review/12_SECOND_PASS_FINDINGS.md` in `C:\Users\harsh\Downloads\sec-filings-price-impact`. The locked test is spent. Do not push or upload anything without asking. Start with engineering item 1 in section 8 (accounting rule and `meta_year`), show me the plan first, and keep all new results labelled exploratory.
+
+## 11. Facts from the assistant's memory that are not stated elsewhere
+
+These came from the assistant's own memory notes, written during the earlier build (26 October to 3 November 2026). They are recorded here so a new window does not depend on that memory.
+
+**Run history.** All 25 stages ran: the CPU part locally, the GPU part on Colab (fast mode, A100-class GPU, exact model not recorded). The locked test was scored once on 2026-10-25T23:59:58Z. Report v2 (D-078) was built from the finished stages into a Desktop folder `SEC_Report_150_Stocks` (html, pdf, md, 48 figures). The report stage is rebuilt with `force=["S24"]` through `Downloads\sec_inputs_staging
+eport_run.py` on the merged root `Downloads\sec_report_mini` (CPU stages plus Colab stages). The Colab settings were reconstructed as `unlock_locked_test=True`, `acknowledge_reuse=True`. The raw Colab results copy is `Downloads\sec_results_mini`. The notebook that embeds the code also sits on the Desktop and in `colab_upload_mini\`; commit code before rebuilding the notebook.
+
+**Headline numbers from that run (locked 2023 to 2026, n = 8,199).** L6 macro-F1 0.384. Real chance is about 0.33 (shuffled own predictions), not the 0.19 majority baseline. Walk-forward L7 minus L6 = -0.001 [-0.007, 0.005]; development +0.007; locked -0.001 [-0.012, 0.009]. Gate G3 failed, so no fine-tuning. Magnitude (does it move) AUC 0.635; direction AUC 0.494 [0.475, 0.509]. Backtest shows no edge. H4 no difference; H3 and H6 untestable (no gold labels). Track C, L8 and G3b were not run (149 Qwen-pre-filled annotation templates exist).
+
+**Known issues listed in report section 11.**
+1. LightGBM re-scores differ across machines (about 80% identical classes), roughly plus or minus 0.004.
+2. The L6-versus-L7 freeze compared scores from two runs (S11 on the PC, S15 on Colab). Inside S15, L6 0.3909 beat L7 0.3898, so frozen L7 (retrospective, BGE) is a tie, not a win.
+3. Stress folds were built but not scored.
+4. S19 does not compute locked-test paired lifts (the report does).
+5. PBO = 0 is uninformative.
+6. Fast mode dropped sec_bert, finbert and catboost-on-embeddings (for time; not measured).
+7. Tuning budgets are below Optuna's 10 random start-up trials, so several rungs share identical parameters.
+8. The environment manifest is from the PC; the GPU model is unrecorded.
+9. Locked direction AUC is identical for L6 and L7 (0.493902) and has not been investigated.
+
+**500-firm study (the planned major project).** The CPU part exists, but accounting-dependent results are superseded by D-077 (re-run S09 to S24, about 4.5 hours). Before starting it: make LightGBM deterministic, compare finalists inside one run with a strict-model tie-break, score the stress folds, add locked lifts to S19, annotate the gold labels (templates are pre-filled), consider adding delisted firms, and fix `window_cars` (alpha term). The locked test of that study is unspent.
+
+**Machine and process notes.** Windows, 15 GB RAM. Use PowerShell. Launcher scripts need `if __name__ == "__main__"`. Inline Python quoting breaks in PowerShell, so use script files. Drive sync from the PC is unreliable; upload zips through the browser. `pymupdf` is in the venv only to render PDF pages for checks.
+
+**Dashboard.** `dashboard/` is a Streamlit 1.66 app with two windows: "Project Flow" (a clickable 16-step Plotly flowchart with per-step tabs) and "Slide Deck" (18 slides with notes, an overview grid and an HTML handout). The data snapshot is built by `dashboard/build_snapshot.py --root <merged root>/full` and holds numbers from artifacts only. Run it with `dashboard
+un_dashboard.bat` or `cd dashboard; streamlit run app.py` (the working directory must be `dashboard/` for `.streamlit/config.toml`). Tests are in `tests/dashboard`. Streamlit does not reliably hot-reload `lib/` modules, so restart the server after edits. The cloud app at https://sec-filings-study.streamlit.app/ returns 200 but the frame stayed blank after the redeploy; a fresh clone runs locally. Logs are only visible to the owner in Streamlit Cloud (Manage app, then logs or Reboot app, or recreate the app with Python 3.12).
+
+**Report references.** The written report ends with a References page of seven verified papers (He et al., JFE 185; Fink, JFQA 59(6); Karolyi, Management Science 71(3); Zhang, IRFA 94; Lan, IRFA 95; Magner, FRL 81; Fengler, IRFA 103). Scimago confirmed Q1 only for IRFA and FRL. A small language-model perplexity test (Qwen2.5-0.5B) gave the report a median of 121, against 95 for human abstracts and 19.5 for generic AI prose; it is a style probe, not a real detector.
+
+**Original specs** are now in `docs/original_specs/` (build specs, research spec, data dictionary, professor review). `SPEC.md` and `SPEC_ADDENDUM.md` in the repository root are the binding v5 versions.

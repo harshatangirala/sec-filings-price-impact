@@ -41,3 +41,5 @@ labels), stress-fold scores, a deterministic LightGBM and a strict-model tie-bre
 the accounting fix D-077 (S09-S24 need a re-run, ~4.5 h) and that study is the planned major project. Owner decisions: no pilot gate (D-058),
 S&P / non-S&P / combined reporting (D-056), survivor-only wording (D-057), speed switch (D-074). Decisions D-001..D-079; audit in
 docs/audit_2026-10-23.md. **2026-11-02 (D-079):** the SUE 'reversal' is an artifact of pre-event alpha over long CAR windows, and L6 already contains classical text; the working paper and its scripts are in `paper/`.
+
+**New session? Read first:** `docs/HANDOFF_CONTEXT.md` (everything outside the code: folder map, decisions, corrected claims, open items), then `docs/review/00_EXECUTIVE_SUMMARY.md` and `docs/review/12_SECOND_PASS_FINDINGS.md` (2026-11-05 quant review: the accounting availability rule in `models/ladder.py:72` is vacuous before 2009, `meta_year` is a feature, direction IC is +0.018 on 2008-2019 and about -0.008 since 2020, magnitude skill is volatility persistence). The locked test is spent. Do not push or upload without being asked.

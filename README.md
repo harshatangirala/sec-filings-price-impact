@@ -14,6 +14,8 @@ Three tracks: **A** event study (association), **B** prospective prediction (pri
 | **Slide deck** (13 slides, with speaker notes) | [`docs/write-up/SEC_Filings_Study_13_Slides.pptx`](docs/write-up/SEC_Filings_Study_13_Slides.pptx) |
 | Automated pipeline report (tables, 48 figures) | [`reports/`](reports/) |
 | Why each choice was made, every bug found | [`docs/decision_log.md`](docs/decision_log.md) |
+| **Quant review** (SWOT, per-stage critique, roadmap, issue register, measured second pass) | [`docs/review/`](docs/review/00_EXECUTIVE_SUMMARY.md) |
+| **Handoff** (everything outside the code, for a new session) | [`docs/HANDOFF_CONTEXT.md`](docs/HANDOFF_CONTEXT.md) |
 | Earnings-drift analysis scripts | [`analysis/`](analysis/) (set `RUN_ROOT` to a finished run folder) |
 | Models used (all on Hugging Face) | [ChronoBERT](https://huggingface.co/collections/manelalab/chronobert), [BGE-base](https://huggingface.co/BAAI/bge-base-en-v1.5), [BGE reranker](https://huggingface.co/BAAI/bge-reranker-base), [Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) |
 
