@@ -19,6 +19,7 @@ Reviewer stance: chief quant officer reviewing a research project for promotion 
 | `10_research_agenda_alpha_ideas.md` | Ideas that could turn this into a world-class programme, ranked |
 | `11_appendix_issue_register_evidence.md` | File-and-line issue register, evidence table, reproducibility notes |
 | `12_SECOND_PASS_FINDINGS.md` | Empirical second pass: three corrections to this review, six new weaknesses (accounting rule, calendar features, direction decay, magnitude baseline), confirmed strengths |
+| `13_SECOND_PASS_SUMMARY.md` | Plain-language summary of the second pass (what changed, new weaknesses, cheapest fixes, limits) |
 | `evidence/` | The script and CSVs behind the new numbers |
 
 ## Verdict in one paragraph
